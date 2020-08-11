@@ -1,0 +1,6 @@
+In alphabetic order, the authors of dNami are:
+----------------------------------------------
+
+ALFEREZ, Nicolas <nicolas.alferez@lecnam.net>
+TOUBER, Emile <emile.touber@oist.jp>
+WINN, Stephen <stephen.winn@oist.jp>
