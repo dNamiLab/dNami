@@ -1,0 +1,192 @@
+import distutils.sysconfig, os,sys
+
+
+
+# Setting libraryDirs and libraries ===========================================
+ld_libpath = os.getenv('LD_LIBRARY_PATH')
+
+# '/opt/intel/vtune_amplifier/lib64/'
+libraryDirs = ['./build']
+src_for     = ['./src_for']
+src_py      = ['./src_py']
+includeDirs = [src_for[0]+'/includes/','/opt/intel/vtune_amplifier/include/intel64/']
+libraries = []
+InstallLoc = './pymod'
+
+# Builder fortran
+#==============================================================================
+def which(pgm):
+    path=os.getenv('PATH')
+    for p in path.split(os.path.pathsep):
+        p=os.path.join(p,pgm)
+        if os.path.exists(p) and os.access(p,os.X_OK):
+            return p
+
+cc  = 'gcc'
+cxx = 'g++'
+AR  = 'ar'
+
+#-qopt-report-file=optimisation
+ifortPath = which('ifort')
+if ifortPath: 
+  f90compiler = 'ifort'
+  # f90Args   = '-O3 -fPIC -qopenmp -fno-alias -fno-fnalias -ip -qopt-zmm-usage:high -xSKYLAKE-AVX512 -unroll0 -g -fp-model source -qoverride-limits '
+  f90Args   = '-O3 -fPIC -qopenmp -fno-alias -fno-fnalias -ip -unroll0  -xSKYLAKE-AVX512  -g -fp-model precise -fp-model source  -fp-model consistent -qoverride-limits '
+  # f90Args   = '-O3 -fPIC -xCORE-AVX2 -g -fp-model strict -fp-model source -fp-model consistent -qoverride-limits '
+  
+  # f90Args   = '-O3 -fPIC -qopenmp -fno-alias -fno-fnalias -ip -finline -inline-forceinline -parallel -xHost  -g -fp-model strict -fp-model source  -prec-div -prec-sqrt -qoverride-limits '
+  # f90Args   = '-O3 -fPIC -qopenmp -fno-alias -fno-fnalias -ip -finline -inline-forceinline -parallel -xHost  -g -fp-model source  -prec-div -prec-sqrt -qoverride-limits '
+  
+  # f90Args   = '-O3 -fPIC -qopenmp -fno-alias -fno-fnalias -ip -unroll0  -xCORE-AVX2 -g -fp-model source -qoverride-limits '
+  # f90Args   = '-O3 -fPIC -g -fp-model precise -qoverride-limits '
+  f90Args   = f90Args + ' -qopt-report5 -qopt-report-phase=loop,vec,cg,openmp  -qopt-report-embed '
+  # f90Args   = '-O3 -fPIC -qopenmp -fno-alias -fno-fnalias -qopt-zmm-usage:high -xSKYLAKE-AVX512 -g -fp-model source -qoverride-limits '
+  # f90Args   = f90Args + ' -qopt-report5 -qopt-report-phase=loop,vec,cg,openmp  -qopt-report-embed '
+else:
+  f90compiler = 'gfortran'
+  # f90Args   = '-O3 -fPIC -g -fopenmp -ffree-line-length-512 -ftree-loop-vectorize -ftree-vectorize'
+  # f90Args   = '-O3 -fPIC -g -fopenmp -ffree-line-length-512 -mavx2 -mfma -mavx256-split-unaligned-load -mavx256-split-unaligned-store -ftree-loop-vectorize -ftree-vectorize'
+  f90Args   = '-O3 -fPIC -g -ffree-line-length-512 -ftree-loop-vectorize -ftree-vectorize -mavx2 -mfma '
+
+  # f90Args   = '-O3 -fPIC -g -fopenmp -ffree-line-length-512 -mavx5124fmaps -mfma -ftree-loop-vectorize -ftree-vectorize'
+
+# debug:
+# f90Args   = '-fbounds-check -fbacktrace -fcheck=all -O0 -Wall -fno-range-check -g -ggdb -ffpe-trap=invalid,zero -fPIC -fopenmp -ffree-line-length-512'
+# f90Args = '-O0 -fPIC -check all -check bounds -check uninit -ftrapuv -debug all -traceback -fpe-all=0 -fp-stack-check -ftrapuv -g'
+# F2PYFLAGS = '\'-Wall -g -fPIC -funroll-loops -O3 -fopenmp -ffree-line-length-512\''
+F2PYFLAGS  = '\'' + f90Args 
+
+#~~~~ preprocessing 
+prepFlags = ''
+# prep      = 'cpp -P -traditional %s -I'+includeDirs[0]%prepFlags+' $SOURCES $TARGETS'
+prep      = 'cpp -P -traditional -I'+includeDirs[0]+' -I'+includeDirs[0]+'gen/'+' -I'+includeDirs[1]+prepFlags+' $SOURCES $TARGETS'
+prepro    = Builder(action=prep, suffix='.f90', src_suffix='.for')
+
+
+#====================== Set Env + Compilers details =========================
+
+def getenv(name):
+     #if os.environ.has_key(name): return os.environ[name]
+     if name in os.environ: return os.environ[name]
+     else: return ''
+
+def getEnvForScons():
+    return {'PATH': getenv('PATH'),
+            'LD_LIBRARY_PATH': getenv('LD_LIBRARY_PATH'),
+            'LM_LICENSE_FILE': getenv('LM_LICENSE_FILE'),
+            'INTEL_LICENSE_FILE': getenv('INTEL_LICENSE_FILE')}
+
+env = Environment(tools=None, CC=cc, CXX=cxx, AR=AR, CCFLAGS=[], CXXFLAGS=[],
+                  BUILDERS={'CPPRFOR': prepro}, 
+                  BINDIR = "./pymod",
+                  FORTRAN=f90compiler,
+                  LIBPATH=libraryDirs,
+                  LIBS=libraries,
+                  ENV=getEnvForScons())
+
+if f90compiler == 'ifort':
+   env.Replace(FORTRANFLAGS= f90Args )
+else:
+   env.Replace(FORTRANFLAGS= f90Args)
+
+env.Replace(FORTRANSUFFIXES=['.f', '.F', '.f90', '.F90'])
+fortran_builder = Builder(action='$FORTRANCOM',
+                          suffix='.o', src_suffix='.f90')
+
+env.Append(BUILDERS={'Fortran' : fortran_builder},)
+
+
+#==================== Build Static Library RHS ==============================
+
+fortran_lib = []
+
+import glob
+
+srcdata =           glob.glob("./src_for/includes/gen/bcsrc*.for")
+srcdata = srcdata + glob.glob("./src_for/includes/gen/PhyBC*.for")
+# srcdata = []
+srcdata.append(src_for[0]+'/'+'rhs.for')
+
+print(srcdata)
+
+olib1   = []
+
+for src_lib1 in srcdata:
+  cpplib1  = env.CPPRFOR(target=src_lib1)
+  olib1.append(env.Fortran(target=cpplib1))
+
+lib1 = env.StaticLibrary('rhs', olib1)
+# lib1 = env.StaticLibrary('rhs', srcdata)
+l1   = env.Install(lib1)
+fortran_lib.append('rhs')
+if ifortPath:
+  fortran_lib.append('iomp5 ')
+else:
+  fortran_lib.append('gomp ')
+# fortran_lib.append('ittnotify')
+
+#==================== Build Python module  ====================================
+
+src         = src_for[0]+'/'+'dnamiF.for'
+cppsrc      = env.CPPRFOR(target=src)
+
+
+# Define a builder to run f2py 
+def generate_f2py(source, target, env,for_signature):
+    module = os.path.splitext(os.path.basename(str(source[0])))[0]
+    # if len(liblist) > 0:
+    #     for lib in liblist:
+    #         module = module + ' ' + str(lib)
+
+    ifortPath = which('ifort')
+    f2pycmd   = 'f2py3'
+
+    if ifortPath:
+      ifortPath = '\''+ifortPath+'\'' 
+      # f2pycmd = 'f2py3.6 -I'+includeDirs[1]+' --opt=\'-O3 -qopenmp -fno-alias -fno-fnalias -ip -qopt-zmm-usage:high -xSKYLAKE-AVX512 -unroll\'  --fcompiler=intelem  --f90exec='+ifortPath+' --f77exec='+ifortPath+' -c $SOURCE  ' + ' -m ' + module +' -L$LIBPATH '      
+      f2py3p6cmd = which('f2py3.6')
+      if f2py3p6cmd:
+        f2pycmd = f2py3p6cmd
+
+      f2pycmd = f2pycmd + ' --build-dir '+libraryDirs[0]+'/'+' -I'+includeDirs[1]+' --fcompiler=intelem --f90flags='+F2PYFLAGS+'\''+' --opt='+F2PYFLAGS+' -qopt-report-file=optimisation '+'\''+' --f90exec='+ifortPath+' --f77exec='+ifortPath+' -c $SOURCE' + ' -m ' + module +' -L$LIBPATH -L/opt/intel/vtune_amplifier/lib64/ '      
+      # f2pycmd = 'f2py3  --fcompiler=intelem '+' -c $SOURCE' + ' -m ' + module +' -L$LIBPATH '      
+      # print(f2pycmd)
+      # import sys
+      # sys.exit()
+
+    else:
+      f2pycmd = f2pycmd + ' --build-dir '+libraryDirs[0]+'/'+' -I'+includeDirs[1]+' --f90flags='+F2PYFLAGS+'\''+' --opt='+F2PYFLAGS+'\''+' -c $SOURCE' + ' -m ' + module +' -L$LIBPATH '
+
+    #-DF2PY_REPORT_ON_ARRAY_COPY=10  
+    for libfor in fortran_lib:
+         f2pycmd = f2pycmd+' -l'+libfor
+
+    
+    # print(f2pycmd)
+    # import sys
+    # sys.exit()     
+         
+    # installcmd = "cp " + os.path.splitext(str(source[0]))[0] + '*' + '.so' + ' ' + InstallLoc
+    installcmd = "mv " + './' + os.path.splitext(os.path.basename(str(source[0])))[0] + '*' + '.so' + ' ' + InstallLoc
+    return [f2pycmd, installcmd]
+
+
+f2py = Builder(generator = generate_f2py)
+env.Append(BUILDERS = {'f2py' : f2py},)
+
+
+dNami_mod = env.f2py(str(cppsrc[0]))
+
+Requires(dNami_mod,lib1)
+
+#==================== Build Full Fortran Version ==============================
+
+# src_prog    = [src_for[0]+'/'+'rk3.for']
+# cppsrc_prog = []
+# for f in src_prog :
+#   cpp_f = env.CPPRFOR(target=f)
+#   o_f   = env.Fortran(target=cpp_f)
+#   olib1.append(o_f)
+
+# bld_prog    = env.Program('dNami_fort', source=olib1)
+
