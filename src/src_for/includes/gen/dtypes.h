@@ -1,0 +1,1 @@
+integer,parameter :: wp = kind(0.0D0) ! working precision

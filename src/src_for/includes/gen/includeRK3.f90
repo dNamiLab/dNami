@@ -1,0 +1,8 @@
+q2(i,j,1) = q1(i,j,1)
+q1(i,j,1) = param_float(fadrTIMESTEP)*rk2(nrk)*rhs(i,j,1) + q1(i,j,1)
+q2(i,j,2) = q1(i,j,2)
+q1(i,j,2) = param_float(fadrTIMESTEP)*rk2(nrk)*rhs(i,j,2) + q1(i,j,2)
+q2(i,j,3) = q1(i,j,3)
+q1(i,j,3) = param_float(fadrTIMESTEP)*rk2(nrk)*rhs(i,j,3) + q1(i,j,3)
+q2(i,j,4) = q1(i,j,4)
+q1(i,j,4) = param_float(fadrTIMESTEP)*rk2(nrk)*rhs(i,j,4) + q1(i,j,4)
