@@ -1,0 +1,27 @@
+import os
+import glob
+
+tildefile = glob.glob("./*~")
+tildefile.append(glob.glob("./src_py/*~"))
+tildefile.append(glob.glob("./src_for/*~"))
+tildefile.append(glob.glob("./generate/*~"))
+
+lockfile = glob.glob("./*#")
+lockfile.append(glob.glob("./src_py/*#"))
+lockfile.append(glob.glob("./src_for/*#"))
+lockfile.append(glob.glob("./generate/*#"))
+
+
+dir_path = os.getcwd()
+additional_clean = ['./pymod','build',dir_path+'/src_for/includes/gen','generate/__pycache__','src_py/__pycache__'] + tildefile + lockfile 
+
+Clean('.',additional_clean)
+
+
+#==============================================================================
+
+
+SConscript('setup.scons', variant_dir='build/',duplicate=0)
+
+
+
