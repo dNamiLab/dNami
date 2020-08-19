@@ -35,11 +35,11 @@ with_grid   = [576,576]   # number of points in each direction
 
 # ... and time ...
 with_dt   = dn.cst(5.0e-4) # time step
-nitmax    = 5000
+nitmax    = 1000
 filtr_amp = dn.cst(0.1)    # filter amplitude
 
 # ... as fast as possible!
-with_proc = [2,1] # mpi proc. topology
+with_proc = [1,1] # mpi proc. topology
 
 # ===================================================================== PREPARE
 
@@ -283,4 +283,5 @@ for n in range(ni,nitmax+ni):
             cfl = dt*(np.abs(U[hlo:nx+hlo,hlo:ny+hlo])+c)/dx
             dn.dnami_io.globalMax(dtree,cfl,'cfl-x')
 
-
+t1  = timer()
+print('Total comp time:', t1-t0)
