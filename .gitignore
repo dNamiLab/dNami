@@ -1,1 +1,8 @@
+*.bin
 wrk/restarts
+src/.sconsign.dblite
+src/build
+src/pymod
+*/*/__pycache__
+src/src_for/rhs.for
+
