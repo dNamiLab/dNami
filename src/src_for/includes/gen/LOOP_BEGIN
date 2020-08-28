@@ -1,3 +1,0 @@
-     do j=idloop(3),idloop(4) 
- 
-      do i=idloop(1),idloop(2) 
