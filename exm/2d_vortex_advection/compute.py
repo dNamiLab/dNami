@@ -16,6 +16,24 @@ import os
 # dNami pre-processing tools?
 # dNami runtime tools?
 
+# =================================================================== Create WRK
+
+# -- restarts
+try:
+    os.mkdir('./restarts/')
+except FileExistsError:
+    pass
+# -- out
+try :
+    os.mkdir('./out/')
+except FileExistsError:
+    pass
+# -- out/liv
+try :
+    os.mkdir('./out/liv')
+except FileExistsError:
+    pass
+
 # ========================================================================= ASK
 
 iRestart = False  
