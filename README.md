@@ -1,14 +1,14 @@
 # dNami
 -----
 
-Overview
+## Overview
 --------
 dNami is an open-source multi-language (Python, Fortran, C) framework for solving systems of balance laws using explicit numerical schemes. 
 
-Authors
+## Authors
 -------
 See the AUTHORS file.
 
-License
+## License
 -------
 dNami is released under the New BSD License (see the LICENSE file for details).
