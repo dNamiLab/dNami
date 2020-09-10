@@ -1,4 +1,5 @@
 *.bin
+*.mod
 wrk/restarts
 src/.sconsign.dblite
 src/build
