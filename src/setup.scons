@@ -155,7 +155,7 @@ def generate_f2py(source, target, env,for_signature):
       # sys.exit()
 
     else:
-      f2pycmd = f2pycmd + ' only: init time_march stored filter :' + ' --build-dir '+libraryDirs[0]+'/'+' -I'+includeDirs[1]+' --f90flags='+F2PYFLAGS+'\''+' --opt='+F2PYFLAGS+'\''+' -c $SOURCE' + ' -m ' + module +' -L$LIBPATH '
+      f2pycmd = f2pycmd + ' --build-dir '+libraryDirs[0]+'/'+' -I'+includeDirs[1]+' --f90flags='+F2PYFLAGS+'\''+' --opt='+F2PYFLAGS+'\''+' -c $SOURCE' + ' -m ' + module +' -L$LIBPATH '
 
     #-DF2PY_REPORT_ON_ARRAY_COPY=10  
     for libfor in fortran_lib:
