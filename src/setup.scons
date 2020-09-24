@@ -152,7 +152,8 @@ Requires(dNami_mod,lib1)
 senv = env.Clone(FORTRANFLAGS=freeFormFlag+' -cpp '+f90Args,
                  FORTRANPATH=['#'+includeDirs[0], '#'+includeDirs[0]+'gen'],
                  LINK=f90compiler,
-                 LINKFLAGS=['-O3','-fPIC','-shared','-Wl,-soname,libtest.so'],
+                 #LINKFLAGS=['-O3','-fPIC','-shared','-Wl,-soname,libtest.so'],
+                 LINKFLAGS=['-O3','-fPIC','-shared'],
                  LIBS=['m','rhs'],
                  BUILD_ROOT=Dir('#').abspath)
 
