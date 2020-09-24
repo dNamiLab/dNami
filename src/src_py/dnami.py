@@ -11,8 +11,15 @@ import ctypes
 
 # LoadLibrary does not seem to search the PYPATH, for this reason
 # set the absolute path
+# get the path of the current file "dnami.py"
+dnamiFile = os.path.dirname(os.path.abspath(__file__))
+# goto the parent directory
+pdnamiFile = os.path.dirname(dnamiFile)
+# join the path with the filename
 libname    = "libtest.so"
-dllabspath = os.path.join(os.path.dirname(os.path.abspath(__file__)),libname)
+dllabspath = os.path.join(pdnamiFile,"pymod",libname)
+#print("Librarypath: ",dllabspath)
+# load the library
 dNami      = ctypes.cdll.LoadLibrary(dllabspath)
 
 # set the functions signature for the four dnami functions
