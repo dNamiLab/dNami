@@ -31,11 +31,12 @@ ifortPath = which('ifort')
 if ifortPath: 
   f90compiler = 'ifort'
   f90Args   = '-O3 -fPIC -qopenmp -fno-alias -fno-fnalias -ip -unroll0  -xSKYLAKE-AVX512  -g -fp-model precise -fp-model source  -fp-model consistent -qoverride-limits '
-  
   f90Args   = f90Args + ' -qopt-report5 -qopt-report-phase=loop,vec,cg,openmp  -qopt-report-embed '
+  freeFormFlag='-free'
 else:
   f90compiler = 'gfortran'
   f90Args   = '-O3 -fPIC -g -ffree-line-length-none -ftree-loop-vectorize -ftree-vectorize -mavx2 -mfma '
+  freeFormFlag='-ffree-form'
 
 F2PYFLAGS  = '\'' + f90Args 
 
@@ -120,6 +121,7 @@ def generate_f2py(source, target, env,for_signature):
 
     ifortPath = which('ifort')
     f2pycmd   = 'f2py3'
+    needed_interface = ' only: init time_march stored filter :'
 
     if ifortPath:
       ifortPath = '\''+ifortPath+'\'' 
@@ -127,10 +129,10 @@ def generate_f2py(source, target, env,for_signature):
       if f2py3p6cmd:
         f2pycmd = f2py3p6cmd
 
-      f2pycmd = f2pycmd  + ' --build-dir '+libraryDirs[0]+'/'+' -I'+includeDirs[1]+' --fcompiler=intelem --f90flags='+F2PYFLAGS+'\''+' --opt='+F2PYFLAGS+' -qopt-report-file=optimisation '+'\''+' --f90exec='+ifortPath+' --f77exec='+ifortPath+' -c $SOURCE' + ' -m ' + module +' -L$LIBPATH -L/opt/intel/vtune_amplifier/lib64/ '      
+      f2pycmd = f2pycmd  + needed_interface + ' --build-dir '+libraryDirs[0]+'/'+' -I'+includeDirs[1]+' --fcompiler=intelem --f90flags='+F2PYFLAGS+'\''+' --opt='+F2PYFLAGS+' -qopt-report-file=optimisation '+'\''+' --f90exec='+ifortPath+' --f77exec='+ifortPath+' -c $SOURCE' + ' -m ' + module +' -L$LIBPATH -L/opt/intel/vtune_amplifier/lib64/ '
 
     else:
-      f2pycmd = f2pycmd + ' only: init time_march stored filter :' + ' --build-dir '+libraryDirs[0]+'/'+' -I'+includeDirs[1]+' --f90flags='+F2PYFLAGS+'\''+' --opt='+F2PYFLAGS+'\''+' -c $SOURCE' + ' -m ' + module +' -L$LIBPATH '
+      f2pycmd = f2pycmd + needed_interface + ' --build-dir '+libraryDirs[0]+'/'+' -I'+includeDirs[1]+' --f90flags='+F2PYFLAGS+'\''+' --opt='+F2PYFLAGS+'\''+' -c $SOURCE' + ' -m ' + module +' -L$LIBPATH '
 
     for libfor in fortran_lib:
          f2pycmd = f2pycmd+' -l'+libfor
@@ -147,9 +149,9 @@ dNami_mod = env.f2py(str(cppsrc[0]))
 Requires(dNami_mod,lib1)
 
 # Clone the initial env. and compile/build dNami as a shared library
-senv = env.Clone(FORTRANFLAGS='-cpp  -O3 -fPIC -g -ffree-form -ftree-loop-vectorize -ftree-vectorize -mavx2 -mfma ',
+senv = env.Clone(FORTRANFLAGS=freeFormFlag+' -cpp '+f90Args,
                  FORTRANPATH=['#'+includeDirs[0], '#'+includeDirs[0]+'gen'],
-                 LINK='gfortran',
+                 LINK=f90compiler,
                  LINKFLAGS=['-O3','-fPIC','-shared','-Wl,-soname,libtest.so'],
                  LIBS=['m','rhs'],
                  BUILD_ROOT=Dir('#').abspath)
