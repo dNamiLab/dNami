@@ -30,7 +30,7 @@ AR  = 'ar'
 ifortPath = which('ifort')
 if ifortPath: 
   f90compiler = 'ifort'
-  f90Args   = '-O3 -fPIC -qopenmp -fno-alias -fno-fnalias -ip -unroll0  -xSKYLAKE-AVX512  -g -fp-model precise -fp-model source  -fp-model consistent -qoverride-limits '
+  f90Args   = '-O3 -fPIC -fno-alias -fno-fnalias -ip -unroll0  -xHost -g -fp-model precise -fp-model source  -fp-model consistent -qoverride-limits '
   f90Args   = f90Args + ' -qopt-report5 -qopt-report-phase=loop,vec,cg,openmp  -qopt-report-embed '
   freeFormFlag='-free'
 else:
