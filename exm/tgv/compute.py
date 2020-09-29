@@ -39,9 +39,9 @@ geom['Ly'] = dn.cst(2.0*m.pi)
 geom['Lz'] = dn.cst(2.0*m.pi)
 
 
-mpi['nxpr'] = 4
-mpi['nypr'] = 4
-mpi['nzpr'] = 4
+mpi['nxpr'] = 1
+mpi['nypr'] = 5
+mpi['nzpr'] = 8
 
 dtree = dn.start_mpi(dtree)
 
@@ -140,8 +140,8 @@ def sound_speed():
 dMpi.swap(q,hlo,dtree)
 
 if 'qstored' in dtree['eqns']['qvec']['views'].keys():
-	dn.dnamiF.stored(intparam,fltparam,data)	
-	#dn.stored(intparam,fltparam,data)	
+	#dn.dnamiF.stored(intparam,fltparam,data)	
+	dn.stored(intparam,fltparam,data)	
 	dMpi.swap(qstored,hlo,dtree)
 
 #=====================================================================================================================
