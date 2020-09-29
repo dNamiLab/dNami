@@ -39,9 +39,9 @@ geom['Ly'] = dn.cst(2.0*m.pi)
 geom['Lz'] = dn.cst(2.0*m.pi)
 
 
-mpi['nxpr'] = 2
-mpi['nypr'] = 2
-mpi['nzpr'] = 2
+mpi['nxpr'] = 4
+mpi['nypr'] = 4
+mpi['nzpr'] = 4
 
 dtree = dn.start_mpi(dtree)
 
