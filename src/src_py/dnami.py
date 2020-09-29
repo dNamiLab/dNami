@@ -1,11 +1,10 @@
 import numpy as np
-import dnamiF
+#import dnamiF
 import sys
 
 import dnami_io
 import os
 
-from dnami_mpi import type_mpi
 
 import ctypes
 
@@ -56,6 +55,7 @@ def stored(intparam, fltparam, data, type_st=0):
 def filter(dirp, intparam, fltparam, data):
   dNami.filter(ctypes.byref(ctypes.c_int32(dirp)), intparam, fltparam, data)
 
+from dnami_mpi import type_mpi
 # =============================================================================
 # TOOL BOX
 # =============================================================================
