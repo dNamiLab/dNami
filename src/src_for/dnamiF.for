@@ -1163,14 +1163,15 @@ idloop(1) = bi
 
  end subroutine periodic_z
 
-subroutine pack(buf,f,ibeg,iend,jbeg,jend,kbeg,kend,sizex,sizey,sizez,sizenv)
-
+subroutine pack(buf,f,ibeg,iend,jbeg,jend,kbeg,kend,sizex,sizey,sizez,sizenv) bind(c)
+  use iso_c_binding, only: c_double, c_int
 implicit none
 
 #include "dtypes.h"
 
-real(wp), intent(inout) :: buf(*),f(*)
-integer,intent(in)      :: ibeg,iend,jbeg,jend,kbeg,kend,sizex,sizey,sizez,sizenv
+real(c_double), intent(out):: buf(*)
+real(c_double), intent(in) :: f(*)
+integer(c_int),intent(in)      :: ibeg,iend,jbeg,jend,kbeg,kend,sizex,sizey,sizez,sizenv
 
 integer :: sx,sy,sz,i,j,k,n,indbuf,indf
 
@@ -1200,14 +1201,15 @@ enddo
 end subroutine pack  
 
 
-subroutine unpack(buf,f,ibeg,iend,jbeg,jend,kbeg,kend,sizex,sizey,sizez,sizenv)
-
+subroutine unpack(buf,f,ibeg,iend,jbeg,jend,kbeg,kend,sizex,sizey,sizez,sizenv)bind(c)
+  use iso_c_binding, only: c_double, c_int
 implicit none
 
 #include "dtypes.h"
 
-real(wp), intent(inout) :: buf(*),f(*)
-integer,intent(in)      :: ibeg,iend,jbeg,jend,kbeg,kend,sizex,sizey,sizez,sizenv
+real(c_double), intent(in) :: buf(*)
+real(c_double), intent(out) :: f(*)
+integer(c_int),intent(in)      :: ibeg,iend,jbeg,jend,kbeg,kend,sizex,sizey,sizez,sizenv
 
 integer :: sx,sy,sz,i,j,k,n,indbuf,indf
 
