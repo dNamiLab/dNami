@@ -1,8 +1,10 @@
-from dnami import np, sys, dnamiF
+from dnami import np, sys,os,ctypes
 from timeit import default_timer as timer
 #import os
 #import time
 # TODO: make swap compatible with varstored
+
+
 
 class type_mpi:
 	# mpi class
@@ -134,6 +136,65 @@ class type_mpi:
 					  'j1':True,'jmax':True,
 					  'k1':True,'kmax':True}
 
+		# import the shared library from the dnami.py file
+		# and set the interface for the pack and unpack functions
+		from dnami import dNami
+		self.dNami_mpi = dNami
+		self.dNami_mpi.pack.argtypes=[np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS'),
+					    np.ctypeslib.ndpointer(dtype=np.float64),
+		                    	    ctypes.POINTER(ctypes.c_int32),
+		                    	    ctypes.POINTER(ctypes.c_int32),
+		                    	    ctypes.POINTER(ctypes.c_int32),
+		                    	    ctypes.POINTER(ctypes.c_int32),
+		                    	    ctypes.POINTER(ctypes.c_int32),
+		                    	    ctypes.POINTER(ctypes.c_int32),
+		                    	    ctypes.POINTER(ctypes.c_int32),
+		                    	    ctypes.POINTER(ctypes.c_int32),
+		                    	    ctypes.POINTER(ctypes.c_int32),
+		                    	    ctypes.POINTER(ctypes.c_int32),
+		                    	    ]
+
+		self.dNami_mpi.unpack.argtypes=[np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS'),
+					    np.ctypeslib.ndpointer(dtype=np.float64),
+		                    	    ctypes.POINTER(ctypes.c_int32),
+		                    	    ctypes.POINTER(ctypes.c_int32),
+		                    	    ctypes.POINTER(ctypes.c_int32),
+		                    	    ctypes.POINTER(ctypes.c_int32),
+		                    	    ctypes.POINTER(ctypes.c_int32),
+		                    	    ctypes.POINTER(ctypes.c_int32),
+		                    	    ctypes.POINTER(ctypes.c_int32),
+		                    	    ctypes.POINTER(ctypes.c_int32),
+		                    	    ctypes.POINTER(ctypes.c_int32),
+		                    	    ctypes.POINTER(ctypes.c_int32),
+		                    	    ]
+
+	# these are wrapper functions to make the usage of the Fortran functions 
+	# easier, without these wrapper functions one would always have to use
+	# ctypes.byref(.....) because Fortran just accpets pass by reference
+	def pack(self,buf,f,nx,nh_nx,nh,nh_ny,nh1,nh_nz,nx_2_nh,ny_2_nh,nz_2_nh,nv):
+	    self.dNami_mpi.pack(buf,f,ctypes.byref(ctypes.c_int32(nx)),
+		                ctypes.byref(ctypes.c_int32(nh_nx)),
+		                ctypes.byref(ctypes.c_int32(nh)),
+		                ctypes.byref(ctypes.c_int32(nh_ny)),
+		                ctypes.byref(ctypes.c_int32(nh1)),
+		                ctypes.byref(ctypes.c_int32(nh_nz)),
+		                ctypes.byref(ctypes.c_int32(nx_2_nh)),
+		                ctypes.byref(ctypes.c_int32(ny_2_nh)),
+		                ctypes.byref(ctypes.c_int32(nz_2_nh)),
+		                ctypes.byref(ctypes.c_int32(nv)))
+
+	def unpack(self,buf,f,nx,nh_nx,nh,nh_ny,nh1,nh_nz,nx_2_nh,ny_2_nh,nz_2_nh,nv):
+	    self.dNami_mpi.unpack(buf,f,ctypes.byref(ctypes.c_int32(nx)),
+		                    ctypes.byref(ctypes.c_int32(nh_nx)),
+		                    ctypes.byref(ctypes.c_int32(nh)),
+		                    ctypes.byref(ctypes.c_int32(nh_ny)),
+		                    ctypes.byref(ctypes.c_int32(nh1)),
+		                    ctypes.byref(ctypes.c_int32(nh_nz)),
+		                    ctypes.byref(ctypes.c_int32(nx_2_nh)),
+		                    ctypes.byref(ctypes.c_int32(ny_2_nh)),
+		                    ctypes.byref(ctypes.c_int32(nz_2_nh)),
+		                    ctypes.byref(ctypes.c_int32(nv)))
+
 	def showTorus(self):
 		# visualise torus
 		if self.ioproc:
@@ -228,13 +289,14 @@ class type_mpi:
 			# print("f is ",f[:,:,:,0])
 			# sys.stdout.flush()
 			# sys.exit()
-			dnamiF.pack(buf,f,nx,nh+nx,nh,nh+ny,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
+			#dnamiF.pack(buf,f,nx,nh+nx,nh,nh+ny,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
+			self.pack(buf,f,nx,nh+nx,nh,nh+ny,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
 			# t1=timer()
 			if self.iMpi: self.comm_torus.Sendrecv_replace(buf,self.neighxp,sendtag=0,source=self.neighxm,recvtag=0,status=None)
 			# t2=timer()
 			# f[0:nh,nh:nh+ny,nh:nh+nz,0:nv] = buf.reshape((nh,ny,nz,nv)).copy()
 			if iSwap['i1']:			
-				dnamiF.unpack(buf,f,0,nh,nh,nh+ny,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
+				self.unpack(buf,f,0,nh,nh,nh+ny,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
 			# print("f is ",f[:,:,:,0])
 			# sys.stdout.flush()
 			# sys.exit()
@@ -243,13 +305,13 @@ class type_mpi:
 			buf = np.empty(nh*ny*nz*nv,dtype=wp)
 			# t4=timer()
 			# buf = f[nh:2*nh,nh:nh+ny,nh:nh+nz,0:nv].copy().reshape((nh*ny*nz*nv,1))
-			dnamiF.pack(buf,f,nh,2*nh,nh,nh+ny,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
+			self.pack(buf,f,nh,2*nh,nh,nh+ny,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
 			# t5=timer()
 			if self.iMpi: self.comm_torus.Sendrecv_replace(buf,self.neighxm,sendtag=0,source=self.neighxp,recvtag=0,status=None)
 			# t6=timer()
 			# f[nx+nh:nx+2*nh,nh:nh+ny,nh:nh+nz,0:nv] = buf.reshape((nh,ny,nz,nv)).copy()
 			if iSwap['imax']:			
-				dnamiF.unpack(buf,f,nx+nh,nx+2*nh,nh,nh+ny,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
+				self.unpack(buf,f,nx+nh,nx+2*nh,nh,nh+ny,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
 			# t7=timer()
 			# print("in mpi x",(t1-t0+t3-t2+t5-t4+t7-t6)/(128**3))
 		else:
@@ -369,13 +431,13 @@ class type_mpi:
 			# print("f is ",f[:,:,:,0])
 			# sys.stdout.flush()
 			# sys.exit()
-			dnamiF.pack(buf,f,nx,nh+nx,0,2*nh+ny,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
+			self.pack(buf,f,nx,nh+nx,0,2*nh+ny,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
 			# t1=timer()
 			if self.iMpi: self.comm_torus.Sendrecv_replace(buf,self.neighxp,sendtag=0,source=self.neighxm,recvtag=0,status=None)
 			# t2=timer()
 			if iSwap['i1']:			
 				# f[0:nh,0:2*nh+ny,nh:nh+nz,0:nv] = buf.reshape((nh,ny+2*nh,nz,nv)).copy()
-				dnamiF.unpack(buf,f,0,nh,0,2*nh+ny,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
+				self.unpack(buf,f,0,nh,0,2*nh+ny,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
 			# print("f is ",f[:,:,:,0])
 			# sys.stdout.flush()
 			# sys.exit()
@@ -384,13 +446,13 @@ class type_mpi:
 			buf = np.empty(nh*(ny+2*nh)*nz*nv,dtype=wp)
 			# t4=timer()
 			# buf = f[nh:2*nh,0:2*nh+ny,nh:nh+nz,0:nv].copy().reshape((nh*(ny+2*nh)*nz*nv,1))
-			dnamiF.pack(buf,f,nh,2*nh,0,2*nh+ny,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
+			self.pack(buf,f,nh,2*nh,0,2*nh+ny,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
 			# t5=timer()
 			if self.iMpi: self.comm_torus.Sendrecv_replace(buf,self.neighxm,sendtag=0,source=self.neighxp,recvtag=0,status=None)
 			# t6=timer()
 			if iSwap['imax']:			
 				# f[nx+nh:nx+2*nh,0:2*nh+ny,nh:nh+nz,0:nv] = buf.reshape((nh,ny+2*nh,nz,nv)).copy()
-				dnamiF.unpack(buf,f,nx+nh,nx+2*nh,0,2*nh+ny,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
+				self.unpack(buf,f,nx+nh,nx+2*nh,0,2*nh+ny,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
 			# t7=timer()
 			# print("in mpi x",(t1-t0+t3-t2+t5-t4+t7-t6)/(128**3))
 		else:
@@ -429,24 +491,24 @@ class type_mpi:
 			buf = np.empty(nh*(nx+2*nh)*nz*nv,dtype=wp)
 			# t0=timer()
 			# buf = f[0:2*nh+nx,ny:nh+ny,nh:nh+nz,0:nv].copy().reshape((nh*(nx+2*nh)*nz*nv,1))
-			dnamiF.pack(buf,f,0,2*nh+nx,ny,nh+ny,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
+			self.pack(buf,f,0,2*nh+nx,ny,nh+ny,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
 			# t1=timer()
 			if self.iMpi: self.comm_torus.Sendrecv_replace(buf,self.neighyp,sendtag=0,source=self.neighym,recvtag=0,status=None)
 			# t2=timer()				
 			if iSwap['j1']:
 				# f[0:2*nh+nx,0:nh,nh:nh+nz,0:nv] = buf.reshape((nx+2*nh,nh,nz,nv)).copy()
-				dnamiF.unpack(buf,f,0,2*nh+nx,0,nh,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
+				self.unpack(buf,f,0,2*nh+nx,0,nh,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
 			# t3=timer()			
 			# negative y-dir
 			buf = np.empty(nh*(nx+2*nh)*nz*nv,dtype=wp)
 			# t4=timer()
 			# buf = f[0:2*nh+nx,nh:2*nh,nh:nh+nz,0:nv].copy().reshape((nh*(nx+2*nh)*nz*nv,1))
-			dnamiF.pack(buf,f,0,2*nh+nx,nh,2*nh,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
+			self.pack(buf,f,0,2*nh+nx,nh,2*nh,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
 			# t5=timer()
 			if self.iMpi: self.comm_torus.Sendrecv_replace(buf,self.neighym,sendtag=0,source=self.neighyp,recvtag=0,status=None)
 			# t6=timer()
 			if iSwap['jmax']:			
-				dnamiF.unpack(buf,f,0,2*nh+nx,ny+nh,ny+2*nh,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
+				self.unpack(buf,f,0,2*nh+nx,ny+nh,ny+2*nh,nh,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
 				# f[0:2*nh+nx,ny+nh:ny+2*nh,nh:nh+nz,0:nv] = buf.reshape((nx+2*nh,nh,nz,nv)).copy()
 			# t7=timer()
 			# print("in mpi y",(t1-t0+t3-t2+t5-t4+t7-t6)/(128**3))
@@ -463,25 +525,25 @@ class type_mpi:
 		buf = np.empty(nh*(nx+2*nh)*(ny+2*nh)*nv,dtype=wp)
 		# t0=timer()
 		# buf = f[0:2*nh+nx,0:2*nh+ny,nz:nh+nz,0:nv].copy().reshape((nh*(nx+2*nh)*(ny+2*nh)*nv,1))
-		dnamiF.pack(buf,f,0,2*nh+nx,0,2*nh+ny,nz,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
+		self.pack(buf,f,0,2*nh+nx,0,2*nh+ny,nz,nh+nz,nx+2*nh,ny+2*nh,nz+2*nh,nv)
 		# t1=timer()
 		if self.iMpi: self.comm_torus.Sendrecv_replace(buf,self.neighzp,sendtag=0,source=self.neighzm,recvtag=0,status=None)
 		# t2=timer()
 		if iSwap['k1']:		
 			# f[0:2*nh+nx,0:2*nh+ny,0:nh,0:nv] = buf.reshape((nx+2*nh,ny+2*nh,nh,nv)).copy()
-			dnamiF.unpack(buf,f,0,2*nh+nx,0,2*nh+ny,0,nh,nx+2*nh,ny+2*nh,nz+2*nh,nv)
+			self.unpack(buf,f,0,2*nh+nx,0,2*nh+ny,0,nh,nx+2*nh,ny+2*nh,nz+2*nh,nv)
 		# t3=timer()
 		# negative z-dir
 		buf = np.empty(nh*(nx+2*nh)*(ny+2*nh)*nv,dtype=wp)
 		# t4=timer()
 		# buf = f[0:2*nh+nx,0:2*nh+ny,nh:2*nh,0:nv].copy().reshape((nh*(nx+2*nh)*(ny+2*nh)*nv,1))
-		dnamiF.pack(buf,f,0,2*nh+nx,0,2*nh+ny,nh,2*nh,nx+2*nh,ny+2*nh,nz+2*nh,nv)
+		self.pack(buf,f,0,2*nh+nx,0,2*nh+ny,nh,2*nh,nx+2*nh,ny+2*nh,nz+2*nh,nv)
 		# t5=timer()
 		if self.iMpi: self.comm_torus.Sendrecv_replace(buf,self.neighzm,sendtag=0,source=self.neighzp,recvtag=0,status=None)
 		# t6=timer()
 		if iSwap['kmax']:		
 			# f[0:2*nh+nx,0:2*nh+ny,nz+nh:nz+2*nh,0:nv] = buf.reshape((nx+2*nh,ny+2*nh,nh,nv)).copy()
-			dnamiF.unpack(buf,f,0,2*nh+nx,0,2*nh+ny,nz+nh,nz+2*nh,nx+2*nh,ny+2*nh,nz+2*nh,nv)
+			self.unpack(buf,f,0,2*nh+nx,0,2*nh+ny,nz+nh,nz+2*nh,nx+2*nh,ny+2*nh,nz+2*nh,nv)
 			# t7=timer()
 			# print("in mpi z",(t1-t0+t3-t2+t5-t4+t7-t6)/(128**3))
 '''
