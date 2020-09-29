@@ -116,37 +116,37 @@ cppsrc      = env.CPPRFOR(target=src)
 
 
 # Define a builder to run f2py 
-def generate_f2py(source, target, env,for_signature):
-    module = os.path.splitext(os.path.basename(str(source[0])))[0]
-
-    ifortPath = which('ifort')
-    f2pycmd   = 'f2py3'
-    needed_interface = ' only: init time_march stored filter :'
-
-    if ifortPath:
-      ifortPath = '\''+ifortPath+'\'' 
-      f2py3p6cmd = which('f2py3.6')
-      if f2py3p6cmd:
-        f2pycmd = f2py3p6cmd
-
-      f2pycmd = f2pycmd  + needed_interface + ' --build-dir '+libraryDirs[0]+'/'+' -I'+includeDirs[1]+' --fcompiler=intelem --f90flags='+F2PYFLAGS+'\''+' --opt='+F2PYFLAGS+' -qopt-report-file=optimisation '+'\''+' --f90exec='+ifortPath+' --f77exec='+ifortPath+' -c $SOURCE' + ' -m ' + module +' -L$LIBPATH -L/opt/intel/vtune_amplifier/lib64/ '
-
-    else:
-      f2pycmd = f2pycmd + needed_interface + ' --build-dir '+libraryDirs[0]+'/'+' -I'+includeDirs[1]+' --f90flags='+F2PYFLAGS+'\''+' --opt='+F2PYFLAGS+'\''+' -c $SOURCE' + ' -m ' + module +' -L$LIBPATH '
-
-    for libfor in fortran_lib:
-         f2pycmd = f2pycmd+' -l'+libfor
-
-    
-    # installcmd = "cp " + os.path.splitext(str(source[0]))[0] + '*' + '.so' + ' ' + InstallLoc
-    installcmd = "mv " + './' + os.path.splitext(os.path.basename(str(source[0])))[0] + '*' + '.so' + ' ' + InstallLoc
-    return [f2pycmd, installcmd]
-
-
-f2py = Builder(generator = generate_f2py)
-env.Append(BUILDERS = {'f2py' : f2py},)
-dNami_mod = env.f2py(str(cppsrc[0]))
-Requires(dNami_mod,lib1)
+#def generate_f2py(source, target, env,for_signature):
+#    module = os.path.splitext(os.path.basename(str(source[0])))[0]
+#
+#    ifortPath = which('ifort')
+#    f2pycmd   = 'f2py3'
+#    needed_interface = ' only: init time_march stored filter :'
+#
+#    if ifortPath:
+#      ifortPath = '\''+ifortPath+'\'' 
+#      f2py3p6cmd = which('f2py3.6')
+#      if f2py3p6cmd:
+#        f2pycmd = f2py3p6cmd
+#
+#      f2pycmd = f2pycmd  + needed_interface + ' --build-dir '+libraryDirs[0]+'/'+' -I'+includeDirs[1]+' --fcompiler=intelem --f90flags='+F2PYFLAGS+'\''+' --opt='+F2PYFLAGS+' -qopt-report-file=optimisation '+'\''+' --f90exec='+ifortPath+' --f77exec='+ifortPath+' -c $SOURCE' + ' -m ' + module +' -L$LIBPATH -L/opt/intel/vtune_amplifier/lib64/ '
+#
+#    else:
+#      f2pycmd = f2pycmd + needed_interface + ' --build-dir '+libraryDirs[0]+'/'+' -I'+includeDirs[1]+' --f90flags='+F2PYFLAGS+'\''+' --opt='+F2PYFLAGS+'\''+' -c $SOURCE' + ' -m ' + module +' -L$LIBPATH '
+#
+#    for libfor in fortran_lib:
+#         f2pycmd = f2pycmd+' -l'+libfor
+#
+#    
+#    # installcmd = "cp " + os.path.splitext(str(source[0]))[0] + '*' + '.so' + ' ' + InstallLoc
+#    installcmd = "mv " + './' + os.path.splitext(os.path.basename(str(source[0])))[0] + '*' + '.so' + ' ' + InstallLoc
+#    return [f2pycmd, installcmd]
+#
+#
+#f2py = Builder(generator = generate_f2py)
+#env.Append(BUILDERS = {'f2py' : f2py},)
+#dNami_mod = env.f2py(str(cppsrc[0]))
+#Requires(dNami_mod,lib1)
 
 # Clone the initial env. and compile/build dNami as a shared library
 senv = env.Clone(FORTRANFLAGS=freeFormFlag+' -cpp '+f90Args,
@@ -159,7 +159,7 @@ senv = env.Clone(FORTRANFLAGS=freeFormFlag+' -cpp '+f90Args,
 
 sl = senv.SharedLibrary('libtest',"./src_for/dnamiF.for")
 si = senv.Install(os.path.join('$BUILD_ROOT',InstallLoc),sl)
-Depends(si,dNami_mod)
+Depends(si,lib1)
 
 
 
