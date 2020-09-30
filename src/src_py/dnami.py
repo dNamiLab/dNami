@@ -1,11 +1,61 @@
 import numpy as np
-import dnamiF
+#import dnamiF
 import sys
 
 import dnami_io
+import os
+
+
+import ctypes
+
+# LoadLibrary does not seem to search the PYPATH, for this reason
+# set the absolute path
+# get the path of the current file "dnami.py"
+dnamiFile = os.path.dirname(os.path.abspath(__file__))
+# goto the parent directory
+pdnamiFile = os.path.dirname(dnamiFile)
+# join the path with the filename
+libname    = "libtest.so"
+dllabspath = os.path.join(pdnamiFile,"pymod",libname)
+#print("Librarypath: ",dllabspath)
+# load the library
+dNami      = ctypes.cdll.LoadLibrary(dllabspath)
+
+# set the functions signature for the four dnami functions
+dNami.init.argtypes=[np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags='C_CONTIGUOUS'),
+                     np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS'),
+                     np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS')]
+
+dNami.stored.argtypes=[np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags='C_CONTIGUOUS'),
+                       np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS'),
+                       np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS'),
+                       ctypes.POINTER(ctypes.c_int32)]
+
+dNami.time_march.argtypes=[np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags='C_CONTIGUOUS'),
+                           np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS'),
+                           np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS')]
+
+dNami.filter.argtypes=[ctypes.POINTER(ctypes.c_int32),
+                       np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags='C_CONTIGUOUS'),
+                       np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS'),
+                       np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS')]
+
+# Create wrapper functions in Python, these wrapper functions make
+# is easier for the user to call the Fortran functions, because
+# Fortran functions always pass by reference
+def init(intparam, fltparam, data):
+  dNami.init(intparam, fltparam, data)
+
+def time_march(intparam, fltparam, data):
+  dNami.time_march(intparam, fltparam, data)
+
+def stored(intparam, fltparam, data, type_st=0):
+  dNami.stored(intparam, fltparam, data, ctypes.byref(ctypes.c_int32(type_st)))
+
+def filter(dirp, intparam, fltparam, data):
+  dNami.filter(ctypes.byref(ctypes.c_int32(dirp)), intparam, fltparam, data)
 
 from dnami_mpi import type_mpi
-
 # =============================================================================
 # TOOL BOX
 # =============================================================================
@@ -459,7 +509,8 @@ def allocate(tree):
 	tree['libs']['fort']['data']     = data
 	tree['eqns']['qvec']['views']    = views
 
-	dnamiF.init(param_int,param_float,data)	
+	#dnamiF.dnami1.init(param_int,param_float,data)
+	dNami.init(param_int,param_float,data)
 	
 	return tree
 
