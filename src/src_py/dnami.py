@@ -15,7 +15,7 @@ dnamiFile = os.path.dirname(os.path.abspath(__file__))
 # goto the parent directory
 pdnamiFile = os.path.dirname(dnamiFile)
 # join the path with the filename
-libname    = "libtest.so"
+libname    = "libdnami.so"
 dllabspath = os.path.join(pdnamiFile,"pymod",libname)
 #print("Librarypath: ",dllabspath)
 # load the library
@@ -29,13 +29,14 @@ dNami.init.argtypes=[np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags='C_CONTI
 dNami.stored.argtypes=[np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags='C_CONTIGUOUS'),
                        np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS'),
                        np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS'),
-                       ctypes.POINTER(ctypes.c_int32)]
+                       ctypes.c_int]
+                       #ctypes.POINTER(ctypes.c_int32)]
 
 dNami.time_march.argtypes=[np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags='C_CONTIGUOUS'),
                            np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS'),
                            np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS')]
 
-dNami.filter.argtypes=[ctypes.POINTER(ctypes.c_int32),
+dNami.filter.argtypes=[(ctypes.c_int),
                        np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags='C_CONTIGUOUS'),
                        np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS'),
                        np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS')]
@@ -50,10 +51,10 @@ def time_march(intparam, fltparam, data):
   dNami.time_march(intparam, fltparam, data)
 
 def stored(intparam, fltparam, data, type_st=0):
-  dNami.stored(intparam, fltparam, data, ctypes.byref(ctypes.c_int32(type_st)))
+  dNami.stored(intparam, fltparam, data, type_st)
 
 def filter(dirp, intparam, fltparam, data):
-  dNami.filter(ctypes.byref(ctypes.c_int32(dirp)), intparam, fltparam, data)
+  dNami.filter(dirp, intparam, fltparam, data)
 
 from dnami_mpi import type_mpi
 # =============================================================================
