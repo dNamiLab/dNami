@@ -140,60 +140,41 @@ class type_mpi:
 		# and set the interface for the pack and unpack functions
 		from dnami import dNami
 		self.dNami_mpi = dNami
+		#ctypes.POINTER
 		self.dNami_mpi.pack.argtypes=[np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS'),
-					    np.ctypeslib.ndpointer(dtype=np.float64),
-		                    	    ctypes.POINTER(ctypes.c_int32),
-		                    	    ctypes.POINTER(ctypes.c_int32),
-		                    	    ctypes.POINTER(ctypes.c_int32),
-		                    	    ctypes.POINTER(ctypes.c_int32),
-		                    	    ctypes.POINTER(ctypes.c_int32),
-		                    	    ctypes.POINTER(ctypes.c_int32),
-		                    	    ctypes.POINTER(ctypes.c_int32),
-		                    	    ctypes.POINTER(ctypes.c_int32),
-		                    	    ctypes.POINTER(ctypes.c_int32),
-		                    	    ctypes.POINTER(ctypes.c_int32),
-		                    	    ]
+						np.ctypeslib.ndpointer(dtype=np.float64),
+						ctypes.c_int,
+						ctypes.c_int,
+						ctypes.c_int,
+						ctypes.c_int,
+						ctypes.c_int,
+						ctypes.c_int,
+						ctypes.c_int,
+						ctypes.c_int,
+						ctypes.c_int,
+						ctypes.c_int ]
 
 		self.dNami_mpi.unpack.argtypes=[np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS'),
-					    np.ctypeslib.ndpointer(dtype=np.float64),
-		                    	    ctypes.POINTER(ctypes.c_int32),
-		                    	    ctypes.POINTER(ctypes.c_int32),
-		                    	    ctypes.POINTER(ctypes.c_int32),
-		                    	    ctypes.POINTER(ctypes.c_int32),
-		                    	    ctypes.POINTER(ctypes.c_int32),
-		                    	    ctypes.POINTER(ctypes.c_int32),
-		                    	    ctypes.POINTER(ctypes.c_int32),
-		                    	    ctypes.POINTER(ctypes.c_int32),
-		                    	    ctypes.POINTER(ctypes.c_int32),
-		                    	    ctypes.POINTER(ctypes.c_int32),
-		                    	    ]
+						np.ctypeslib.ndpointer(dtype=np.float64),
+						ctypes.c_int,
+						ctypes.c_int,
+						ctypes.c_int,
+						ctypes.c_int,
+						ctypes.c_int,
+						ctypes.c_int,
+						ctypes.c_int,
+						ctypes.c_int,
+						ctypes.c_int,
+						ctypes.c_int ]
 
 	# these are wrapper functions to make the usage of the Fortran functions 
 	# easier, without these wrapper functions one would always have to use
 	# ctypes.byref(.....) because Fortran just accpets pass by reference
 	def pack(self,buf,f,nx,nh_nx,nh,nh_ny,nh1,nh_nz,nx_2_nh,ny_2_nh,nz_2_nh,nv):
-	    self.dNami_mpi.pack(buf,f,ctypes.byref(ctypes.c_int32(nx)),
-		                ctypes.byref(ctypes.c_int32(nh_nx)),
-		                ctypes.byref(ctypes.c_int32(nh)),
-		                ctypes.byref(ctypes.c_int32(nh_ny)),
-		                ctypes.byref(ctypes.c_int32(nh1)),
-		                ctypes.byref(ctypes.c_int32(nh_nz)),
-		                ctypes.byref(ctypes.c_int32(nx_2_nh)),
-		                ctypes.byref(ctypes.c_int32(ny_2_nh)),
-		                ctypes.byref(ctypes.c_int32(nz_2_nh)),
-		                ctypes.byref(ctypes.c_int32(nv)))
+	    self.dNami_mpi.pack(buf,f, nx, nh_nx, nh, nh_ny, nh1, nh_nz, nx_2_nh, ny_2_nh, nz_2_nh, nv)
 
 	def unpack(self,buf,f,nx,nh_nx,nh,nh_ny,nh1,nh_nz,nx_2_nh,ny_2_nh,nz_2_nh,nv):
-	    self.dNami_mpi.unpack(buf,f,ctypes.byref(ctypes.c_int32(nx)),
-		                    ctypes.byref(ctypes.c_int32(nh_nx)),
-		                    ctypes.byref(ctypes.c_int32(nh)),
-		                    ctypes.byref(ctypes.c_int32(nh_ny)),
-		                    ctypes.byref(ctypes.c_int32(nh1)),
-		                    ctypes.byref(ctypes.c_int32(nh_nz)),
-		                    ctypes.byref(ctypes.c_int32(nx_2_nh)),
-		                    ctypes.byref(ctypes.c_int32(ny_2_nh)),
-		                    ctypes.byref(ctypes.c_int32(nz_2_nh)),
-		                    ctypes.byref(ctypes.c_int32(nv)))
+	    self.dNami_mpi.unpack(buf,f, nx, nh_nx, nh, nh_ny, nh1, nh_nz, nx_2_nh, ny_2_nh, nz_2_nh, nv)
 
 	def showTorus(self):
 		# visualise torus
