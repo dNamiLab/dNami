@@ -154,9 +154,11 @@ cppsrc      = env.CPPRFOR(target=src)
 senv = env.Clone(FORTRANFLAGS=freeFormFlag+' -cpp '+f90Args,
                  FORTRANPATH=['#'+includeDirs[0], '#'+includeDirs[0]+'gen'],
                  #LINK=f90compiler,
+                 CC=ccompiler,
+                 CCFLAGS='-O3',
                  LINK=ccompiler,
                  #LINKFLAGS=['-O3','-fPIC','-shared','-Wl,-soname,libtest.so'],
-                 #LINKFLAGS=['-O3','-fPIC','-shared'],
+                 LINKFLAGS=['-O3'],
                  LIBS=['m','rhs'],
                  BUILD_ROOT=Dir('#').abspath)
 
