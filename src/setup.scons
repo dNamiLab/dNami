@@ -30,11 +30,13 @@ AR  = 'ar'
 ifortPath = which('ifort')
 if ifortPath: 
   f90compiler = 'ifort'
+  ccompiler   = 'icc'
   f90Args   = '-O3 -fPIC -fno-alias -fno-fnalias -ip -unroll0  -xHost -g -fp-model precise -fp-model source  -fp-model consistent -qoverride-limits '
   f90Args   = f90Args + ' -qopt-report5 -qopt-report-phase=loop,vec,cg,openmp  -qopt-report-embed '
   freeFormFlag='-free'
 else:
   f90compiler = 'gfortran'
+  ccompiler   = 'gcc'
   f90Args   = '-O3 -fPIC -g -ffree-line-length-none -ftree-loop-vectorize -ftree-vectorize -mavx2 -mfma '
   freeFormFlag='-ffree-form'
 
@@ -151,13 +153,14 @@ cppsrc      = env.CPPRFOR(target=src)
 # Clone the initial env. and compile/build dNami as a shared library
 senv = env.Clone(FORTRANFLAGS=freeFormFlag+' -cpp '+f90Args,
                  FORTRANPATH=['#'+includeDirs[0], '#'+includeDirs[0]+'gen'],
-                 LINK=f90compiler,
+                 #LINK=f90compiler,
+                 LINK=ccompiler,
                  #LINKFLAGS=['-O3','-fPIC','-shared','-Wl,-soname,libtest.so'],
-                 LINKFLAGS=['-O3','-fPIC','-shared'],
+                 #LINKFLAGS=['-O3','-fPIC','-shared'],
                  LIBS=['m','rhs'],
                  BUILD_ROOT=Dir('#').abspath)
 
-sl = senv.SharedLibrary('libtest',"./src_for/dnamiF.for")
+sl = senv.SharedLibrary(target='libdnami',source=["./src_for/dnami_clayer.c","./src_for/dnamiF.for"])
 si = senv.Install(os.path.join('$BUILD_ROOT',InstallLoc),sl)
 Depends(si,lib1)
 
