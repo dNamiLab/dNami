@@ -37,7 +37,7 @@ the following steps:
 
 4. Change to the `dNami/exm/2d_vortex_advection` directory and run the example with the
 following command:
-     * `mpirun -n 24 python3 compute.sh` 
+     * `mpirun -n 24 python3 compute.py` 
 
 
 ## Authors
