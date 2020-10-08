@@ -32,7 +32,7 @@ the following steps:
      * `./install_clean.sh`
      * If your environment is setup correctly it should compile and build the dNami library.
 
-3. Add the dnami library to your path, from inside the `src` directory execute the command:
+3. Add the dNami library to your path, from inside the `src` directory execute the command:
      * `source env_dNami.sh`
 
 4. Change to the `dNami/exm/2d_vortex_advection` directory and run the example with the
