@@ -9,7 +9,7 @@ dNami uses MPI, OpenMP and cache blocking to speed up the calculation.
 
 ### Required software packages for running dNami
 The following `Python` packages are needed:
-1. `pyhton3.x`
+1. `python3.x`
 2. `mpi4py`
 3. `matlibplot`
 4. `numpy`
