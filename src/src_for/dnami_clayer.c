@@ -3,7 +3,7 @@
 // Forward declaration, in order to avoid compiler warnings, all functions below until
 // init_fortran are implemented inside the file, src_for/dnamiF.for
 void time_march_fortran(const int *param_int, const double *param_float, double *data_float);
-void stored_fortran(const int *param_int, const double *param_float, double *data_float);
+void stored_fortran(const int *param_int, const double *param_float, double *data_float, int *type_st);
 void filter_fortran(int *dir, const int *param_int, const double *param_float, double *data_float);
 
 void pack_fortran(double *buf, const double *f, 
@@ -28,8 +28,8 @@ void time_march(const int *param_int, const double *param_float, double *data_fl
 	time_march_fortran(param_int,param_float,data_float);
 }
 
-void stored(const int *param_int, const double *param_float, double *data_float){
-	stored_fortran(param_int,param_float,data_float);
+void stored(const int *param_int, const double *param_float, double *data_float, int type_st){
+	stored_fortran(param_int,param_float,data_float, &type_st);
 }
 
 void filter(int dir, const int *param_int, const double *param_float, double *data_float){
