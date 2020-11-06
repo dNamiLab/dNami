@@ -242,6 +242,7 @@ def read_restart(tree):
         hlo  = tree['num']['hlo']
         ndim = tree['eqns']['ndim']
         q    = tree['eqns']['qvec']['views']['q']
+        bcs  = tree['bc']
 
         ioproc = dmpi.ioproc
         iMpi   = dmpi.iMpi

@@ -1,0 +1,12 @@
+############
+Installation
+############
+
+Linux
+*****
+
+MacOS
+*****
+
+Windows
+*******
