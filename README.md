@@ -23,8 +23,8 @@ the following steps:
 
 1. Change into the `dNami/exm/2d_vortex_advection` directory, copy the two files `genRhs.py` and `rhs.py` to the
 `src/generate` directory:
-     * `cp genRhs.py ../../src/generate`
-     * `cp rhs.py  ../../src/generate`
+     * `cp genRhs.py ../../src/generate/`
+     * `cp rhs.py  ../../src/generate/`
 
 2. Change into the `src` directory run the script: 
      * `./install_clean.sh`
