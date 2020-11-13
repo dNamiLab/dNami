@@ -885,7 +885,9 @@ def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fals
 				dummy  = open(incPATH+'selectfilterbc_'+d+'.f90' ,'a+')
 				dummy  = open(incPATH+'selectupdate_filterbc_'+d+'.f90' ,'a+')			
 				dummy  = open(incPATH+'update_filterbc_'+d+'.f90' ,'a+')
-				dummy  = open(incPATH+'filterbc_'+d+'.f90' ,'a+')									
+				dummy  = open(incPATH+'filterbc_'+d+'.f90' ,'a+')	
+				dummy  = open(incPATH+'Filter_'+d ,'a+')	
+				dummy  = open(incPATH+'updateFilter_'+d ,'a+')								
 
 			gendtype()
 			globvar()
