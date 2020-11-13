@@ -1,5 +1,5 @@
-Howto run dNami on the OIST Deigo cluster in interactive mode
-*************************************************************
+How-To run dNami on the OIST Deigo cluster in interactive mode
+**************************************************************
 This tutorial will explain how to run the 2D-Vortex-Advection example 
 on the OIST cluster Deigo. 
 
@@ -16,7 +16,7 @@ Pre-requisites
 ==============
 
 The following steps assume that you already have a Github account.
-If you don't have one please go to www.github.com and create a account.
+If you don't have one please go to www.github.com and create an account.
 
 .. highlight:: sh
 
@@ -142,14 +142,14 @@ Running the code on Deigo
    .. image:: img/deigo_partition.png
       :width: 50%
 
-#. Change into the dNami/exm/2d_vortex_advection directory, copy the two files genRhs.py and rhs.py to the src/generate directory
+#. Change into the **dNami/exm/2d_vortex_advection** directory, copy the two files genRhs.py and rhs.py to the src/generate directory
 
    .. code-block:: bash
 
       cp genRhs.py ../../src/generate
       cp rhs.py ../../src/generate
 
-#. Change into the src directory run the script
+#. Change into the **src** directory and run the script
 
    .. code-block:: bash
 
@@ -168,7 +168,7 @@ Running the code on Deigo
 
       export OMP_NUM_THREADS=1
 
-#. Change to the dNami/exm/2d_vortex_advection/ directory and run the example with the following command
+#. Change to the **dNami/exm/2d_vortex_advection/** directory and run the example with the following command
 
    .. code-block:: bash
 
@@ -176,7 +176,8 @@ Running the code on Deigo
 
 #. The output can be visualized by using the live_view.py script. 
 
-   You can login to Deigo with a second terminal window (keep the first terminal open to run the code). For running dNami you **must** be in **interactive mode**, for visualizing the output you don't need to be in interactive mode (running live_view from a login node is ok).
+   You can login to Deigo with a second terminal window (keep the first terminal open to run the code). 
+   For running dNami you **must** be in **interactive mode**, for visualizing the output you don't need to be in interactive mode (running live_view from a login node is ok).
    You can distinguish between the two modes by looking at your terminal prompt:
 
    .. code-block:: bash
@@ -184,7 +185,7 @@ Running the code on Deigo
       your_name@deigo-login1 ~]$   "login" indicates that you are on a login node
       your_name@deigo011706  ~]$   "deigo011706" indicates that you are in the interactive mode (instead of 011706 it could also be a different number)
 
-#. Copy the live_view.py file to the example directory (assuming you are inside the directory dNami/exm/2d_vortex_advection) 
+#. Copy the live_view.py file to the example directory (assuming you are inside the directory **dNami/exm/2d_vortex_advection**)
 
    .. code-block:: bash
 
@@ -196,7 +197,21 @@ Running the code on Deigo
    .. code-block:: bash
 
      python3 live_view.py
+   
+   If no new window opens on your MacOS screen, you may need to install XQuartz: https://www.xquartz.org/index.html
 
-#. If no new window opens on your MacOS screen, you may need to install XQuartz: https://www.xquartz.org/index.html
+
+#. You can exit the interactive mode by the following command
+
+   .. code-block:: bash
+
+      exit
+
+   After exiting the interactive mode you are back on the Deigo login node
+
+   .. code-block:: bash
+
+      your_name@deigo011706  ~]$ exit
+      your_name@deigo-login1 ~]$  
 
 
