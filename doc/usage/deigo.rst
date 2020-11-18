@@ -89,7 +89,7 @@ Running the code on Deigo
       :caption: 1 
       :name: Try-1
 
-      srun -t 0-1 -p short -c 20  --mem=16G --pty bash -l
+      srun -t 0-1 -p short --ntasks 20  --mem=16G --pty bash -l
     
    If your request was successful you should see that your terminal prompt changed as shown below.
    Instead of **deigo-login*** it will show something similar to **deigo011706**
@@ -115,7 +115,7 @@ Running the code on Deigo
       :caption: Try to change into the interactive mode on another partition
       :name: Try-2
 
-      srun -t 0-1 -p compute -c 20  --mem=16G --pty bash -l
+      srun -t 0-1 -p compute --ntasks 20  --mem=16G --pty bash -l
 
    Some additional background information on the options and the available partitions on Deigo.
    (You can skip this for the moment)
@@ -172,7 +172,7 @@ Running the code on Deigo
 
    .. code-block:: bash
 
-      mpirun --oversubscribe -n 24 python3 compute.py
+      mpirun -n 24 python3 compute.py
 
 #. The output can be visualized by using the live_view.py script. 
 
