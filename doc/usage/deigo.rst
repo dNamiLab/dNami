@@ -30,7 +30,7 @@ If you don't have one please go to www.github.com and create an account.
 #. Generate a SSH key 
 
    The next command may prompt some questions where to save the generated key, simply
-   press the Enter key so select the default values.
+   press the **Enter** key to select the default values.
 
    .. code-block:: bash
 
