@@ -949,9 +949,9 @@ def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fals
 
 		# vpl = Variables per line, meaning how many variables
 		# should be printed in one line
-		vpl = 3
+		vpl = 4
 		if(len(tmp_list) != 0):
-			localvar.write('\n\nreal(wp) :: ')
+			localvar.write('\n\n real(wp) :: ')
 			output_list = []
 			for i in range(int(len(tmp_list)/vpl)+1):
 				output_list.append(", ".join(tmp_list[i*vpl:(i+1)*vpl]))
