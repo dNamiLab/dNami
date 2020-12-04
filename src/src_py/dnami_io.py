@@ -58,13 +58,13 @@ def hello_world(tree):
 # RESTARTS
 # =============================================================================
 
-def write_restart(n,t,flag,tree):
+def write_restart(n,t,flag,tree,fpath='./restarts/'):
         # file name switch (for live views)
         ndim = tree['eqns']['ndim']     
         bcs   = tree['bc']
         fnameshell = {} 
         if flag == 0:
-                fname      = './restarts/restart_' + str(n).zfill(8)
+                fname      = fpath + 'restart_' + str(n).zfill(8)
                 if  len(bcs['allbc']) != 0:     
                         dirBC = ['i1','imax']
                         if ndim == 2:
@@ -72,7 +72,7 @@ def write_restart(n,t,flag,tree):
                         if ndim == 3:   
                                 dirBC = dirBC + ['j1','jmax','k1','kmax']
                         for dir in dirBC:
-                                fnameshell[dir] = './restarts/restartshell_'+dir+'_'+ str(n).zfill(8)
+                                fnameshell[dir] = fpath + 'restartshell_'+dir+'_'+ str(n).zfill(8)
                 
         else:
                 fname = './out/liv/restart.bin'
@@ -232,7 +232,7 @@ def write_restart(n,t,flag,tree):
 
                 
 
-def read_restart(tree):
+def read_restart(tree,fname='restart.bin'):
         # unpack useful tree data
         wp   = tree['misc']['working precision']
         dmpi = tree['mpi']['dMpi']
@@ -255,7 +255,6 @@ def read_restart(tree):
         nx  , ny  , nz   = dmpi.nx             , dmpi.ny             , dmpi.nz
 
         # read in restart
-        fname = 'restart.bin'
         headsize = 7
         if iMpi:
                 head = np.empty(headsize,dtype=wp)
