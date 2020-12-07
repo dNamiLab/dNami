@@ -35,5 +35,9 @@ jobs:
          cd $GITHUB_WORKSPACE/src
          source env_dNami.sh
          cd $GITHUB_WORKSPACE/tst/1d_entropywave
+         ref=$( cat reference.dat )
          ./run.sh recomp
+         res=$( cat $GITHUB_WORKSPACE/wrk/out.dat )
+         echo ref
+         echo res
           
