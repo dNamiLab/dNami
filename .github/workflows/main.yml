@@ -32,6 +32,8 @@ jobs:
          sudo apt-get install -y scons
          sudo apt-get install openmpi-bin
          python3 -m pip install numpy
+         which f2py
+         which f2py3
          cd $GITHUB_WORKSPACE/tst/1d_entropywave
          ./run.sh recomp
           
