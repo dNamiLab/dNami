@@ -29,10 +29,9 @@ jobs:
       - name: Run a multi-line script
         run: |
          echo Start the dNami test case!
+         sudo apt-get install -y scons
          sudo apt-get install openmpi-bin
-         which python
-         python3 -m pip install scons
-         python3 -m pip install scons
+         python3 -m pip install numpy
          cd $GITHUB_WORKSPACE/tst/1d_entropywave
          ./run.sh recomp
           
