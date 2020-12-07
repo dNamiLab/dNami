@@ -3,6 +3,28 @@
 dNami is an open-source multi-language (Python, Fortran, C) framework for solving systems of balance laws using explicit numerical schemes. 
 dNami uses MPI, OpenMP and cache blocking to speed up the calculation.
 
+## How-To generate the documentation
+The repository contains a documentation inside the **doc** directory.
+In order to generate the html documentation the following Python packages are needed:
+1. Sphinx
+2. sphinx-rtd-theme
+
+They can be installed using the following command:
+```bash
+pip3 install -U Sphinx
+pip3 install -U sphinx-rtd-theme
+```
+Build the documentation by changing into the doc directory and executing the following command:
+```bash
+make html
+```
+After building the documentation the *_build/html* directory should contain the index.html.
+
+### Extending the documentation
+
+If you want to add additional content to the documentation, add/edit *.rst* files in the *doc/usage*
+directory and also update *doc/index.rst* (if necessary). 
+
 ## Quickstart Guide
 
 ### Required software packages for running dNami
