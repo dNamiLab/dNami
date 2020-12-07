@@ -40,5 +40,5 @@ jobs:
          res=$( cat $GITHUB_WORKSPACE/wrk/out.dat )
          echo $ref
          echo $res
-         if: ${{ ref }} != ${{ res }} exit 1
+         diff $GITHUB_WORKSPACE/tst/1d_entropywave/reference.dat $GITHUB_WORKSPACE/wrk/out.dat; exit $?
           
