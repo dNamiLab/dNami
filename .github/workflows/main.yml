@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: 1D_entropy_testcase
+name: 1DEntropyTestcase
 
 # Controls when the action will run. 
 on:
