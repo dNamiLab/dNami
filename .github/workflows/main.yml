@@ -38,6 +38,6 @@ jobs:
          ref=$( cat reference.dat )
          ./run.sh recomp
          res=$( cat $GITHUB_WORKSPACE/wrk/out.dat )
-         echo ref
-         echo res
+         echo $ref
+         echo $res
           
