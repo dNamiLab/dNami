@@ -30,8 +30,9 @@ jobs:
         run: |
          echo Start the dNami test case!
          sudo apt-get install openmpi-bin
-         pip3 install scons
-         pip3 install numpy
+         which python
+         python -m pip install scons
+         python -m pip install scons
          cd $GITHUB_WORKSPACE/tst/1d_entropywave
          ./run.sh recomp
           
