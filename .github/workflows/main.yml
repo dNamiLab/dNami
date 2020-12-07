@@ -40,5 +40,4 @@ jobs:
          res=$( cat $GITHUB_WORKSPACE/wrk/out.dat )
          echo $ref
          echo $res
-         diff $GITHUB_WORKSPACE/tst/1d_entropywave/reference.dat $GITHUB_WORKSPACE/wrk/out.dat; exit $?
-          
+         diff <(echo "$ref") <(echo "$res"); exit $? 
