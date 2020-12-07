@@ -1,7 +1,6 @@
 ![example workflow name](https://github.com/oist/dNami/workflows/1D_entropy_testcase/badge.svg)
 
 # dNami
-
 dNami is an open-source multi-language (Python, Fortran, C) framework for solving systems of balance laws using explicit numerical schemes. 
 dNami uses MPI, OpenMP and cache blocking to speed up the calculation.
 
