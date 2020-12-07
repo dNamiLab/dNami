@@ -86,6 +86,7 @@ Running the code on Deigo
 
 
    .. code-block:: bash
+      :name: Try-1
   
       srun -t 0-1 -p short --ntasks 20  --mem=16G --pty bash -l
     
