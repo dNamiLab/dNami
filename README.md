@@ -14,6 +14,7 @@ They can be installed using the following command:
 pip3 install -U Sphinx
 pip3 install -U sphinx-rtd-theme
 ```
+
 Build the documentation by changing into the doc directory and executing the following command:
 ```bash
 make html
