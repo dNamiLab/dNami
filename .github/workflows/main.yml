@@ -29,6 +29,6 @@ jobs:
       - name: Run a multi-line script
         run: |
          echo Start the dNami test case!
-         cd $GITHUB_WORKSPACE/tst
+         cd $GITHUB_WORKSPACE/tst/1d_entropywave
          ./run.sh recomp
           
