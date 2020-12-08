@@ -1,5 +1,6 @@
 Quickstart Guide
 ****************
+
 Required software packages for running dNami
 The following Python packages are needed:
 
@@ -13,6 +14,7 @@ In addition the following software is needed:
 
 * MPI (OpenMPI or Intel-MPI recommended)
 * A Fortran compiler gfortran or the Intel compiler ifort
+
 
 Run the 2D-Vortex-Advection example
 ===================================

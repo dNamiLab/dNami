@@ -6,12 +6,8 @@ on the OIST cluster Deigo.
 * :ref:`req-label` 
 * :ref:`code-label`
 
-.. sectnum::
-
-
 .. _req-label:
 
-==============
 Pre-requisites
 ==============
 
@@ -55,7 +51,6 @@ If you don't have one please go to www.github.com and create an account.
 
 .. _code-label:
 
-=========================
 Running the code on Deigo
 =========================
 
@@ -84,7 +79,6 @@ Running the code on Deigo
    If the cluster is very busy it may take some time until your request will be executed.
    Try the following command first.
 
-
    .. code-block:: bash
       :caption: 1
       :name: Try-1
@@ -98,6 +92,9 @@ Running the code on Deigo
 
       your_name@deigo-login1 ~]$  "login" indicates that you are on a login node
       your_name@deigo011706  ~]$  "deigo011706" indicates that you are in the interactive mode (instead of 011706 it could also be a different number)
+
+   .. Caution:: Double check that you are on a compute node (interactive mode), running heavy workloads on login nodes is forbidden and
+      may have an impact on the usage of the Deigo system.
 
    It may happen that the command in :ref:`Try-1` takes some time to be evaluated.
    You may also see some output similar to the output below. 
@@ -120,19 +117,19 @@ Running the code on Deigo
    Some additional background information on the options and the available partitions on Deigo.
    (You can skip this for the moment)
 
-   +-----------+------------------------------------------------------+
-   | Option    | Explanation                                          |
-   +===========+======================================================+
-   | -t 0-1    | You want to use Deigo for **0** days and **1** hour  | 
-   +-----------+------------------------------------------------------+
-   | -p short  | You want to use the **short** partition              | 
-   +-----------+------------------------------------------------------+
-   | -C zen2   | You want to use the AMD CPUS                         | 
-   +-----------+------------------------------------------------------+
-   | -c 20     | Reserve 20 CPU cores                                 | 
-   +-----------+------------------------------------------------------+
-   | --mem=16G | Reserve 16 GB of RAM                                 | 
-   +-----------+------------------------------------------------------+
+   +------------+------------------------------------------------------+
+   | Option     | Explanation                                          |
+   +============+======================================================+
+   | -t 0-1     | You want to use Deigo for **0** days and **1** hour  |
+   +------------+------------------------------------------------------+
+   | -p short   | You want to use the **short** partition              |
+   +------------+------------------------------------------------------+
+   | -C zen2    | You want to use the AMD CPUS                         |
+   +------------+------------------------------------------------------+
+   | --ntasks 20| You want to use 20 MPI processes                     |
+   +------------+------------------------------------------------------+
+   | --mem=16G  | Reserve 16 GB of RAM                                 |
+   +------------+------------------------------------------------------+
 
    The following image shows the Deigo cluster partition layout, as a student you hava access
    to the **short** and **compute** partition.
