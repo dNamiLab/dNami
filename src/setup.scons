@@ -139,7 +139,7 @@ def generate_f2py(source, target, env,for_signature):
     #         module = module + ' ' + str(lib)
 
     ifortPath = which('ifort')
-    f2pycmd   = 'f2py3'
+    f2pycmd   = 'python3 -m numpy.f2py'
 
     if ifortPath:
       ifortPath = '\''+ifortPath+'\'' 

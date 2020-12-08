@@ -1,5 +1,6 @@
-# dNami
+![example workflow name](https://github.com/oist/dNami/workflows/1DEntropyTestcase/badge.svg)
 
+# dNami
 dNami is an open-source multi-language (Python, Fortran, C) framework for solving systems of balance laws using explicit numerical schemes. 
 dNami uses MPI, OpenMP and cache blocking to speed up the calculation.
 
@@ -14,11 +15,12 @@ They can be installed using the following command:
 pip3 install -U Sphinx
 pip3 install -U sphinx-rtd-theme
 ```
+
 Build the documentation by changing into the doc directory and executing the following command:
 ```bash
 make html
 ```
-After building the documentation the *_build/html* directory should contain the index.html.
+After building the documentation the *_build/html* directory should contain the index.html startpage.
 
 ### Extending the documentation
 
