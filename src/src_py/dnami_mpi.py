@@ -137,7 +137,7 @@ class type_mpi:
 	def showTorus(self):
 		# visualise torus
 		if self.ioproc:
-			print('\033[1;104m'+'proc id|   with coords  | ibeg jbeg kbeg |      x-,     y-,     z-  neighbours'+'\033[0m')
+			print('\033[1;104m'+'proc id|   with coords test  | ibeg jbeg kbeg |      x-,     y-,     z-  neighbours'+'\033[0m')
 			print('\033[1;104m'+'       |                | iend jend kend |      x+,     y+,     z+   (proc id)'+'\033[0m')		
 			print("\033[1;30;47m{0:7d}|({1:4d},{2:4d},{3:4d})| {4:4d} {5:4d} {6:4d} | {7:7d},{8:7d},{9:7d}\033[0m".format(self.procid,self.coords[0],self.coords[1],self.coords[2],self.ibeg,self.jbeg,self.kbeg,self.neighxm,self.neighym,self.neighzm))
 			print("\033[1;30;47m       |                | {0:4d} {1:4d} {2:4d} | {3:7d},{4:7d},{5:7d}\033[0m".format(self.iend,self.jend,self.kend,self.neighxp,self.neighyp,self.neighzp))
