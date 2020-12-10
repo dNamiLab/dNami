@@ -25,25 +25,26 @@ dNami      = ctypes.cdll.LoadLibrary(dllabspath)
 from rhsinfo import wp
 iwp = np.float64 # default precision
 if wp == 'float32': iwp = np.float32
-#
-dNami.init.argtypes=[np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags='C_CONTIGUOUS'),
-                     np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags='C_CONTIGUOUS'),
-                     np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags='C_CONTIGUOUS')]
 
-dNami.stored.argtypes=[np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags='C_CONTIGUOUS'),
-                       np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags='C_CONTIGUOUS'),
-                       np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags='C_CONTIGUOUS'),
+mem_order='F'
+dNami.init.argtypes=[np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags=mem_order),
+                     np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags=mem_order),
+                     np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags=mem_order)]
+
+dNami.stored.argtypes=[np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags=mem_order),
+                       np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags=mem_order),
+                       np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags=mem_order),
                        ctypes.c_int]
                        #ctypes.POINTER(ctypes.c_int32)]
 
-dNami.time_march.argtypes=[np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags='C_CONTIGUOUS'),
-                           np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags='C_CONTIGUOUS'),
-                           np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags='C_CONTIGUOUS')]
+dNami.time_march.argtypes=[np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags=mem_order),
+                           np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags=mem_order),
+                           np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags=mem_order)]
 
 dNami.filter.argtypes=[(ctypes.c_int),
-                       np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags='C_CONTIGUOUS'),
-                       np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags='C_CONTIGUOUS'),
-                       np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags='C_CONTIGUOUS')]
+                       np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags=mem_order),
+                       np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags=mem_order),
+                       np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags=mem_order)]
 
 # Create wrapper functions in Python, these wrapper functions make
 # is easier for the user to call the Fortran functions, because
