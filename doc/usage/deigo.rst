@@ -4,7 +4,8 @@ This tutorial will explain how to run the 2D-Vortex-Advection example
 on the OIST cluster Deigo. 
 
 * :ref:`req-label` 
-* :ref:`code-label`
+* :ref:`interactive-label`
+* :ref:`batch-label`
 
 .. _req-label:
 
@@ -49,10 +50,10 @@ If you don't have one please go to www.github.com and create an account.
    .. image:: img/g2.jpg
       :width: 100%
 
-.. _code-label:
+.. _interactive-label:
 
-Running the code on Deigo
-=========================
+Running dNami from in interactive mode
+======================================
 
 #. Clone dNami from the github repository
 
@@ -212,3 +213,80 @@ Running the code on Deigo
       your_name@deigo-login1 ~]$  
 
 
+
+.. _batch-label:
+
+Running dNami from a batch script
+=================================
+
+dNami can also be executed using a job submission script.
+The script :ref:`batch-1`  can be used as a template, it assumes that **gFortran** and
+**OpenMPI** are used to compile the program. 
+Copy the code from below and save it in the same directory as your compute.py, use the
+filename **deigo_script.sh**
+
+   .. code-block:: bash
+      :caption: Job script template
+      :name: batch-1
+
+      #!/bin/bash
+      #SBATCH --job-name=YourJobName
+      #SBATCH --partition=short
+      #SBATCH -C zen2
+      #SBATCH --time=01:20:00
+      #SBATCH --mem=500G
+      #SBATCH --ntasks=1024
+      #SBATCH --cpus-per-task=1
+      
+      #SBATCH --threads-per-core=1
+      #SBATCH --sockets-per-node=2
+      #SBATCH --cores-per-socket=64
+      #SBATCH --ntasks-per-node=128
+      #SBATCH --ntasks-per-socket=64
+      #SBATCH --ntasks-per-core=1
+      #SBATCH --exclusive
+      
+      module purge
+      module load python/3.7.3
+      
+      cd ../../src/
+      source env_dNami.sh
+      cd $SLURM_SUBMIT_DIR
+      
+      export OMP_NUM_THREADS=1
+      
+      srun --mpi=pmix python3.7 compute.py > output.log 2>&1
+
+You can adjust the following options to match your settings in the compute.py. 
+
+   +-----------+--------------------------------------------------------+
+   | Option    | Explanation                                            |
+   +===========+========================================================+
+   | --job-name| Set a job name, if you run multiple jobs you can       |
+   |           | distinguish between different jobs.                    |
+   +-----------+--------------------------------------------------------+
+   | --time    | You can set a rough (or precise) estimate how long your|
+   |           | job may take to run. The more precise you are the      |
+   |           | higher the propability that your job starts earlier.   |
+   +-----------+--------------------------------------------------------+
+   | --mem     | Set the amount of memory you want to use, this setting |
+   |           | is per node. 500G is the maximum.                      |
+   +-----------+--------------------------------------------------------+
+   | --ntasks  | Set the number of MPI processes, this setting must     |
+   |           | match the product of your *with_proc* setting inside   |
+   |           | your compute.py.                                       |
+   +-----------+--------------------------------------------------------+
+
+Submit the job script from the same directory where you placed yout compute.py.
+
+   .. code-block:: bash
+
+     sbatch deigo_script.sh
+
+You can check the status of your jobs by using the following command:
+
+   .. code-block:: bash
+
+     squeue
+
+The job will write all the output to the file **output.log**. 
