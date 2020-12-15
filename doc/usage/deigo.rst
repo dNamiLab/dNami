@@ -1,7 +1,10 @@
-How-To run dNami on the OIST Deigo cluster in interactive mode
-**************************************************************
+How-To run dNami on the OIST Deigo cluster
+******************************************
 This tutorial will explain how to run the 2D-Vortex-Advection example 
-on the OIST cluster Deigo. 
+on the OIST cluster Deigo. You can run dNami in interactive mode or
+by submitting a job script.
+If you already have the dNami code and know how to login into Deigo
+you can skip the :ref:`req-label` section.
 
 * :ref:`req-label` 
 * :ref:`interactive-label`
@@ -52,8 +55,8 @@ If you don't have one please go to www.github.com and create an account.
 
 .. _interactive-label:
 
-Running dNami from in interactive mode
-======================================
+Running dNami in interactive mode
+=================================
 
 #. Clone dNami from the github repository
 
@@ -289,4 +292,4 @@ You can check the status of your jobs by using the following command:
 
      squeue
 
-The job will write all the output to the file **output.log**. 
+The job will write all the output to the file **output.log**.
