@@ -885,9 +885,7 @@ def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fals
 				dummy  = open(incPATH+'selectfilterbc_'+d+'.f90' ,'a+')
 				dummy  = open(incPATH+'selectupdate_filterbc_'+d+'.f90' ,'a+')			
 				dummy  = open(incPATH+'update_filterbc_'+d+'.f90' ,'a+')
-				dummy  = open(incPATH+'filterbc_'+d+'.f90' ,'a+')	
-				dummy  = open(incPATH+'Filter_'+d ,'a+')	
-				dummy  = open(incPATH+'updateFilter_'+d ,'a+')								
+				dummy  = open(incPATH+'filterbc_'+d+'.f90' ,'a+')									
 
 			gendtype()
 			globvar()
@@ -1481,7 +1479,9 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 												            DirDic   = DirDic,
 												            vname    = vname_st,
 												            update   = False,
-												            updatest = True)											
+												            updatest = True)
+
+												            											
 
 											if not update:
 			 
@@ -1542,7 +1542,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 													create_bccalls(efname_stored[k],edgecallname_stored[k],bcall_stored[k])
 													efname_stored[k].close()
 
-		else:
+		else: # setbc[0] True (Physical BC)
 
 			if dim == 3:	
 				dir2gen2 = ['i1','imax','j1','jmax','k1','kmax']
@@ -1585,7 +1585,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 										DirDic[dir2[0]]['indbc'] = layer2
 
 										localvar = open(incPATH+'include_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2)+'_BClocVar.f90','a+')
-										output   = open(incPATH+'include_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2)+'_BCLoops.f90' ,'a+')
+										outputPhy   = open(incPATH+'include_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2)+'_BCLoops.f90' ,'a+')
 
 										if DirDic['i']['dir'] == 'i1': 
 											indi = '1-'+str(hlo_rhs)
@@ -1607,7 +1607,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 										else:
 											updateq = False	
 				 
-										gen_eqns_bc(Eqns,output,localvar,
+										gen_eqns_bc(Eqns,outputPhy,localvar,
 									        rhsname,Order=Order,Stencil=Stencil,
 									        indi    = indi,indj = indj,indk = indk,
 									        DirDic  = DirDic,
@@ -3724,6 +3724,8 @@ def gen_eqns_bc(Eqns,output,localvar,
 					if(tmpvar !=''):
 						localvar.write('\n\n real(wp) :: ')						
 						localvar.write(tmpvar[:-1])
+
+						
 
 
 
