@@ -995,6 +995,8 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 
 		newtype = False
 
+		from itertools import permutations
+
 		if setbc[0]: 			
 			for bckey in setbc[1].keys():									
 				bcname = bckey
@@ -1002,17 +1004,21 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 
 					for bcdir in setbc[1][bcname].keys():
 						
-						if bcdir in bc_info[bcname]: # physical BC direction already generated
+						perms = [''.join(p) for p in permutations(bcdir)]
+
+						if bcdir in bc_info[bcname] or (list(set(perms)&set(bc_info[bcname])) != [] ): # physical BC direction already generated
 							
+							bcdirinf = list(set(perms)&set(bc_info[bcname]))[0]
+
 							for bckey2 in setbc[1][bcname][bcdir]:
 								bctype = bckey2
-								if bctype in bc_info[bcname][bcdir]:
+								if bctype in bc_info[bcname][bcdirinf]:
 									print('[error] bc already generated for: '+bcname+' with type '+bctype+' in dir '+bcdir)
 									sys.exit()
 								else:                 # new type for direction bcdir of bcname 
 									print('NEW TYPE')
 									newtype = True
-									bc_info[bcname][bcdir].append(bctype)
+									bc_info[bcname][bcdirinf].append(bctype)
 
 						else:                        # new direction for bcname
 							bc_info[bcname][bcdir] = []
@@ -1319,9 +1325,9 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 					            DirDic  = DirDic,
 					            vname   = vname,
 					            update  = update)
-
-		# generate edges	
-
+#
+#		Generate edges	
+#
 		if not setbc[0]: 
 
 			if stored:
@@ -1373,8 +1379,6 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 		
 			edone = []
 
-			layerbeg = 1
-
 			for dir1 in dir2gen:
 				DirDic[dir1[0]]['dir'] = dir1	
 				for dir2 in dir2gen:
@@ -1389,26 +1393,11 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 			 
 										rhs.bc_info[1][dir1+dir2] = []
 										rhs.bc_info[1][dir1+dir2].append(bcnum)
-
-										# Stored OPEN select and static/dyn extraction	
-	
-										if stored:	
-											for k in var2process:
-												if var2process[k] != {}:
-													layerbeg = 0
-									elif update:
-	
-										if stored:	
-											for k in var2process:
-												if var2process[k] != {}:		
-													layerbeg = 0	
-
-									
 				
 									edone.append(dir1+dir2)
 
 									DirDic[dir2[0]]['dir'] = dir2									
-									for layer1 in range(layerbeg,hlo_rhs): #BC layers dir1
+									for layer1 in range(0,hlo_rhs): #BC layers dir1
 
 										DirDic[dir1[0]]['indbc'] = layer1	
 
@@ -1432,7 +1421,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 													bcall_stored[k]        = '\n'
 
 										bcall = '\n'
-										for layer2 in range(layerbeg,hlo_rhs): #BC layers dir2
+										for layer2 in range(0,hlo_rhs): #BC layers dir2
 
 #											
 #											Start generating boundary equations for points (layer 1, layer 2)
@@ -1579,99 +1568,187 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 		
 			edone = []
 
+			test ='i1j1'
+
+			edgeBCs = []
+			for d1 in dir2gen2:
+				for d2 in dir2gen2:
+					if d1 != d2:
+						edgeBCs.append(d1+d2)
+
+#
+#           Generate faces BCs (i1,j1,k1,imax,...) and subsequent edges combinations (i1j1,...). 
+#           Physical BC at layer 0 0 for (i1j1,...) can be imposed separately from the faces eqns (see below)
+#			
 			for dir1 in dir2gen:
-				DirDic[dir1[0]]['dir'] = dir1	
-				for dir2 in dir2gen2:
-						if dir2[0] != dir1[0]:
-
-							if ((dir2+dir1 not in edone) and (dir1+dir2 not in edone)):
-
-									edone.append(dir1+dir2)
-									DirDic[dir2[0]]['dir']   = dir2
-									DirDic[dir1[0]]['indbc'] = 0
+				if dir1 not in edgeBCs:
+					DirDic[dir1[0]]['dir'] = dir1	
+					for dir2 in dir2gen2:
+							if dir2[0] != dir1[0]:
+	
+								if ((dir2+dir1 not in edone) and (dir1+dir2 not in edone)):
+	
+										edone.append(dir1+dir2)
+										DirDic[dir2[0]]['dir']   = dir2
+										DirDic[dir1[0]]['indbc'] = 0
 #
-#									Create first layer1 subroutine, that includes calls to second layer
+#										Create first layer1 subroutine, that includes calls to second layer
 #
-									edgecallname =                       '_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'
-									efname       = open(incPATH+'bcsrc_edgescall_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0.for','w')
-
-									bcall = '\n'
-
-									for layer2 in range(0,hlo_rhs): #BC layers dir2
-			 
-										DirDic[dir2[0]]['indbc'] = layer2
-
-#
-#										Generate boundary eqns for point (layer1,layer2)	
-#
-										localvar = open(incPATH+'include_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2)+'_BClocVar.f90','a+')
-										outputPhy   = open(incPATH+'include_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2)+'_BCLoops.f90' ,'a+')
-
-										if DirDic['i']['dir'] == 'i1': 
-											indi = '1-'+str(hlo_rhs)
-										if DirDic['i']['dir'] == 'imax': 
-											indi = 'nx+'+str(hlo_rhs)
-									
-										if DirDic['j']['dir'] == 'j1': 
-											indj = '1-'+str(hlo_rhs)
-										if DirDic['j']['dir'] == 'jmax': 
-											indj = 'ny+'+str(hlo_rhs)
-									
-										if DirDic['k']['dir'] == 'k1': 
-											indk = '1-'+str(hlo_rhs)
-										if DirDic['k']['dir'] == 'kmax': 
-											indk = 'nz+'+str(hlo_rhs) 
-
-										if bctype == 'q':
-											updateq = True
-										else:
-											updateq = False	
+										edgecallname =                       '_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'
+										efname       = open(incPATH+'bcsrc_edgescall_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0.for','w')
+	
+										bcall = '\n'
+	
+										for layer2 in range(0,hlo_rhs): #BC layers dir2
 				 
-										gen_eqns_bc(Eqns,outputPhy,localvar,
-									        rhsname,Order=Order,Stencil=Stencil,
-									        indi    = indi,indj = indj,indk = indk,
-									        DirDic  = DirDic,
-									        vname   = vname,
-									        update  = update,
-									        updateq = updateq)
-
+											DirDic[dir2[0]]['indbc'] = layer2
+	
 #
-#										Create second layer subroutine with the newly generates eqns (and accumulate call names)	
+#											Generate boundary eqns for point (layer1,layer2)	
+#
+											localvar = open(incPATH+'include_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2)+'_BClocVar.f90','a+')
+											outputPhy   = open(incPATH+'include_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2)+'_BCLoops.f90' ,'a+')
+	
+											if DirDic['i']['dir'] == 'i1': 
+												indi = '1-'+str(hlo_rhs)
+											if DirDic['i']['dir'] == 'imax': 
+												indi = 'nx+'+str(hlo_rhs)
+										
+											if DirDic['j']['dir'] == 'j1': 
+												indj = '1-'+str(hlo_rhs)
+											if DirDic['j']['dir'] == 'jmax': 
+												indj = 'ny+'+str(hlo_rhs)
+										
+											if DirDic['k']['dir'] == 'k1': 
+												indk = '1-'+str(hlo_rhs)
+											if DirDic['k']['dir'] == 'kmax': 
+												indk = 'nz+'+str(hlo_rhs) 
+	
+											if bctype == 'q':
+												updateq = True
+											else:
+												updateq = False	
+					 
+											gen_eqns_bc(Eqns,outputPhy,localvar,
+										        rhsname,Order=Order,Stencil=Stencil,
+										        indi    = indi,indj = indj,indk = indk,
+										        DirDic  = DirDic,
+										        vname   = vname,
+										        update  = update,
+										        updateq = updateq)
+	
+#
+#											Create second layer subroutine with the newly generates eqns (and accumulate calls)	
 #			 
-										indrangei = 'indbc(1)=1\nindbc(2)=1\n'
-										indrangej = 'indbc(3)=1\nindbc(4)=1\n'
-										indrangek = 'indbc(5)=1\nindbc(6)=1\n'
-				 
-										edir = 'ijk'
-										edir = edir.replace(dir1[0],'').replace(dir2[0],'')
-				 
-										if dim == 3:
-											if   edir == 'i':
-												indrangei = 'indbc(1)=1\nindbc(2)=nx\n'
-											elif edir == 'j':
-												indrangej = 'indbc(1)=1\nindbc(2)=ny\n'
-											elif edir == 'k':
-												indrangek = 'indbc(1)=1\nindbc(2)=nz\n'	
-												
-				 
-										indrange = {'i':indrangei,
-													'j':indrangej,
-													'k':indrangek}
-	 
-		 								
-										bcedges  = open(incPATH+'bcsrc_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2)+'.for','w')
-										
-										create_bcsubroutine(bcedges,'_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2),
-															'include_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2)+'_BClocVar.f90',
-															'include_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2)+'_BCLoops.f90',indrange)
-										bcedges.close()
-										bcedges  = open(incPATH+'bcsrc_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2)+'.for','r')
-										cname = bcedges.readlines()[8][10:]
-										bcall    = bcall + '      call '+ cname
+											indrangei = 'indbc(1)=1\nindbc(2)=1\n'
+											indrangej = 'indbc(3)=1\nindbc(4)=1\n'
+											indrangek = 'indbc(5)=1\nindbc(6)=1\n'
+					 
+											edir = 'ijk'
+											edir = edir.replace(dir1[0],'').replace(dir2[0],'')
+					 
+											if dim == 3:
+												if   edir == 'i':
+													indrangei = 'indbc(1)=1\nindbc(2)=nx\n'
+												elif edir == 'j':
+													indrangej = 'indbc(1)=1\nindbc(2)=ny\n'
+												elif edir == 'k':
+													indrangek = 'indbc(1)=1\nindbc(2)=nz\n'	
+													
+					 
+											indrange = {'i':indrangei,
+														'j':indrangej,
+														'k':indrangek}
+		 
+			 								
+											bcedges  = open(incPATH+'bcsrc_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2)+'.for','w')
+											
+											create_bcsubroutine(bcedges,'_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2),
+																'include_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2)+'_BClocVar.f90',
+																'include_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2)+'_BCLoops.f90',indrange)
+											bcedges.close()
+											bcedges  = open(incPATH+'bcsrc_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2)+'.for','r')
+											cname = bcedges.readlines()[8][10:]
+											bcall    = bcall + '      call '+ cname
+	
+											
+										create_bccalls(efname,edgecallname,bcall)
+										efname.close()
 
-										
-									create_bccalls(efname,edgecallname,bcall)
-									efname.close()
+				else: # dir1 is a new physical BC related to a 0 0 layer (i1j1,...)
+
+					# recover direction from dirname (another brute force approach)
+
+					for a in dir2gen2:
+						for b in dir2gen2:
+							if (a+b == dir1) or (b+a == dir1):
+								d1 = a
+								d2 = b
+
+					DirDic[d1[0]]['dir']   = d1	
+					DirDic[d2[0]]['dir']   = d2
+					DirDic[d1[0]]['indbc'] = 0
+					DirDic[d2[0]]['indbc'] = 0
+
+					localvar = open(incPATH+'include_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_0_0'+'_BClocVar.f90','a+')
+					outputPhy   = open(incPATH+'include_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_0_0'+'_BCLoops.f90' ,'a+')
+					if DirDic['i']['dir'] == 'i1': 
+						indi = '1-'+str(hlo_rhs)
+					if DirDic['i']['dir'] == 'imax': 
+						indi = 'nx+'+str(hlo_rhs)
+				
+					if DirDic['j']['dir'] == 'j1': 
+						indj = '1-'+str(hlo_rhs)
+					if DirDic['j']['dir'] == 'jmax': 
+						indj = 'ny+'+str(hlo_rhs)
+				
+					if DirDic['k']['dir'] == 'k1': 
+						indk = '1-'+str(hlo_rhs)
+					if DirDic['k']['dir'] == 'kmax': 
+						indk = 'nz+'+str(hlo_rhs) 
+					if bctype == 'q':
+						updateq = True
+					else:
+						updateq = False	
+
+					gen_eqns_bc(Eqns,outputPhy,localvar,
+				        rhsname,Order=Order,Stencil=Stencil,
+				        indi    = indi,indj = indj,indk = indk,
+				        DirDic  = DirDic,
+				        vname   = vname,
+				        update  = update,
+				        updateq = updateq)
+#
+#						Create second layer subroutine with the newly generates eqns (and accumulate calls)	
+#
+					indrangei = 'indbc(1)=1\nindbc(2)=1\n'
+					indrangej = 'indbc(3)=1\nindbc(4)=1\n'
+					indrangek = 'indbc(5)=1\nindbc(6)=1\n'
+
+					edir = 'ijk'
+					edir = edir.replace(d1[0],'').replace(d2[0],'')
+
+					if dim == 3:
+						if   edir == 'i':
+							indrangei = 'indbc(1)=1\nindbc(2)=nx\n'
+						elif edir == 'j':
+							indrangej = 'indbc(1)=1\nindbc(2)=ny\n'
+						elif edir == 'k':
+							indrangek = 'indbc(1)=1\nindbc(2)=nz\n'	
+							
+
+					indrange = {'i':indrangei,
+								'j':indrangej,
+								'k':indrangek}
+						
+					bcedges  = open(incPATH+'bcsrc_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_0_0'+'.for','w')
+					
+					create_bcsubroutine(bcedges,'_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_0_0',
+										'include_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_0_0'+'_BClocVar.f90',
+										'include_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_0_0'+'_BCLoops.f90',indrange)
+					bcedges.close()				
+
+
 
 def genBC_calls(rhs):
 
@@ -1690,9 +1767,6 @@ def genBC_calls(rhs):
 
 	bc_info = rhs.bc_info[0]
 
-	print(color('Bc all bc :'+str(rhs.bc_info[1])))
-	print(color('Bc all bc 2:'+str(rhs.bc_info)))
-
 # Extract bcdir:
 
 	bcdir_all = []
@@ -1700,7 +1774,6 @@ def genBC_calls(rhs):
 		bcdir_all = bcdir_all + list(bc_info[bcname].keys())
 
 	bcdir_all = sorted(bcdir_all)
-
 
 # Extract phybc details:
 
@@ -1711,8 +1784,6 @@ def genBC_calls(rhs):
 		for bcname in bc_info:
 			if bcdir in list(bc_info[bcname].keys()):
 				bcphy_all[bcdir][bcname] = bc_info[bcname][bcdir] 
-
-	print("bcphy_all :",bcphy_all)			
 
 	static  = {}
 	dynamic = {}	
@@ -1752,69 +1823,101 @@ def genBC_calls(rhs):
 
 # # ADD EDGES :
 
+	if dim == 3:	
+		dirlist = ['i1','imax','j1','jmax','k1','kmax']
+	elif dim == 2:
+		dirlist = ['i1','imax','j1','jmax']
+	elif dim == 1:
+		dirlist = ['i1','imax']
+
+
+	edgeBCs = []
+	for d1 in dirlist:
+		for d2 in dirlist:
+			if d1 != d2:
+				edgeBCs.append(d1+d2)
+
+	from itertools import permutations
+
 	edone = []
 	for dir1 in bcdir_all:
-		DirDic[dir1[0]]['dir'] = dir1	
-		for dir2 in bcdir_all:
-				if dir2[0] != dir1[0]:
-
-					if ((dir2+dir1 not in edone) and (dir1+dir2 not in edone)):
-						if ((dir1+dir2 not in bcdone) and (dir2+dir1 not in bcdone)):
-
-							bcnum = bcnum + 1
-
-							bcdone[dir1+dir2] = []
-							bcdone[dir1+dir2].append(bcnum)		
-
-							slcbc = {'rhs': open(incPATH+'select_phybc_rhs.f90' ,'a+')}
-
-							typebc = []
-							for bcname in bcphy_all[dir1]:
-								for bctype in bcphy_all[dir1][bcname]:
-									typebc.append(bctype)
-							print('typebc is ',typebc,dir1,dir2,bcname)
-
-
-							if 'rhs' not in typebc:  # By default we extend interiror eqns for rhs at the edges
-									slcbc['rhs'].write('CASE ('+str(bcnum)+')\n')	
-
-							for bctype in typebc:
-								slcbc[bctype] = open(incPATH+'select_phybc_'+bctype+'.f90' ,'a+')
-								slcbc[bctype].write('CASE ('+str(bcnum)+')\n')
-							
-							fephy = {}
-
-							if dir1 in bcphy_all:
-								# slcbc[bctype] = open(incPATH+'select_phybc_'+bctype+'.f90' ,'a+')
-								# slcbc[bctype].write('CASE ('+str(bcnum)+')\n')
+		if dir1 not in edgeBCs:
+			for dir2 in bcdir_all:
+				if dir2 not in edgeBCs:
+					if dir2[0] != dir1[0]:
+	
+						if ((dir2+dir1 not in edone) and (dir1+dir2 not in edone)):
+							if ((dir1+dir2 not in bcdone) and (dir2+dir1 not in bcdone)):
+	
+								bcnum = bcnum + 1
+	
+								bcdone[dir1+dir2] = []
+								bcdone[dir1+dir2].append(bcnum)		
+	
+								slcbc = {'rhs': open(incPATH+'select_phybc_rhs.f90' ,'a+')}
+	
+								typebc = []
 								for bcname in bcphy_all[dir1]:
 									for bctype in bcphy_all[dir1][bcname]:
+										typebc.append(bctype)	
+	
+								if 'rhs' not in typebc:  # By default we extend interiror eqns for rhs at the edges
+										slcbc['rhs'].write('CASE ('+str(bcnum)+')\n')	
+	
+								for bctype in typebc:
+									slcbc[bctype] = open(incPATH+'select_phybc_'+bctype+'.f90' ,'a+')
+									slcbc[bctype].write('CASE ('+str(bcnum)+')\n')
+	
+								# rhs bc edge:
+	
+								for layer1 in range(0,hlo_rhs): #BC layers dir1
+									efname       = open(incPATH+'bcsrc_edgescall_'+dir1+'_'+dir2+'_'+str(layer1)+'.for','r')
+									slcbc['rhs'].write('      call '+efname.readlines()[8][10:])
+								slcbc['rhs'].write('      '+idrhs[dir1])
+								slcbc['rhs'].write('      '+idrhs[dir2])
+	
+	
+								fephy = {}
+	
+	
+								if dir1 in bcphy_all:
+									# slcbc[bctype] = open(incPATH+'select_phybc_'+bctype+'.f90' ,'a+')
+									# slcbc[bctype].write('CASE ('+str(bcnum)+')\n')
+									for bcname in bcphy_all[dir1]:
+										for bctype in bcphy_all[dir1][bcname]:
+	
+											fephy[bctype] = open(incPATH+'bcsrc_edgescall_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0.for','r')
+											slcbc[bctype].write('      call '+fephy[bctype].readlines()[8][10:])
+	
+								if dir2 in bcphy_all:
+									for bcname in bcphy_all[dir2]:
+										for bctype in bcphy_all[dir2][bcname]:
+											if bctype not in slcbc:
+												slcbc[bctype] = open(incPATH+'select_phybc_'+bctype+'.f90' ,'a+')
+												slcbc[bctype].write('CASE ('+str(bcnum)+')\n')
+											fephy[bctype] = open(incPATH+'bcsrc_edgescall_PhyBC_'+bcname+'_'+bctype+'_'+dir2+'_'+dir1+'_0.for','r')
+											slcbc[bctype].write('      call '+fephy[bctype].readlines()[8][10:])
 
-										fephy[bctype] = open(incPATH+'bcsrc_edgescall_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0.for','r')
-										slcbc[bctype].write('      call '+fephy[bctype].readlines()[8][10:])
+								perms = [''.join(p) for p in permutations(dir1+dir2)]
+										
+								if (dir1+dir2) in bcphy_all or (list(set(perms)&set(bcphy_all)) != [] ):
+									
+									dir1dir2 = list(set(perms)&set(bcphy_all))[0]
 
-							if dir2 in bcphy_all:
-								for bcname in bcphy_all[dir2]:
-									for bctype in bcphy_all[dir2][bcname]:
-										if bctype not in slcbc:
-											slcbc[bctype] = open(incPATH+'select_phybc_'+bctype+'.f90' ,'a+')
-											slcbc[bctype].write('CASE ('+str(bcnum)+')\n')
-										fephy[bctype] = open(incPATH+'bcsrc_edgescall_PhyBC_'+bcname+'_'+bctype+'_'+dir2+'_'+dir1+'_0.for','r')
-										slcbc[bctype].write('      call '+fephy[bctype].readlines()[8][10:])
-
-							edone.append(dir1+dir2)
-							DirDic[dir2[0]]['dir'] = dir2	
-
-							# corner phy bc (NRY)
-							# NRY
+									for bcname in bcphy_all[dir1dir2]:
+										for bctype in bcphy_all[dir1dir2][bcname]:
+											if bctype not in slcbc:
+												slcbc[bctype] = open(incPATH+'select_phybc_'+bctype+'.f90' ,'a+')
+												slcbc[bctype].write('CASE ('+str(bcnum)+')\n')
+											fephy[bctype] = open(incPATH+'bcsrc_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1dir2+'_0_0.for','r')
+											slcbc[bctype].write('      call '+fephy[bctype].readlines()[8][10:])
+	
+								edone.append(dir1+dir2)
+	
+								# corner phy bc (NRY)
+								# NRY
 							
-							# rhs bc edge:
 
-							for layer1 in range(1,hlo_rhs): #BC layers dir1
-								efname       = open(incPATH+'bcsrc_edgescall_'+dir1+'_'+dir2+'_'+str(layer1)+'.for','r')
-								slcbc['rhs'].write('      call '+efname.readlines()[8][10:])
-							slcbc['rhs'].write('      '+idrhs[dir1])
-							slcbc['rhs'].write('      '+idrhs[dir2])
 
 
 
@@ -1867,111 +1970,110 @@ def genBC_calls(rhs):
 # # ADDS NORMAL-TO-BOUNDARY FILTERS FOR BC DIRECTION:
 
 	for dir1 in bcdir_all:
-
-		DirDic[dir1[0]]['dir'] = dir1	
+		if dir1 not in edgeBCs:
 		
-		bcnum = bcnum + 1
-
-		bcdone[dir1] = []
-		bcdone[dir1].append(bcnum)
-					
-		axes  = {'i':'x','j':'y','k':'z'}
-
-		slcbcflt   = open(incPATH+'selectfilterbc_'+axes[dir1[0]]+'.f90'        ,'a+')
-		slcbcfltup = open(incPATH+'selectupdate_filterbc_'+axes[dir1[0]]+'.f90' ,'a+')							
-		slcbcflt.write('\n CASE ('+str(bcnum)+')\n\n')
-		slcbcfltup.write('\n CASE ('+str(bcnum)+')\n\n')
-
-		for layer in range(2,hlo_rhs):
-			     genFilter(stencil_rhs,order_rhs,len(varsolved),dirBC=dir1,indbc=layer,fltbeg=2,rhs=rhs)
-		
-		up    = open(incPATH+'update_filterbc_'+axes[dir1[0]]+'.f90','r') # set to empty
-		fltbc = open(incPATH+'filterbc_'+axes[dir1[0]]+'.f90'       ,'r') # set to empty	
-
-		fltbclines = fltbc.readlines()
-		uplines    = up.readlines()
-
-		for l in fltbclines:
-			slcbcflt.write('   '+l)
-		for l in uplines:
-			slcbcfltup.write('   '+l)		
-
-
+			bcnum = bcnum + 1
+	
+			bcdone[dir1] = []
+			bcdone[dir1].append(bcnum)
+						
+			axes  = {'i':'x','j':'y','k':'z'}
+	
+			slcbcflt   = open(incPATH+'selectfilterbc_'+axes[dir1[0]]+'.f90'        ,'a+')
+			slcbcfltup = open(incPATH+'selectupdate_filterbc_'+axes[dir1[0]]+'.f90' ,'a+')							
+			slcbcflt.write('\n CASE ('+str(bcnum)+')\n\n')
+			slcbcfltup.write('\n CASE ('+str(bcnum)+')\n\n')
+	
+			for layer in range(2,hlo_rhs):
+				     genFilter(stencil_rhs,order_rhs,len(varsolved),dirBC=dir1,indbc=layer,fltbeg=2,rhs=rhs)
+			
+			up    = open(incPATH+'update_filterbc_'+axes[dir1[0]]+'.f90','r') # set to empty
+			fltbc = open(incPATH+'filterbc_'+axes[dir1[0]]+'.f90'       ,'r') # set to empty	
+	
+			fltbclines = fltbc.readlines()
+			uplines    = up.readlines()
+	
+			for l in fltbclines:
+				slcbcflt.write('   '+l)
+			for l in uplines:
+				slcbcfltup.write('   '+l)		
+	
+	
 # #		extends in-plane filtering along the bc:
-		
-		slcbcflt.close()
-		slcbcfltup.close()
-
-		if dir1[1:] == 'max':
-			bndx  = 'idflt(2) = idarray(2)\n'							
-			bndy  = 'idflt(4) = idarray(4)\n'
-			bndz  = 'idflt(6) = idarray(6)\n'
-		else:	
-			bndx  = 'idflt(1) = idarray(1)\n'							
-			bndy  = 'idflt(3) = idarray(3)\n'
-			bndz  = 'idflt(5) = idarray(5)\n'									
-
-		fltbnd = {'x':[{},{'y':bndx},{'y':bndx,'z':bndx}],
-				  'y':[{},{'x':bndy},{'x':bndy,'z':bndy}],
-				  'z':[{},{        },{'x':bndz,'y':bndz}]}
-		bounds = fltbnd[axes[dir1[0]]][dim-1]
-		
-		for axebd in bounds:
-			slcbd = open(incPATH+'selectfilterbc_'+axebd+'.f90','a+')
-			slcbd.write('\n CASE ('+str(bcnum)+')\n\n')
-			slcbd.write('   '+bounds[axebd])		
-						   	
+			
+			slcbcflt.close()
+			slcbcfltup.close()
+	
+			if dir1[1:] == 'max':
+				bndx  = 'idflt(2) = idarray(2)\n'							
+				bndy  = 'idflt(4) = idarray(4)\n'
+				bndz  = 'idflt(6) = idarray(6)\n'
+			else:	
+				bndx  = 'idflt(1) = idarray(1)\n'							
+				bndy  = 'idflt(3) = idarray(3)\n'
+				bndz  = 'idflt(5) = idarray(5)\n'									
+	
+			fltbnd = {'x':[{},{'y':bndx},{'y':bndx,'z':bndx}],
+					  'y':[{},{'x':bndy},{'x':bndy,'z':bndy}],
+					  'z':[{},{        },{'x':bndz,'y':bndz}]}
+			bounds = fltbnd[axes[dir1[0]]][dim-1]
+			
+			for axebd in bounds:
+				slcbd = open(incPATH+'selectfilterbc_'+axebd+'.f90','a+')
+				slcbd.write('\n CASE ('+str(bcnum)+')\n\n')
+				slcbd.write('   '+bounds[axebd])		
+							   	
 # # GENERATE STATIC/DYNAMIC STORED VARIABLES:			
-							
-		for k in var2process:
-			if var2process[k] != {}:	
-
-				slcbc    = open(incPATH+'select'+k+'bc.f90','a+')
-				st       = open(incPATH+'bcsrc'+k+'_'+dir1+'.for','r') # set to empty	
-				
-				slcbc.write('CASE ('+str(bcnum)+')\n')
-				callname = st.readlines()[8][10:]
-				slcbc.write('      call '+ callname)
-
+								
+			for k in var2process:
+				if var2process[k] != {}:	
+	
+					slcbc    = open(incPATH+'select'+k+'bc.f90','a+')
+					st       = open(incPATH+'bcsrc'+k+'_'+dir1+'.for','r') # set to empty	
+					
+					slcbc.write('CASE ('+str(bcnum)+')\n')
+					callname = st.readlines()[8][10:]
+					slcbc.write('      call '+ callname)
+	
 # # ADD CALL TO NEW PHYSICAL BC :					
-		
-		slcbc = {}
-		# for bctype in ['rhs','q']:
-		# 	slcbc[bctype] = open(incPATH+'select_phybc_'+bctype+'.f90' ,'a+')
-		# 	slcbc[bctype].write('CASE ('+str(bcnum)+')\n')
-
-		if dir1 in bcphy_all:
-			for bcname in bcphy_all[dir1]:
-				for bctype in bcphy_all[dir1][bcname]:
-
-					slcbc[bctype] = open(incPATH+'select_phybc_'+bctype+'.f90' ,'a+')
-					slcbc[bctype].write('CASE ('+str(bcnum)+')\n')
-													
-				# slcbc      = open(incPATH+'select_phybc_'+bctype+'.f90' ,'a+')
-				# rhs_for.close()
-				
-					phyBCread  = open(incPATH+'PhyBC'+bcname+'_'+dir1+'_'+bctype+'.for','r')	
-					rhshlo = []
-					for layer in range(1,hlo_rhs):
-						rhshlo.append(open(incPATH+'bcsrc'+dir1+'_'+str(layer)+'.for','r'))
-		
-					# slcbc[bctype].write('CASE ('+str(bcnum)+')\n')
-					slcbc[bctype].write('      call '+phyBCread.readlines()[9][10:])
-					if(bctype=='rhs'):
-						for layer in range(1,hlo_rhs):
-								slcbc[bctype].write('      call '+rhshlo[layer-1].readlines()[8][10:])
-						slcbc[bctype].write('      '+idrhs[dir1])		
-			if slcbc != {}:
-				if 'rhs' not in slcbc:
-						slcbc['rhs'] = open(incPATH+'select_phybc_rhs.f90' ,'a+')
-						slcbc['rhs'].write('CASE ('+str(bcnum)+')\n')		
+			
+			slcbc = {}
+			# for bctype in ['rhs','q']:
+			# 	slcbc[bctype] = open(incPATH+'select_phybc_'+bctype+'.f90' ,'a+')
+			# 	slcbc[bctype].write('CASE ('+str(bcnum)+')\n')
+	
+			if dir1 in bcphy_all:
+				for bcname in bcphy_all[dir1]:
+					for bctype in bcphy_all[dir1][bcname]:
+	
+						slcbc[bctype] = open(incPATH+'select_phybc_'+bctype+'.f90' ,'a+')
+						slcbc[bctype].write('CASE ('+str(bcnum)+')\n')
+														
+					# slcbc      = open(incPATH+'select_phybc_'+bctype+'.f90' ,'a+')
+					# rhs_for.close()
+					
+						phyBCread  = open(incPATH+'PhyBC'+bcname+'_'+dir1+'_'+bctype+'.for','r')	
 						rhshlo = []
 						for layer in range(1,hlo_rhs):
-							rhshlo.append(open(incPATH+'bcsrc'+dir1+'_'+str(layer)+'.for','r'))	
-						for layer in range(1,hlo_rhs):
-								slcbc['rhs'].write('      call '+rhshlo[layer-1].readlines()[8][10:])
-						slcbc[bctype].write('      '+idrhs[dir1])							
-
+							rhshlo.append(open(incPATH+'bcsrc'+dir1+'_'+str(layer)+'.for','r'))
+			
+						# slcbc[bctype].write('CASE ('+str(bcnum)+')\n')
+						slcbc[bctype].write('      call '+phyBCread.readlines()[9][10:])
+						if(bctype=='rhs'):
+							for layer in range(1,hlo_rhs):
+									slcbc[bctype].write('      call '+rhshlo[layer-1].readlines()[8][10:])
+							slcbc[bctype].write('      '+idrhs[dir1])		
+				if slcbc != {}:
+					if 'rhs' not in slcbc:
+							slcbc['rhs'] = open(incPATH+'select_phybc_rhs.f90' ,'a+')
+							slcbc['rhs'].write('CASE ('+str(bcnum)+')\n')		
+							rhshlo = []
+							for layer in range(1,hlo_rhs):
+								rhshlo.append(open(incPATH+'bcsrc'+dir1+'_'+str(layer)+'.for','r'))	
+							for layer in range(1,hlo_rhs):
+									slcbc['rhs'].write('      call '+rhshlo[layer-1].readlines()[8][10:])
+							slcbc[bctype].write('      '+idrhs[dir1])							
+	
 	rhs.bc_info[1] = bcdone					
 
 def loop(beg,end):
