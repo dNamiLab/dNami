@@ -1669,6 +1669,7 @@ def genBC_calls(rhs):
 	bc_info = rhs.bc_info[0]
 
 	print(color('Bc all bc :'+str(rhs.bc_info[1])))
+	print(color('Bc all bc 2:'+str(rhs.bc_info)))
 
 # Extract bcdir:
 
@@ -1677,6 +1678,7 @@ def genBC_calls(rhs):
 		bcdir_all = bcdir_all + list(bc_info[bcname].keys())
 
 	bcdir_all = sorted(bcdir_all)
+
 
 # Extract phybc details:
 
@@ -1687,6 +1689,8 @@ def genBC_calls(rhs):
 		for bcname in bc_info:
 			if bcdir in list(bc_info[bcname].keys()):
 				bcphy_all[bcdir][bcname] = bc_info[bcname][bcdir] 
+
+	print("bcphy_all :",bcphy_all)			
 
 	static  = {}
 	dynamic = {}	
@@ -1738,16 +1742,20 @@ def genBC_calls(rhs):
 							bcnum = bcnum + 1
 
 							bcdone[dir1+dir2] = []
-							bcdone[dir1+dir2].append(bcnum)
+							bcdone[dir1+dir2].append(bcnum)		
 
 							slcbc = {'rhs': open(incPATH+'select_phybc_rhs.f90' ,'a+')}
+
 							typebc = []
 							for bcname in bcphy_all[dir1]:
 								for bctype in bcphy_all[dir1][bcname]:
 									typebc.append(bctype)
-							
-							if 'rhs' not in typebc:
-									slcbc['rhs'].write('CASE ('+str(bcnum)+')\n')		
+							print('typebc is ',typebc,dir1,dir2,bcname)
+
+
+							if 'rhs' not in typebc:  # By default we extend interiror eqns for rhs at the edges
+									slcbc['rhs'].write('CASE ('+str(bcnum)+')\n')	
+
 							for bctype in typebc:
 								slcbc[bctype] = open(incPATH+'select_phybc_'+bctype+'.f90' ,'a+')
 								slcbc[bctype].write('CASE ('+str(bcnum)+')\n')
@@ -1766,7 +1774,9 @@ def genBC_calls(rhs):
 							if dir2 in bcphy_all:
 								for bcname in bcphy_all[dir2]:
 									for bctype in bcphy_all[dir2][bcname]:
-
+										if bctype not in slcbc:
+											slcbc[bctype] = open(incPATH+'select_phybc_'+bctype+'.f90' ,'a+')
+											slcbc[bctype].write('CASE ('+str(bcnum)+')\n')
 										fephy[bctype] = open(incPATH+'bcsrc_edgescall_PhyBC_'+bcname+'_'+bctype+'_'+dir2+'_'+dir1+'_0.for','r')
 										slcbc[bctype].write('      call '+fephy[bctype].readlines()[8][10:])
 
