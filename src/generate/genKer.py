@@ -1182,9 +1182,9 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 
 			idrhs['i1']   = 'idrhs(1)=idarray(1)\n'
 			idrhs['imax'] = 'idrhs(2)=idarray(2)\n'
-			idrhs['j1']   = 'idrhs(3)=idarray(3)\n'	
-			idrhs['jmax'] = 'idrhs(4)=idarray(4)\n'						
-			idrhs['k1']   = 'idrhs(5)=idarray(5)\n'	
+			idrhs['j1']   = 'idrhs(3)=idarray(3)\n'
+			idrhs['jmax'] = 'idrhs(4)=idarray(4)\n'
+			idrhs['k1']   = 'idrhs(5)=idarray(5)\n'
 			idrhs['kmax'] = 'idrhs(6)=idarray(6)\n'
 
 			idflt['i1']   = 'idflt(1)=idarray(1)\n'
@@ -1217,7 +1217,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 					outlayer   = []
 					locallayer = []
 
-					for layer in range(1,hlo_rhs): #BC layers  
+					for layer in range(0,hlo_rhs): #BC layers  
 
 						localvar = open(incPATH+'include_BClocVar_'+dirBC+'_'+str(layer)+'.f90','w')
 						output   = open(incPATH+'include_BCLoops_'+dirBC+'_'+str(layer)+'.f90' ,'w')	
@@ -1244,7 +1244,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 					outlayer   = []
 					locallayer = []
 
-					for layer in range(1,hlo_rhs): #BC layers  
+					for layer in range(0,hlo_rhs): #BC layers  
 
 						localvar       = open(incPATH+'include_BClocVar_'+dirBC+'_'+str(layer)+'.f90','a+')
 						output         = open(incPATH+'include_BCLoops_'+dirBC+'_'+str(layer)+'.f90' ,'a+')	
@@ -1306,7 +1306,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 				
 			else:	
 
-				for layer in range(1,hlo_rhs): #BC layers 
+				for layer in range(0,hlo_rhs): #BC layers 
 
 					DirDic[dirBC[0]]['indbc'] = layer
 
@@ -1411,6 +1411,10 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 									for layer1 in range(layerbeg,hlo_rhs): #BC layers dir1
 
 										DirDic[dir1[0]]['indbc'] = layer1	
+
+#										
+#										Create first layer of subroutines (for layer1), that includes calls to second layer
+#										
 										
 										if not update:
 											edgecallname = '_edges_'+dir1+'_'+dir2+'_'+str(layer1)
@@ -1429,7 +1433,11 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 
 										bcall = '\n'
 										for layer2 in range(layerbeg,hlo_rhs): #BC layers dir2
-			 
+
+#											
+#											Start generating boundary equations for points (layer 1, layer 2)
+#											
+			 	
 											DirDic[dir2[0]]['indbc'] = layer2
 											localvar = open(incPATH+'include_edges_'+dir1+'_'+dir2+'_'+str(layer1)+'_'+str(layer2)+'_BClocVar.f90','a+')
 											output   = open(incPATH+'include_edges_'+dir1+'_'+dir2+'_'+str(layer1)+'_'+str(layer2)+'_BCLoops.f90' ,'a+')
@@ -1481,7 +1489,9 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 												            update   = False,
 												            updatest = True)
 
-												            											
+#														
+#											Create the second layer of subroutines with the newly generated eqns (for layer 2)	            											
+#											
 
 											if not update:
 			 
@@ -1530,6 +1540,9 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 														cname = bcedges_stored[k].readlines()[8][10:]
 														bcall_stored[k]    = bcall_stored[k] + '      call '+ cname
 
+#										
+#										Create calls of the second layer of subroutines
+#														
 
 										if not update:		
 											create_bccalls(efname,edgecallname,bcall)
@@ -1541,7 +1554,9 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 												if var2process[k] != {}:
 													create_bccalls(efname_stored[k],edgecallname_stored[k],bcall_stored[k])
 													efname_stored[k].close()
-
+#       
+#       Generates physical BC edges
+#
 		else: # setbc[0] True (Physical BC)
 
 			if dim == 3:	
@@ -1574,7 +1589,9 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 									edone.append(dir1+dir2)
 									DirDic[dir2[0]]['dir']   = dir2
 									DirDic[dir1[0]]['indbc'] = 0
-
+#
+#									Create first layer1 subroutine, that includes calls to second layer
+#
 									edgecallname =                       '_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'
 									efname       = open(incPATH+'bcsrc_edgescall_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0.for','w')
 
@@ -1584,6 +1601,9 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 			 
 										DirDic[dir2[0]]['indbc'] = layer2
 
+#
+#										Generate boundary eqns for point (layer1,layer2)	
+#
 										localvar = open(incPATH+'include_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2)+'_BClocVar.f90','a+')
 										outputPhy   = open(incPATH+'include_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2)+'_BCLoops.f90' ,'a+')
 
@@ -1615,7 +1635,9 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 									        update  = update,
 									        updateq = updateq)
 
-			 
+#
+#										Create second layer subroutine with the newly generates eqns (and accumulate call names)	
+#			 
 										indrangei = 'indbc(1)=1\nindbc(2)=1\n'
 										indrangej = 'indbc(3)=1\nindbc(4)=1\n'
 										indrangek = 'indbc(5)=1\nindbc(6)=1\n'
