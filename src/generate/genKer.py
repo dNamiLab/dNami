@@ -987,6 +987,14 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 			
 		dir2gen = ['i1','imax','j1','jmax','k1','kmax']	
 
+		cornerperm = {}
+		for d1 in dir2gen:
+			cornerperm[d1] = d1
+			for d2 in dir2gen:
+				cornerperm[d2] = d2
+				if d1 != d2 and d1[0] != d2[0]:
+						 cornerperm[d1+d2] = d2+d1
+
 		if len(rhs.bc_info[1].values()) != 0:
 			print(rhs.bc_info[1].values())
 			bcnum = max(max(rhs.bc_info[1].values()))
@@ -1006,9 +1014,10 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 						
 						perms = [''.join(p) for p in permutations(bcdir)]
 
-						if bcdir in bc_info[bcname] or (list(set(perms)&set(bc_info[bcname])) != [] ): # physical BC direction already generated
+						if bcdir in bc_info[bcname] or cornerperm[bcdir] in bc_info : # physical BC direction already generated
+									
 							
-							bcdirinf = list(set(perms)&set(bc_info[bcname]))[0]
+							bcdirinf = list(set([cornerperm[bcdir],bcdir])&set(bc_info[bcname]))[0]
 
 							for bckey2 in setbc[1][bcname][bcdir]:
 								bctype = bckey2
@@ -1026,27 +1035,90 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 								bctype = bckey3
 								bc_info[bcname][bcdir].append(bctype)		
 							
-							# generate static/dynamic stored variables:			
-							
-							# from genRhs import varstored
+							if bcdir == cornerperm[bcdir]:
 
+								# generate static/dynamic stored variables:			
+								
+								# from genRhs import varstored
+	
+								static  = {}
+								dynamic = {}
+	
+								for var in varstored:
+									if varstored[var]['static']:
+										static[var] = varstored[var]['symb']
+									else:
+										dynamic[var] = varstored[var]['symb']
+	
+								var2process = {'storedstatic':static, 'stored':dynamic}
+	
+								for k in var2process:
+									if var2process[k] != {}:
+	
+										st       = open(incPATH+'bcsrc'+k+'_'+bcdir+'.for','w') # set to empty													
+										locst    = open(incPATH+'include_BClocVar_'+k+'_'+bcdir+'.f90','w') # set to empty							
+										loopst   = open(incPATH+'include_BCLoops_'+k+'_'+bcdir+'.f90','w')  # set to empty
+			
+										indrangei = 'indbc(1)=1\nindbc(2)=1\n'
+										indrangej = 'indbc(3)=1\nindbc(4)=1\n'
+										indrangek = 'indbc(5)=1\nindbc(6)=1\n'
+							
+										if dim == 2:
+											if bcdir[0] == 'i':
+												indrangej = 'indbc(3)=1\nindbc(4)=ny\n'
+											elif bcdir[0] == 'j':	
+												indrangei = 'indbc(1)=1\nindbc(2)=nx\n'
+										elif dim == 3:
+											if   bcdir[0] == 'i':
+												indrangej = 'indbc(3)=1\nindbc(4)=ny\n'
+												indrangek = 'indbc(5)=1\nindbc(6)=nz\n'
+											elif bcdir[0] == 'j':	
+												indrangei = 'indbc(1)=1\nindbc(2)=nx\n'	
+												indrangek = 'indbc(5)=1\nindbc(6)=nz\n'
+											elif bcdir[0] == 'k':	
+												indrangei = 'indbc(1)=1\nindbc(2)=nx\n'	
+												indrangej = 'indbc(3)=1\nindbc(4)=ny\n'
+		
+		
+										indrange = {'i':indrangei,
+										            'j':indrangej,
+										            'k':indrangek}	
+		
+										compute_storedbc(var2process[k],Stencil,Order,loopst,locst,bcdir,update=update,rhs=rhs)
+			
+										create_bcsubroutine(st,k+'_faces_'+bcdir,
+														 'include_BClocVar_'+k+'_'+bcdir+'.f90',
+														 'include_BCLoops_'+k+'_' +bcdir+'.f90',indrange)	
+								
+
+				else: # new bc name
+					bc_info[bcname] = {}
+					for bcdir in setbc[1][bcname].keys():
+						bc_info[bcname][bcdir] = []
+						for bctype in setbc[1][bcname][bcdir]:
+							bc_info[bcname][bcdir].append(bctype)	   	
+
+
+						if bcdir == cornerperm[bcdir]:
+
+							# generate static/dynamic stored variables:			
+								
+							# from genRhs import varstored
 							static  = {}
 							dynamic = {}
-
 							for var in varstored:
 								if varstored[var]['static']:
 									static[var] = varstored[var]['symb']
 								else:
 									dynamic[var] = varstored[var]['symb']
-
+							
 							var2process = {'storedstatic':static, 'stored':dynamic}
-
+	
 							for k in var2process:
 								if var2process[k] != {}:
-
 									st       = open(incPATH+'bcsrc'+k+'_'+bcdir+'.for','w') # set to empty													
 									locst    = open(incPATH+'include_BClocVar_'+k+'_'+bcdir+'.f90','w') # set to empty							
-									loopst   = open(incPATH+'include_BCLoops_'+k+'_'+bcdir+'.f90','w')  # set to empty
+									loopst   = open(incPATH+'include_BCLoops_'+k+'_' +bcdir+'.f90','w')  # set to empty
 		
 									indrangei = 'indbc(1)=1\nindbc(2)=1\n'
 									indrangej = 'indbc(3)=1\nindbc(4)=1\n'
@@ -1078,65 +1150,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 									create_bcsubroutine(st,k+'_faces_'+bcdir,
 													 'include_BClocVar_'+k+'_'+bcdir+'.f90',
 													 'include_BCLoops_'+k+'_' +bcdir+'.f90',indrange)	
-								
-
-				else: # new bc name
-					bc_info[bcname] = {}
-					for bcdir in setbc[1][bcname].keys():
-						bc_info[bcname][bcdir] = []
-						for bctype in setbc[1][bcname][bcdir]:
-							bc_info[bcname][bcdir].append(bctype)	   	
-
-						# generate static/dynamic stored variables:			
-							
-						# from genRhs import varstored
-						static  = {}
-						dynamic = {}
-						for var in varstored:
-							if varstored[var]['static']:
-								static[var] = varstored[var]['symb']
-							else:
-								dynamic[var] = varstored[var]['symb']
-						
-						var2process = {'storedstatic':static, 'stored':dynamic}
-
-						for k in var2process:
-							if var2process[k] != {}:
-								st       = open(incPATH+'bcsrc'+k+'_'+bcdir+'.for','w') # set to empty													
-								locst    = open(incPATH+'include_BClocVar_'+k+'_'+bcdir+'.f90','w') # set to empty							
-								loopst   = open(incPATH+'include_BCLoops_'+k+'_' +bcdir+'.f90','w')  # set to empty
-	
-								indrangei = 'indbc(1)=1\nindbc(2)=1\n'
-								indrangej = 'indbc(3)=1\nindbc(4)=1\n'
-								indrangek = 'indbc(5)=1\nindbc(6)=1\n'
-					
-								if dim == 2:
-									if bcdir[0] == 'i':
-										indrangej = 'indbc(3)=1\nindbc(4)=ny\n'
-									elif bcdir[0] == 'j':	
-										indrangei = 'indbc(1)=1\nindbc(2)=nx\n'
-								elif dim == 3:
-									if   bcdir[0] == 'i':
-										indrangej = 'indbc(3)=1\nindbc(4)=ny\n'
-										indrangek = 'indbc(5)=1\nindbc(6)=nz\n'
-									elif bcdir[0] == 'j':	
-										indrangei = 'indbc(1)=1\nindbc(2)=nx\n'	
-										indrangek = 'indbc(5)=1\nindbc(6)=nz\n'
-									elif bcdir[0] == 'k':	
-										indrangei = 'indbc(1)=1\nindbc(2)=nx\n'	
-										indrangej = 'indbc(3)=1\nindbc(4)=ny\n'
-
-
-								indrange = {'i':indrangei,
-								            'j':indrangej,
-								            'k':indrangek}	
-
-								compute_storedbc(var2process[k],Stencil,Order,loopst,locst,bcdir,update=update,rhs=rhs)
-	
-								create_bcsubroutine(st,k+'_faces_'+bcdir,
-												 'include_BClocVar_'+k+'_'+bcdir+'.f90',
-												 'include_BCLoops_'+k+'_' +bcdir+'.f90',indrange)	
-								
+									
 								
 							
 			dir2gen = []
