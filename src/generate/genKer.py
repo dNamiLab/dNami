@@ -1316,8 +1316,8 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 
 					DirDic[dirBC[0]]['indbc'] = layer
 
-					localvar = locallayer[layer-1]
-					output   = outlayer[layer-1]
+					localvar = locallayer[layer]
+					output   = outlayer[layer]
 	
 					gen_eqns_bc(Eqns,output,localvar,
 					            rhsname,Order=Order,Stencil=Stencil,
@@ -2054,24 +2054,24 @@ def genBC_calls(rhs):
 					
 						phyBCread  = open(incPATH+'PhyBC'+bcname+'_'+dir1+'_'+bctype+'.for','r')	
 						rhshlo = []
-						for layer in range(1,hlo_rhs):
+						for layer in range(0,hlo_rhs):
 							rhshlo.append(open(incPATH+'bcsrc'+dir1+'_'+str(layer)+'.for','r'))
 			
 						# slcbc[bctype].write('CASE ('+str(bcnum)+')\n')
-						slcbc[bctype].write('      call '+phyBCread.readlines()[9][10:])
 						if(bctype=='rhs'):
-							for layer in range(1,hlo_rhs):
-									slcbc[bctype].write('      call '+rhshlo[layer-1].readlines()[8][10:])
-							slcbc[bctype].write('      '+idrhs[dir1])		
+							for layer in range(0,hlo_rhs):
+									slcbc[bctype].write('      call '+rhshlo[layer].readlines()[8][10:])
+							slcbc[bctype].write('      '+idrhs[dir1])	
+						slcbc[bctype].write('      call '+phyBCread.readlines()[9][10:])								
 				if slcbc != {}:
 					if 'rhs' not in slcbc:
 							slcbc['rhs'] = open(incPATH+'select_phybc_rhs.f90' ,'a+')
 							slcbc['rhs'].write('CASE ('+str(bcnum)+')\n')		
 							rhshlo = []
-							for layer in range(1,hlo_rhs):
+							for layer in range(0,hlo_rhs):
 								rhshlo.append(open(incPATH+'bcsrc'+dir1+'_'+str(layer)+'.for','r'))	
-							for layer in range(1,hlo_rhs):
-									slcbc['rhs'].write('      call '+rhshlo[layer-1].readlines()[8][10:])
+							for layer in range(0,hlo_rhs):
+									slcbc['rhs'].write('      call '+rhshlo[layer].readlines()[8][10:])
 							slcbc[bctype].write('      '+idrhs[dir1])							
 	
 	rhs.bc_info[1] = bcdone					
