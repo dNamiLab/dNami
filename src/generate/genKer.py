@@ -654,6 +654,40 @@ def updateStored(vname,expr,i='i',j='j',k='k',update=False):
 
 	return storedout
 
+def updateqbc(vname,expr,i='i',j='j',k='k',update=False):
+	
+	from genRhs import varbc, dim
+
+	sizebc   = {'face':{'i'  :{3:'('+rangej+','+rangek,
+							   2:'('+rangej,
+							   1:'('},
+						'j'  :{3:'('+rangei+','+rangek,
+							   2:'('+rangei,
+							   1:'('},
+						'k'  :{3:'('+rangei+','+rangek,
+							   2:'('+rangei,
+							   1:'('}},
+				'edge':{'ij' :{3:'('+rangek,
+							   2:'(',
+							   1:'('},
+						'jk' :{3:'('+rangei,
+							   2:'(',
+							   1:'('},
+						'ik' :{3:'('+rangej,
+							   2:'(',
+							   1:'('}}} 
+
+	for loc in ['face','edge']:	
+		if loc in varbc[vname]:
+			qbc = 'q'+loc+'_'+varbc[vname][loc]+sizebc[loc][varbc[vname][loc]][dim]+','+str(varbc[vname]['ind'])+')'	
+
+	if not update:	
+		qbcout = qbc + ' = ' + ' ' + expr
+	else:
+		qbcout = qbc + ' = ' + qbc + ' ' + expr	
+
+	return qbcout	
+
 def compute_stored(StoredVar,Stencil,Order,output,localvar,update=False,rhs=None):		
 
 		if update and rhs != None:
@@ -802,9 +836,10 @@ def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fals
 		dim = rhs.dim
 		wp  = rhs.wp
 		coefficients = rhs.coefficients
-		varname = rhs.varname
-		varstored = rhs.varstored
-		varsolved = rhs.varsolved
+		varname      = rhs.varname
+		varstored    = rhs.varstored
+		varbc        = rhs.varbc
+		varsolved    = rhs.varsolved
 
 
 
@@ -823,6 +858,9 @@ def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fals
 		
 		Path(incPATH+'include_StoredVarStatic.f90').touch()
 		Path(incPATH+'includeRHS_locVarStoredStatic.f90').touch()
+
+		Path(incPATH+'include_qbcVar.f90').touch()
+		Path(incPATH+'include_qbcVarStatic.f90').touch()
 
 		Path(incPATH+'include_bccmpstored.f90').touch()
 		Path(incPATH+'include_bccmpstoredstatic.f90').touch()
@@ -859,7 +897,9 @@ def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fals
 
 			print(color('varstored generated with parameters (stencil, order): ('+str(Stencil)+','+str(Order)+')'))
 		elif varstored != {}:
-			print(color('varstored not generated'))	
+			print(color('varstored not generated'))
+
+
 			
 		if update == False:
 			rhs_for        = open(incPATH[:-13]+'rhs.for','w')
@@ -3769,7 +3809,8 @@ def gen_eqns_bc(Eqns,output,localvar,
 	            vname   = 'symb',
 	            update  = False,
 	            updateq = False,
-	            updatest= False):
+	            updatest= False,
+	            updateqbc=False):
 					
 					from genRhs import dim
 					
@@ -3851,6 +3892,9 @@ def gen_eqns_bc(Eqns,output,localvar,
 						elif updatest:
 							exp_stored = op_to_dNami(Out,i=indiri,j=indirj,k=indirk) 
 							output.write(updateStored(eqn,exp_stored,i=indiri,j=indirj,k=indirk,update=update)+'\n\n')	
+						elif updateqbc:
+							exp_qbc = op_to_dNami(Out,i=indiri,j=indirj,k=indirk) 
+							output.write(updateqbc(eqn,exp_stored,i=indiri,j=indirj,k=indirk,update=update)+'\n\n')									
 						else:
 							exp_rhs = ' - '
 							exp_rhs = exp_rhs + ' ( ' + op_to_dNami(Out,i=indiri,j=indirj,k=indirk) + ' ) '
