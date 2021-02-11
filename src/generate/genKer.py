@@ -284,6 +284,14 @@ def dNamiVar(var,rangei,rangej,rangek):
 
 	try:
 		from genRhs import varbc
+		knownbcs = []
+		for v in varbc:
+			knownbcs.append(varbc[v]['ind'])
+		from collections import Counter	
+		if 	not (Counter(Counter(knownbcs).values())[1] == len(knownbcs)):
+			print(color('[error] Several occurrences of identical indices for "varbc". This ambiguity is not managed yet — generation abord.',message=error))
+			sys.exit()
+
 	except:
 		varbc = {}
 	try:
@@ -348,7 +356,8 @@ def dNamiVar(var,rangei,rangej,rangek):
 	elif var in varbc:
 		for loc in ['face','edge']:	
 			if loc in varbc[var]:
-				dvar = 'q'+loc+'_'+varbc[var][loc]+sizebc[loc][varbc[var][loc]][dim]+','+str(varbc[var]['ind'])+')'	
+				loctype = ''.join(sorted(varbc[var][loc].replace('1','').replace('max','')))
+				dvar = 'q'+loc+'_'+varbc[var][loc]+sizebc[loc][loctype][dim]+','+str(varbc[var]['ind'])+')'	
 
 	elif var in coefficients:
 		dvar = 'param_float('+str(coefficients[var])+' + 5)' 				
@@ -679,7 +688,8 @@ def updateqbc(vname,expr,i='i',j='j',k='k',update=False):
 
 	for loc in ['face','edge']:	
 		if loc in varbc[vname]:
-			qbc = 'q'+loc+'_'+varbc[vname][loc]+sizebc[loc][varbc[vname][loc]][dim]+','+str(varbc[vname]['ind'])+')'	
+			loctype = ''.join(sorted(varbc[vname][loc].replace('1','').replace('max','')))
+			qbc = 'q'+loc+'_'+varbc[vname][loc]+sizebc[loc][loctype][dim]+','+str(varbc[vname]['ind'])+')'	
 
 	if not update:	
 		qbcout = qbc + ' = ' + ' ' + expr
@@ -763,7 +773,7 @@ def compute_stored(StoredVar,Stencil,Order,output,localvar,update=False,rhs=None
 
 		loop_create('end',output)
 
-def compute_storedbc(StoredVar,Stencil,Order,output,localvar,dirBC,update=False,rhs=None):		
+def compute_storedbc(StoredVar,Stencil,Order,output,localvar,dirBC,update=False,updateqbc=False,rhs=None):		
 
 		# if update and rhs != None:
 		hlo_rhs      = rhs.hlo_rhs
@@ -823,11 +833,12 @@ def compute_storedbc(StoredVar,Stencil,Order,output,localvar,dirBC,update=False,
 			
 			gen_eqns_bc(StoredVar,output,localvar,
 			            rhsname,Order=Order,Stencil=Stencil,
-			            indi    =indi,indj =indj,indk =indk,
-			            DirDic  = DirDic,
-			            vname   = rhsname,
-			            update  = update,
-			            updatest= True)
+			            indi     =indi,indj =indj,indk =indk,
+			            DirDic   = DirDic,
+			            vname    = rhsname,
+			            update   = update,
+			            updatest = True,
+			            updateqbc= updateqbc)
 
 def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=False):		
 
@@ -860,7 +871,10 @@ def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fals
 		Path(incPATH+'includeRHS_locVarStoredStatic.f90').touch()
 
 		Path(incPATH+'include_qbcVar.f90').touch()
+		Path(incPATH+'includeRHS_locVarqbc.f90').touch()
+
 		Path(incPATH+'include_qbcVarStatic.f90').touch()
+		Path(incPATH+'includeRHS_locVarqbcStatic.f90').touch()
 
 		Path(incPATH+'include_bccmpstored.f90').touch()
 		Path(incPATH+'include_bccmpstoredstatic.f90').touch()
@@ -896,11 +910,44 @@ def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fals
 				compute_stored(static,Stencil,Order,storedincludeStatic,storedlocalvarStatic, update=False,rhs=rhs)
 
 			print(color('varstored generated with parameters (stencil, order): ('+str(Stencil)+','+str(Order)+')'))
+
+# NRY: I need to add the location selection (faces/edges)...			if varbc != {}: # Assuming only one call allowed with stored=True
+# NRY: I need to add the location selection (faces/edges)...				
+# NRY: I need to add the location selection (faces/edges)...				qbcincludenpath = incPATH+'include_qbcVar.f90'
+# NRY: I need to add the location selection (faces/edges)...				qbclocalvarpath = incPATH+'includeRHS_locVarqbc.f90'
+# NRY: I need to add the location selection (faces/edges)...	
+# NRY: I need to add the location selection (faces/edges)...				qbcincludenpathstatic = incPATH+'include_qbcVarStatic.f90'
+# NRY: I need to add the location selection (faces/edges)...				qbclocalvarpathstatic = incPATH+'includeRHS_locVarqbcStatic.f90'	
+# NRY: I need to add the location selection (faces/edges)...
+# NRY: I need to add the location selection (faces/edges)...				indrangei = 'indbc(1)=1\nindbc(2)=1\n'
+# NRY: I need to add the location selection (faces/edges)...				indrangej = 'indbc(3)=1\nindbc(4)=1\n'
+# NRY: I need to add the location selection (faces/edges)...				indrangek = 'indbc(5)=1\nindbc(6)=1\n'
+# NRY: I need to add the location selection (faces/edges)...	
+# NRY: I need to add the location selection (faces/edges)...				if dim == 2:
+# NRY: I need to add the location selection (faces/edges)...					if bcdir[0] == 'i':
+# NRY: I need to add the location selection (faces/edges)...						indrangej = 'indbc(3)=1\nindbc(4)=ny\n'
+# NRY: I need to add the location selection (faces/edges)...					elif bcdir[0] == 'j':	
+# NRY: I need to add the location selection (faces/edges)...						indrangei = 'indbc(1)=1\nindbc(2)=nx\n'
+# NRY: I need to add the location selection (faces/edges)...				elif dim == 3:
+# NRY: I need to add the location selection (faces/edges)...					if   bcdir[0] == 'i':
+# NRY: I need to add the location selection (faces/edges)...						indrangej = 'indbc(3)=1\nindbc(4)=ny\n'
+# NRY: I need to add the location selection (faces/edges)...						indrangek = 'indbc(5)=1\nindbc(6)=nz\n'
+# NRY: I need to add the location selection (faces/edges)...					elif bcdir[0] == 'j':	
+# NRY: I need to add the location selection (faces/edges)...						indrangei = 'indbc(1)=1\nindbc(2)=nx\n'	
+# NRY: I need to add the location selection (faces/edges)...						indrangek = 'indbc(5)=1\nindbc(6)=nz\n'
+# NRY: I need to add the location selection (faces/edges)...					elif bcdir[0] == 'k':	
+# NRY: I need to add the location selection (faces/edges)...						indrangei = 'indbc(1)=1\nindbc(2)=nx\n'	
+# NRY: I need to add the location selection (faces/edges)...						indrangej = 'indbc(3)=1\nindbc(4)=ny\n'
+# NRY: I need to add the location selection (faces/edges)...				indrange = {'i':indrangei,
+# NRY: I need to add the location selection (faces/edges)...				            'j':indrangej,
+# NRY: I need to add the location selection (faces/edges)...				            'k':indrangek}	
+# NRY: I need to add the location selection (faces/edges)...				compute_storedbc(var2process[k],Stencil,Order,loopst,locst,bcdir,update=update,rhs=rhs)
+
+
 		elif varstored != {}:
 			print(color('varstored not generated'))
 
 
-			
 		if update == False:
 			rhs_for        = open(incPATH[:-13]+'rhs.for','w')
 			rhs_template   = open(incPATH[:-13]+'rhs_template.for','r')
@@ -1005,12 +1052,13 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 
 		from genRhs import incPATH
 
-		dim = rhs.dim
-		wp  = rhs.wp
+		dim          = rhs.dim
+		wp           = rhs.wp
 		coefficients = rhs.coefficients
-		varname = rhs.varname
-		varstored = rhs.varstored
-		varsolved = rhs.varsolved
+		varname      = rhs.varname
+		varstored    = rhs.varstored
+		varsolved    = rhs.varsolved
+		varbc        = rhs.varbc
 
 		if rhs.stencil == 1:
 			print(color('[error] RHS must be defined before BCs'))
@@ -1078,19 +1126,39 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 							if bcdir == cornerperm[bcdir]:
 
 								# generate static/dynamic stored variables:			
-								
-								# from genRhs import varstored
 	
-								static  = {}
-								dynamic = {}
-	
+								staticstored  = {}
+								dynamicstored = {}
+								staticvarbc   = {}
+								dynamicvarbc  = {}
+
 								for var in varstored:
 									if varstored[var]['static']:
-										static[var] = varstored[var]['symb']
+										staticstored[var] = varstored[var]['symb']
 									else:
-										dynamic[var] = varstored[var]['symb']
+										dynamicstored[var] = varstored[var]['symb']
+
+								addvarbc = False
+
+								for var in varbc:
+									if 'face' in varbc:
+										if varbc['face'] == bcdir: addvarbc = True
+									elif 'edge' in varbc:
+										if varbc['edge'] == bcdir: addvarbc = True
+									else:
+										addvarbc = False
+
+									if addvarbc:	
+										if varbc[var]['static']:
+											staticvarbc[var] = varbc[var]['symb']
+										else:
+											dynamicvarbc[var] = varbc[var]['symb']		
+
 	
-								var2process = {'storedstatic':static, 'stored':dynamic}
+								var2process = {'storedstatic':staticstored, 
+											   'stored'      :dynamicstored,
+											   'varbcstatic' :staticvarbc,
+											   'varbc'       :dynamicvarbc}
 	
 								for k in var2process:
 									if var2process[k] != {}:
@@ -1123,12 +1191,18 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 										indrange = {'i':indrangei,
 										            'j':indrangej,
 										            'k':indrangek}	
-		
-										compute_storedbc(var2process[k],Stencil,Order,loopst,locst,bcdir,update=update,rhs=rhs)
+										
+										updateqbc = False
+										
+										if k[0:4] == 'varbc': updateqbc = True
+
+										compute_storedbc(var2process[k],Stencil,Order,loopst,locst,bcdir,update=update,updateqbc=updateqbc, rhs=rhs)
 			
 										create_bcsubroutine(st,k+'_faces_'+bcdir,
 														 'include_BClocVar_'+k+'_'+bcdir+'.f90',
-														 'include_BCLoops_'+k+'_' +bcdir+'.f90',indrange)	
+														 'include_BCLoops_'+k+'_' +bcdir+'.f90',indrange)
+
+
 								
 
 				else: # new bc name
@@ -1144,15 +1218,41 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 							# generate static/dynamic stored variables:			
 								
 							# from genRhs import varstored
-							static  = {}
-							dynamic = {}
+							
+							# generate static/dynamic stored variables:			
+	
+							staticstored  = {}
+							dynamicstored = {}
+							staticvarbc   = {}
+							dynamicvarbc  = {}
+
 							for var in varstored:
 								if varstored[var]['static']:
-									static[var] = varstored[var]['symb']
+									staticstored[var] = varstored[var]['symb']
 								else:
-									dynamic[var] = varstored[var]['symb']
-							
-							var2process = {'storedstatic':static, 'stored':dynamic}
+									dynamicstored[var] = varstored[var]['symb']
+
+							addvarbc = False
+
+							for var in varbc:
+								if 'face' in varbc:
+									if varbc['face'] == bcdir: addvarbc = True
+								elif 'edge' in varbc:
+									if varbc['edge'] == bcdir: addvarbc = True
+								else:
+									addvarbc = False
+
+								if addvarbc:	
+									if varbc[var]['static']:
+										staticvarbc[var] = varbc[var]['symb']
+									else:
+										dynamicvarbc[var] = varbc[var]['symb']		
+
+	
+							var2process = {'storedstatic':staticstored, 
+										   'stored'      :dynamicstored,
+										   'varbcstatic' :staticvarbc,
+										   'varbc'       :dynamicvarbc}
 	
 							for k in var2process:
 								if var2process[k] != {}:
@@ -1184,8 +1284,12 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 									indrange = {'i':indrangei,
 									            'j':indrangej,
 									            'k':indrangek}	
-	
-									compute_storedbc(var2process[k],Stencil,Order,loopst,locst,bcdir,update=update,rhs=rhs)
+
+									updateqbc = False
+										
+									if k[0:4] == 'varbc': updateqbc = True
+
+									compute_storedbc(var2process[k],Stencil,Order,loopst,locst,bcdir,update=update,updateqbc=updateqbc,rhs=rhs)
 		
 									create_bcsubroutine(st,k+'_faces_'+bcdir,
 													 'include_BClocVar_'+k+'_'+bcdir+'.f90',
@@ -1385,16 +1489,53 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 		if not setbc[0]: 
 
 			if stored:
-				# from genRhs import varstored
-				static  = {}
-				dynamic = {}
+
+
+
+				staticstored  = {}
+				dynamicstored = {}
+				staticvarbc   = {}
+				dynamicvarbc  = {}
+
 				for var in varstored:
 					if varstored[var]['static']:
-						static[var]  = varstored[var]['symb']
+						staticstored[var] = varstored[var]['symb']
 					else:
-						dynamic[var] = varstored[var]['symb']
+						dynamicstored[var] = varstored[var]['symb']
+
+				addvarbc = False
+
+				for var in varbc:
+					if 'face' in varbc:
+						if varbc['face'] == bcdir: addvarbc = True
+					elif 'edge' in varbc:
+						if varbc['edge'] == bcdir: addvarbc = True
+					else:
+						addvarbc = False
+
+					if addvarbc:	
+						if varbc[var]['static']:
+							staticvarbc[var] = varbc[var]['symb']
+						else:
+							dynamicvarbc[var] = varbc[var]['symb']		
+
+	
+				var2process = {'storedstatic':staticstored, 
+							   'stored'      :dynamicstored,
+							   'varbcstatic' :staticvarbc,
+							   'varbc'       :dynamicvarbc}
+
+
+				# # from genRhs import varstored
+				# static  = {}
+				# dynamic = {}
+				# for var in varstored:
+				# 	if varstored[var]['static']:
+				# 		static[var]  = varstored[var]['symb']
+				# 	else:
+				# 		dynamic[var] = varstored[var]['symb']
 				
-				var2process  = {'storedstatic':static, 'stored':dynamic}	
+				# var2process  = {'storedstatic':static, 'stored':dynamic}	
 				slcbc_stored = {} 
 
 
@@ -1468,6 +1609,31 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 											edgecallname_stored = {}
 											efname_stored       = {}
 											bcall_stored        = {}      
+
+											var2process['varbcstatic'] = {}
+											var2process['varbc']       = {}	
+											staticvarbc = {}
+											dynamicvarbc= {}
+
+											addvarbc = False
+											for var in varbc:
+												if 'face' in varbc:
+													if varbc['face'] == dir1+dir2: addvarbc = True
+												elif 'edge' in varbc:
+													if varbc['edge'] == dir1+dir2: addvarbc = True
+												else:
+													addvarbc = False
+								
+												if addvarbc:	
+													if varbc[var]['static']:
+														staticvarbc[var] = varbc[var]['symb']
+													else:
+														dynamicvarbc[var] = varbc[var]['symb']	
+	
+											var2process['varbcstatic'] = staticvarbc
+											var2process['varbc']       = dynamicvarbc
+												
+	
 											for k in var2process:
 												if var2process[k] != {}:
 													edgecallname_stored[k] = k+'_edges_'+dir1+'_'+dir2+'_'+str(layer1)
@@ -1488,7 +1654,36 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 											# stored open include edges static/dynamic
 											if stored:	
 												localvar_stored = {}
-												output_stored       = {}      
+												output_stored       = {} 
+
+											var2process['varbcstatic'] = {}
+											var2process['varbc']       = {}	
+											staticvarbc = {}
+											dynamicvarbc= {}
+
+											if layer1*layer2 == 0:
+												addvarbc = False
+												for var in varbc:
+													if 'face' in varbc:
+														if varbc['face'] == dir1+dir2: addvarbc = True
+													elif 'edge' in varbc:
+														if varbc['edge'] == dir1+dir2: addvarbc = True
+													else:
+														addvarbc = False
+								
+													if addvarbc:	
+														if varbc[var]['static']:
+															staticvarbc[var] = varbc[var]['symb']
+														else:
+															dynamicvarbc[var] = varbc[var]['symb']	
+	
+												var2process['varbcstatic'] = staticvarbc
+												var2process['varbc']       = dynamicvarbc
+											else:
+												var2process['varbcstatic'] = {}
+												var2process['varbc']       = {}	
+
+
 												for k in var2process:
 													if var2process[k] != {}:
 														localvar_stored[k] = open(incPATH+'include_'+k+'_edges_'+dir1+'_'+dir2+'_'+str(layer1)+'_'+str(layer2)+'_BClocVar.f90','a+')
@@ -1524,12 +1719,17 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 														for v in var2process[k]:
 															vname_st[v] = v
 
+														updateqbc = False
+										
+														if k[0:4] == 'varbc': updateqbc = True	
+
 														gen_eqns_bc(var2process[k],output_stored[k],localvar_stored[k],
 												            vname_st,Order=Order,Stencil=Stencil,
 												            indi     = indi,indj = indj,indk = indk,
 												            DirDic   = DirDic,
 												            vname    = vname_st,
 												            update   = False,
+												            updateqbc= updateqbc,
 												            updatest = True)
 
 #														
@@ -1813,7 +2013,7 @@ def genBC_calls(rhs):
 	varname = rhs.varname
 	varstored = rhs.varstored
 	varsolved = rhs.varsolved
-
+	varbc     = rhs.varbc
 	
 	hlo_rhs = rhs.hlo_rhs
 	stencil_rhs = rhs.stencil
@@ -1839,15 +2039,22 @@ def genBC_calls(rhs):
 			if bcdir in list(bc_info[bcname].keys()):
 				bcphy_all[bcdir][bcname] = bc_info[bcname][bcdir] 
 
-	static  = {}
-	dynamic = {}	
+	staticstored  = {}
+	dynamicstored = {}
+	staticvarbc   = {}
+	dynamicvarbc  = {}
+
 	for var in varstored:
 		if varstored[var]['static']:
-			static[var]  = varstored[var]['symb']
+			staticstored[var] = varstored[var]['symb']
 		else:
-			dynamic[var] = varstored[var]['symb']
-	
-	var2process   = {'storedstatic':static, 'stored':dynamic}	
+			dynamicstored[var] = varstored[var]['symb']	
+
+	var2process = {'storedstatic':staticstored, 
+				   'stored'      :dynamicstored,
+				   'varbcstatic' :staticvarbc,
+				   'varbc'       :dynamicvarbc}
+
 	slcbc_stored  = {} 
 	efname_stored = {}
 
@@ -1968,14 +2175,32 @@ def genBC_calls(rhs):
 	
 								edone.append(dir1+dir2)
 	
-								# corner phy bc (NRY)
-								# NRY
 							
 
 
-
-
 # # Stored OPEN select and static/dyn extraction	
+							var2process['varbcstatic'] = {}
+							var2process['varbc']       = {}	
+							staticvarbc = {}
+							dynamicvarbc= {}
+							addvarbc = False
+							for var in varbc:
+								if 'face' in varbc:
+									if varbc['face'] == dir1+dir2: addvarbc = True
+								elif 'edge' in varbc:
+									if varbc['edge'] == dir1+dir2: addvarbc = True
+								else:
+									addvarbc = False
+							
+								if addvarbc:	
+									if varbc[var]['static']:
+										staticvarbc[var] = varbc[var]['symb']
+									else:
+										dynamicvarbc[var] = varbc[var]['symb']	
+	
+							var2process['varbcstatic'] = staticvarbc
+							var2process['varbc']       = dynamicvarbc
+
 	
 							for k in var2process:
 								if var2process[k] != {}:
@@ -2078,6 +2303,30 @@ def genBC_calls(rhs):
 				slcbd.write('   '+bounds[axebd])		
 							   	
 # # GENERATE STATIC/DYNAMIC STORED VARIABLES:			
+			var2process['varbcstatic'] = {}
+			var2process['varbc']       = {}	
+			staticvarbc = {}
+			dynamicvarbc= {}
+
+
+			addvarbc = False
+			for var in varbc:
+				if 'face' in varbc:
+					if varbc['face'] == dir1: addvarbc = True
+				elif 'edge' in varbc:
+					if varbc['edge'] == dir1: addvarbc = True
+				else:
+					addvarbc = False
+			
+				if addvarbc:	
+					if varbc[var]['static']:
+						staticvarbc[var] = varbc[var]['symb']
+					else:
+						dynamicvarbc[var] = varbc[var]['symb']	
+	
+			var2process['varbcstatic'] = staticvarbc
+			var2process['varbc']       = dynamicvarbc
+
 								
 			for k in var2process:
 				if var2process[k] != {}:	
