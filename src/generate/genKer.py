@@ -689,7 +689,7 @@ def updateVarbc(vname,expr,i='i',j='j',k='k',update=False):
 	for loc in ['face','edge']:	
 		if loc in varbc[vname]:
 			loctype = ''.join(sorted(varbc[vname][loc].replace('1','').replace('max','')))
-			qbc = 'q'+loc+'_'+varbc[vname][loc]+sizebc[loc][loctype][dim]+','+str(varbc[vname]['ind'])+')'	
+			qbc = 'q'+loc+'_'+loctype+sizebc[loc][loctype][dim]+','+str(varbc[vname]['ind'])+')'	
 
 	if not update:	
 		qbcout = qbc + ' = ' + ' ' + expr
@@ -942,6 +942,9 @@ def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fals
 
 			dummy  = open(incPATH+'selectstoredbc.f90'   ,'a+')
 			dummy  = open(incPATH+'selectstoredstaticbc.f90'   ,'a+')
+
+			dummy  = open(incPATH+'selectvarbcbc.f90'   ,'a+')
+			dummy  = open(incPATH+'selectvarbcstaticbc.f90'   ,'a+')
 
 			for d in ['x','y','z']:
 				dummy  = open(incPATH+'selectfilterbc_'+d+'.f90' ,'a+')
@@ -2444,8 +2447,8 @@ def globvar():
 				loctype = ''.join(sorted(varbc[v][bcloc].replace('1','').replace('max','')))
 				nvbc[bcloc][loctype] = nvbc[bcloc][loctype] + 1
 
-	qbc_out = 'real(wp),intent(in) ::'
-	qbcrk_out = 'real(wp),intent(in) ::'
+	qbc_out = 'real(wp),intent(inout) ::'
+	qbcrk_out = 'real(wp),intent(inout) ::'
 
 	for bcloc in ['face','edge']:
 			for dir in nvbc[bcloc]:

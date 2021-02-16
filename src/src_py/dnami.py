@@ -74,7 +74,8 @@ def create_tree():
 	for v in varbc:
 		for bcloc in ['face','edge']:
 			if bcloc in varbc[v]:
-				dtree['eqns']['qvec']['bcs'][bcloc][varbc[v][bcloc]].append([v,varbc[v]['ind']])
+				loctype = ''.join(sorted(varbc[v][bcloc].replace('1','').replace('max','')))
+				dtree['eqns']['qvec']['bcs'][bcloc][loctype].append([v,varbc[v]['ind']])
 
 
 	dtree['eqns']['coeff'] = []
