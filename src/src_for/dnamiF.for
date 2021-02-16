@@ -253,6 +253,9 @@ enddo ! END cache blocking k
 !$OMP END DO NOWAIT
 
 #include "include_bcstored.f90"
+
+#include "include_bcvarbc.f90"
+
     
     CASE(1)
 
@@ -278,6 +281,8 @@ enddo ! END cache blocking k
 !$OMP END DO NOWAIT
 
 #include "include_bcstoredstatic.f90"
+
+#include "include_bcvarbcstatic.f90"
 
   END SELECT
 
