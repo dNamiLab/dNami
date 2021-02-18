@@ -82,8 +82,8 @@ def write_restart(n,t,flag,tree,fpath='./restarts/'):
                                 dirBC = dirBC + ['j1','jmax']
                         if ndim == 3:   
                                 dirBC = dirBC + ['j1','jmax','k1','kmax']
-                        for dir in dirBC:
-                                fnameshell[dir] = fpath + 'restartshell_'+dir+'_'+ str(n).zfill(8)
+                        for dire in dirBC:
+                                fnameshell[dire] = fpath + 'restartshell_' + str(n).zfill(8) + '_%s' % dire
                 
         else:
                 fname = './out/liv/restart.bin'
@@ -242,7 +242,6 @@ def write_restart(n,t,flag,tree,fpath='./restarts/'):
 
 
                 
-
 def read_restart(tree,fname='restart.bin'):
         # unpack useful tree data
         wp   = tree['misc']['working precision']
