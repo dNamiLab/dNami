@@ -493,9 +493,9 @@ def local_coordinates(tree, var, beg, end, idx, ngb, nloc):
 		out[:] = var[beg-1:end]
 	return out
 
-def create_grid(tree):
+def create_grid(tree, x1=None, x2=None, y1=None, y2=None, z1=None, z2=None, x_coordinates=None, y_coordinates=None, z_coordinates=None):
 	
-	wp   = tree['misc']['working precision']
+	wp   = tree['misc']['working precision'] 
 	ndim = tree['eqns']['ndim']
 	grid = tree['grid']['size']
 	geom = tree['grid']['geom']
@@ -506,8 +506,21 @@ def create_grid(tree):
 	dmpi = tree['mpi']['dMpi']
 	ibeg,jbeg,kbeg = dmpi.ibeg,dmpi.jbeg,dmpi.kbeg
 	iend,jend,kend = dmpi.iend,dmpi.jend,dmpi.kend
+	
+	hlo = tree['num']['hlo']
 
-	hlo = tree['num']['hlo'] 
+	if not x1:
+		x1 = cst(0.0)
+	if not x2:
+		x2 = Lx
+	if not y1:
+		y1 = cst(0.0)
+	if not y2:
+		y2 = Ly
+	if not z1:
+		z1 = cst(0.0)
+	if not z2:
+		z2 = Lz
 
 	# create domain
 	#                                   pt 1     2          n-1    n     period
@@ -516,31 +529,43 @@ def create_grid(tree):
 	#                                       \___________________________/ 
 	
 	bc = tree['bc']['allbc']
-
-	if ('i1' in bc) or ('imax' in bc):
-		dx = Lx/cst(nxgb+2*hlo-1)
-		x  = np.linspace(cst(0.0),Lx,nxgb+2*hlo,dtype=wp)
-	else:	
-		dx = Lx/cst(nxgb)
-		x  = np.arange(dx/cst(2.),Lx,dx,dtype=wp)
+	if x_coordinates is None:
+		if ('i1' in bc) or ('imax' in bc):
+			dx = Lx/cst(nxgb+2*hlo-1)
+			x  = np.linspace(x1,x2,nxgb+2*hlo,dtype=wp)
+		else:	
+			dx = Lx/cst(nxgb)
+			x  = np.arange(dx/cst(2.),Lx,dx,dtype=wp)
+	else:
+		x = x_coordinates[:]
+		dx = Lx/cst(nxgb+2*hlo-1) # Only added dx for non-periodic
 
 	if nygb > 1:
-		if ('j1' in bc) or ('jmax' in bc):
-			dy = Ly/cst(nygb+2*hlo-1)
-			y  = np.linspace(cst(0.0),Ly,nygb+2*hlo,dtype=wp)
-		else:		
-			dy = Ly/cst(nygb)
-			y  = np.arange(dy/cst(2.),Ly,dy,dtype=wp)
+		if y_coordinates is None:
+			if ('j1' in bc) or ('jmax' in bc):
+				dy = Ly/cst(nygb+2*hlo-1)
+				# y  = np.linspace(cst(0.0),Ly,nygb+2*hlo,dtype=wp)
+				y = np.linspace(y1, y2, nygb+2*hlo,dtype=wp)
+			else:		
+				dy = Ly/cst(nygb)
+				y  = np.arange(dy/cst(2.),Ly,dy,dtype=wp)
+		else:
+			y = y_coordinates[:]
+			dy = Ly/cst(nygb+2*hlo-1) # Only added dy for non-periodic
 	else:
 		Ly = cst(0.); y = []; dy = cst(0.)
 		
 	if nzgb > 1:
-		if ('k1' in bc) or ('kmax' in bc):
-			dz = Lz/cst(nzgb+2*hlo-1)
-			z  = np.linspace(cst(0.0),Lz,nzgb+2*hlo,dtype=wp)
-		else:			
-			dz = Lz/cst(nzgb)
-			z  = np.arange(dz/cst(2.),Lz,dz,dtype=wp)
+		if z_coordinates is None:
+			if ('k1' in bc) or ('kmax' in bc):
+				dz = Lz/cst(nzgb+2*hlo-1)
+				z  = np.linspace(x1,Lz,nzgb+2*hlo,dtype=wp)
+			else:			
+				dz = Lz/cst(nzgb)
+				z  = np.arange(dz/cst(2.),Lz,dz,dtype=wp)
+		else:
+			z = z_coordinates[:]
+			dz = Lz/cst(nzgb+2*hlo-1) # Only added dz for non-periodic
 	else:
 		Lz = cst(0.); z = []; dz = cst(0.)
 
@@ -553,7 +578,7 @@ def create_grid(tree):
 	# w/ hlo     [<------------------------------------------------------->]
 	# loc py ind    0     1      hlo                   hlo+n-1      n+2*hlo-1
 	# glo py ind             ibeg+hlo-1               iend+hlo-1
-	
+
 	# Create local coordinate arrays on each MPI process depending on whether the boundary is periodic or not
 	# Local MPI sizes
 	nx = tree['mpi']['dMpi'].nx 
