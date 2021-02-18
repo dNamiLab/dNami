@@ -1,7 +1,7 @@
 import numpy as np
 import dnamiF
 import sys
-
+from rhsinfo import wp
 import dnami_io
 
 from dnami_mpi import type_mpi
@@ -467,9 +467,35 @@ def allocate(tree):
 # GEOMETRY
 # =============================================================================
 
+def local_coordinates(tree, var, beg, end, idx, ngb, nloc):
+	""" Returns the coordinate values local to an MPI process."""
+	hlo, bc = tree['num']['hlo'], tree['bc']['allbc']
+	# Each local array is padded by halos on either side, to be consistent with the shape of the q vector arrays
+	out = np.zeros(nloc + 2*hlo, dtype=wp) # Explicitly define the working precision
+	if ('%s1' % idx in bc) or ('%smax' % idx in bc):
+		if beg == 1 and end == ngb: # No MPI => local coordinate has size n+2*hlo
+			out = var[:]
+		elif beg == 1: # Bottom of the domain, fill from the first halo to local n+hlo
+			out[0:nloc+hlo] = var[beg-1:end+hlo]
+			# Overlap with the layer above
+			out[nloc+hlo:] = var[end+hlo:end+2*hlo]
+		elif end == ngb: # Top of the domain, fill from hlo to n+2*hlo
+			out[hlo:nloc+2*hlo] = var[beg-1+hlo:end+2*hlo]
+			# Overlap with the layer below
+			out[0:hlo] = var[beg-1:beg-1+hlo]
+		else: # Away from boundaries, place the coordinates padded by hlo on either side
+			out[hlo:nloc+hlo] = var[beg-1+hlo:end+hlo]
+			# Overlap with the layers above/below
+			out[0:hlo] = var[beg-1:beg-1+hlo]
+			out[nloc+hlo:] = var[end+hlo:end+2*hlo]
+	else: # Periodic boundary condition
+		out = np.zeros(nloc)
+		out[:] = var[beg-1:end]
+	return out
+
 def create_grid(tree):
 	
-	wp   = tree['misc']['working precision'] 
+	wp   = tree['misc']['working precision']
 	ndim = tree['eqns']['ndim']
 	grid = tree['grid']['size']
 	geom = tree['grid']['geom']
@@ -528,18 +554,19 @@ def create_grid(tree):
 	# loc py ind    0     1      hlo                   hlo+n-1      n+2*hlo-1
 	# glo py ind             ibeg+hlo-1               iend+hlo-1
 	
+	# Create local coordinate arrays on each MPI process depending on whether the boundary is periodic or not
+	# Local MPI sizes
+	nx = tree['mpi']['dMpi'].nx 
+	ny = tree['mpi']['dMpi'].ny
+	nz = tree['mpi']['dMpi'].nz
+	geom['xloc'] = local_coordinates(tree, x, ibeg, iend, 'i', nxgb, nx)
+	if ndim == 2:
+		geom['yloc'] = local_coordinates(tree, y, jbeg, jend, 'j', nygb, ny)
+		# xx,yy = np.meshgrid(xloc,yloc,sparse=False,indexing='ij')
 	if ndim == 3:
-		xloc = x[ibeg-1:iend] # without halos
-		yloc = y[jbeg-1:jend]
-		zloc = z[kbeg-1:kend]
-		xx,yy,zz = np.meshgrid(xloc,yloc,zloc,sparse=False,indexing='ij')
-		geom['xloc'],geom['yloc'], geom['zloc'] = xloc,yloc,zloc
-	elif ndim == 2:
-		xloc = x[ibeg-1:iend] # without halos
-		yloc = y[jbeg-1:jend]
-		xx,yy = np.meshgrid(xloc,yloc,sparse=False,indexing='ij')
-		geom['xloc'],geom['yloc'] = xloc,yloc
-	else:
-		xloc = x[ibeg-1:iend] # without halos
-		geom['xloc'] = xloc
+		geom['yloc'] = local_coordinates(tree, y, jbeg, jend, 'j', nygb, ny)
+		geom['zloc'] = local_coordinates(tree, z, kbeg, kend, 'k', nzgb, nz)
+		# xx,yy,zz = np.meshgrid(xloc,yloc,zloc,sparse=False,indexing='ij')
+	if ndim > 3:
+		raise NotImplementedError("Local coordinates are only implemented up to ndim=3.")
 	return tree
