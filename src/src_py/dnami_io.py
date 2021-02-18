@@ -334,108 +334,115 @@ def read_restart(tree,fname='restart.bin'):
 
         if fnameshell != {}     :
 
-                position = {'i':[dmpi.ibeg,dmpi.iend],
-                                'j':[dmpi.jbeg,dmpi.jend],
-                                'k':[dmpi.kbeg,dmpi.kend]}
+            position = {'i':[dmpi.ibeg,dmpi.iend],
+                            'j':[dmpi.jbeg,dmpi.jend],
+                            'k':[dmpi.kbeg,dmpi.kend]}
 
-                nglb    = {'i':nxgb,'j':nygb,'k':nzgb}
+            nglb    = {'i':nxgb,'j':nygb,'k':nzgb}
 
-                fh      = {}
-                header  = {}
-                subarray= {}
+            fh      = {}
+            header  = {}
+            subarray= {}
 
-                for dir in ['i1','imax','j1','jmax','k1','kmax']:
+            # for dir in dirBC:
 
-                        wposition = {'i':dmpi.ibeg,
-                                     'j':dmpi.jbeg,
-                                     'k':dmpi.kbeg}
+            #     wposition = {'i':dmpi.ibeg,
+            #                  'j':dmpi.jbeg,
+            #                  'k':dmpi.kbeg}
 
-                        if ndim == 3:             
-                                sizeglb = {'i':nxgb + 2*hlo,'j':nygb + 2*hlo,'k': nzgb + 2*hlo}
-                                extpos = ['i','j','k']
-                        elif ndim == 2: 
-                                sizeglb = {'i':nxgb + 2*hlo,'j':nygb + 2*hlo,'k': nzgb }
-                                extpos = ['i','j']
-                        elif ndim ==1:
-                                sizeglb = {'i':nxgb + 2*hlo,'j':nygb ,'k': nzgb }
-                                extpos = ['i']                                          
+            #     if ndim == 3:             
+            #             sizeglb = {'i':nxgb + 2*hlo,'j':nygb + 2*hlo,'k': nzgb + 2*hlo}
+            #             extpos = ['i','j','k']
+            #     elif ndim == 2: 
+            #             sizeglb = {'i':nxgb + 2*hlo,'j':nygb + 2*hlo,'k': nzgb }
+            #             extpos = ['i','j']
+            #     elif ndim ==1:
+            #             sizeglb = {'i':nxgb + 2*hlo,'j':nygb ,'k': nzgb }
+            #             extpos = ['i']                                          
 
-                        # sizeglb = {'i':nxgb ,'j':nygb ,'k': nzgb }
-                        sizeloc = {'i':nx  ,'j':ny  ,'k':nz  }
-                        index   = {'i':[hlo,hlo+nx]  ,'j':[hlo,hlo+ny]  ,'k':[hlo,hlo+nz] }
-
-
-                        for d in extpos:
-                                if d != dir[0]:
-                                        if position[d][0] == 1:
-                                                index[d][0]= 0                                  
-                                                sizeloc[d] = sizeloc[d] + hlo
-                                        else:
-                                                wposition[d] =  wposition[d] + hlo
-                                        if position[d][1] == nglb[d]:
-                                                index[d][1]= index[d][1] + hlo
-                                                sizeloc[d] = sizeloc[d]  + hlo
+            #     # sizeglb = {'i':nxgb ,'j':nygb ,'k': nzgb }
+            #     sizeloc = {'i':nx  ,'j':ny  ,'k':nz  }
+            #     index   = {'i':[hlo,hlo+nx]  ,'j':[hlo,hlo+ny]  ,'k':[hlo,hlo+nz] }
 
 
-                        # header
-                        headsize = 7; head = np.empty(headsize,dtype=wp)
-                        head[:]  = [headsize,n,t,nxgb,nygb,nzgb,nvar] # implicit type conversion        
+            #     for d in extpos:
+            #             if d != dir[0]:
+            #                     if position[d][0] == 1:
+            #                             index[d][0]= 0                                  
+            #                             sizeloc[d] = sizeloc[d] + hlo
+            #                     else:
+            #                             wposition[d] =  wposition[d] + hlo
+            #                     if position[d][1] == nglb[d]:
+            #                             index[d][1]= index[d][1] + hlo
+            #                             sizeloc[d] = sizeloc[d]  + hlo
+            headsize = 7           
+            for direction in dirBC:
                 
-                        if iMpi:
-                                header[dir] = MPIWP.Create_contiguous(headsize)
-                                header[dir].Commit()    
-                                fh[dir] = MPI.File.Open(dmpi.comm_torus,fnameshell[dir],MPI.MODE_WRONLY|MPI.MODE_CREATE)
-                                fh[dir].Set_view(0,MPIWP,header[dir])
-                                if ioproc: fh[dir].Read_at(0,head)
-                                header[dir].Free()      
-                                fh[dir].Close()
-                                        
-
-                        if (position[dir[0]][0] == 1 and dir[1] == '1') or (position[dir[0]][1] == nglb[dir[0]] and dir[1:] == 'max' ):
-
-                                sizeglb[dir[0]] = hlo
-                                sizeloc[dir[0]] = hlo
-
-                                if position[dir[0]][0] == 1:
-                                        index[dir[0]]   = [0,hlo]
-                                else:
-                                        index[dir[0]]   = [index[dir[0]][1],index[dir[0]][1]+hlo]                               
-
-                                wposition[dir[0]] = 1
-
-                                # body
-                                dat     =     np.empty((sizeloc['i'],sizeloc['j'],sizeloc['k'],nvar),dtype=wp)  
-
-                                if ndim == 3:
-                                        dat     =     q[index['i'][0]:index['i'][1]
-                                                           ,index['j'][0]:index['j'][1]
-                                                           ,index['k'][0]:index['k'][1],0:nvar].copy()
-                                elif ndim == 2:
-                                        dat     =     q[index['i'][0]:index['i'][1]
-                                                           ,index['j'][0]:index['j'][1]
-                                                           ,np.newaxis,0:nvar].copy()   
-                                else:
-                                        dat     =     q[index['i'][0]:index['i'][1]
-                                                           ,np.newaxis
-                                                           ,np.newaxis,0:nvar].copy()   
-
-                                if iMpi:
-                                        fh[dir]  = MPI.File.Open(dmpi.combc[dir],fnameshell[dir],MPI.MODE_WRONLY|MPI.MODE_CREATE)
-                                        subarray = MPIWP.Create_subarray((  sizeglb['i'],    sizeglb['j'],    sizeglb['k'],  nvar),
-                                                                                                         (  sizeloc['i'],    sizeloc['j'],    sizeloc['k'],  nvar),
-                                                                                                         (wposition['i']-1,wposition['j']-1,wposition['k']-1,   0))
-                                        subarray.Commit()
-                                        disp = MPIWP.Get_size()*headsize
-                                        fh[dir].Set_view(disp,MPIWP,subarray)
-                                        fh[dir].Write_all(dat)
-                                        subarray.Free()
-                                        fh[dir].Close()
-                                else:
-                                        with open(fnameshell[dir],"wb") as fh[dir]:
-                                                np.concatenate((head,np.reshape(dat,(sizeloc['i']*sizeloc['j']*sizeloc['k']*nvar)))).tofile(fh[dir])
-                                        fh[dir].closed          
+                with open(fnameshell[dir],"rb") as fh:
+                        head = np.fromfile(fh,dtype=wp,count=headsize)
+                        if ndim == 3:
+                            if direction == 'i1' or direction == 'imax':
+                                dat = np.fromfile(fh,dtype=wp,count=hlo*(nygb+2*hlo)*(nzgb+2*hlo)*nvar)
+                                dat = np.reshape(dat, (hlo,nygb+2*hlo,nzgb+2*hlo,nvar))
+                            elif direction == 'j1' or direction == 'jmax':
+                                dat = np.fromfile(fh,dtype=wp,count=hlo*(nxgb+2*hlo)*(nzgb+2*hlo)*nvar)
+                                dat = np.reshape(dat, (nxgb+2*hlo,hlo,nzgb+2*hlo,nvar))
+                            else:
+                                dat = np.fromfile(fh,dtype=wp,count=hlo*(nxgb+2*hlo)*(nygb+2*hlo)*nvar)
+                                dat = np.reshape(dat, (nxgb+2*hlo,nygb+2*hlo,hlo,nvar))
+                        elif ndim == 2:
+                            if direction == 'i1' or direction == 'imax':
+                                dat  = np.fromfile(fh,dtype=wp,count=hlo*(nygb+2*hlo)*nvar)
+                                # dat = np.ones(hlo*(nygb+2*hlo)*nvar)*1000
+                                dat  = np.reshape(dat,(hlo,nygb+2*hlo,nvar))
+                            else:
+                                dat  = np.fromfile(fh,dtype=wp,count=hlo*(nxgb+2*hlo)*nvar)
+                                # dat = 10001*np.ones(hlo*(nxgb+2*hlo)*nvar)
+                                dat  = np.reshape(dat,(nxgb+2*hlo,hlo,nvar))
+                        else: # 1D case
+                            dat  = np.reshape(dat,(hlo,nvar))
+                fh.closed
+                # Beginning and end indices of the local MPI chunks
+                ibeg, iend, jbeg, jend,  kbeg, kend = dmpi.ibeg, dmpi.iend, dmpi.jbeg, dmpi.jend, dmpi.kbeg, dmpi.kend
+                # Fill out the halo data from the restart file
+                # x boundaries ndim = 1, 2, or 3
+                if direction == 'i1':
+                    if ibeg-1 == 0:
+                        if ndim == 3:
+                            q[0:hlo,:,:,:] = dat[:,jbeg-1:jend+2*hlo,kbeg-1:kend+2*hlo,:].copy()
+                        elif ndim == 2:
+                            q[0:hlo,:,:] = dat[:,jbeg-1:jend+2*hlo,:].copy()
+                        else:
+                            q[0:hlo,:] = dat[:,:].copy()
+                if direction == 'imax':
+                    if iend == nxgb:
+                        if ndim == 3:
+                            q[nx+hlo:nx+2*hlo,:,:,:] = dat[:,jbeg-1:jend+2*hlo,kbeg-1:kend+2*hlo,:].copy()
+                        elif ndim == 2:
+                            q[nx+hlo:nx+2*hlo,:,:] = dat[:,jbeg-1:jend+2*hlo,:].copy()
+                        else:
+                            q[nx+hlo:nx+2*hlo,:] = dat[:,:].copy()
+                # y boundaries ndim = 2 or 3
+                if direction == 'j1':
+                    if jbeg-1 == 0:
+                        if ndim == 3:
+                            q[:,0:hlo,:,:] = dat[ibeg-1:iend+2*hlo,:,kbeg-1:kend+2*hlo,:].copy()
+                        else:
+                            q[:,0:hlo,:] = dat[ibeg-1:iend+2*hlo,:,:].copy()
+                if direction == 'jmax':
+                    if jend == nygb:
+                        if ndim == 3:
+                            q[:,ny+hlo:ny+2*hlo,:,:] = dat[ibeg-1:iend+2*hlo,:,kbeg-1:kend+2*hlo,:].copy()
+                        else:
+                            q[:,ny+hlo:ny+2*hlo,:] = dat[ibeg-1:iend+2*hlo,:,:].copy()
+                # z boundaries, ndim = 3
+                if direction == 'k1':
+                    if kbeg-1 == 0:
+                        q[:,:,0:hlo,:] = dat[ibeg-1:iend+2*hlo,jbeg-1:jend+2*hlo,:,:].copy()
+                if direction == 'kmax':
+                    if kend == nzgb:
+                        q[:,:,nz+hlo:nz+2*hlo,:] = dat[ibeg-1:iend+2*hlo,jbeg-1:jend+2*hlo,:,:].copy()
         return tree
-
 
 # -- READ 1D BASEFLOW INTO 2D FIELD
 
