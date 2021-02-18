@@ -888,11 +888,12 @@ def read_custom(fname, tree, var2read):
 # Output
 # =============================================================================
 
-def write_data(field,path,n,t,tree):
-        # file name switch (for live views)
+def write_data(field,n,t,tree,fpath='./out/',fname='output'):
+        # File name switch (for live views)
+        fprefix = fname
         ndim = tree['eqns']['ndim']     
         bcs  = tree['bc']
-        fname      = path + 'output_' + str(n).zfill(8)
+        fname      = fpath + '%s_' % fprefix + str(n).zfill(8)
         fnameshell = {} 
         if  len(bcs['allbc']) != 0:     
                 dirBC = ['i1','imax']
@@ -900,8 +901,8 @@ def write_data(field,path,n,t,tree):
                         dirBC = dirBC + ['j1','jmax']
                 if ndim == 3:   
                         dirBC = dirBC + ['j1','jmax','k1','kmax']
-                for dir in dirBC:
-                        fnameshell[dir] = path + 'outputshell_'+dir+'_'+ str(n).zfill(8)
+                for dire in dirBC:
+                        fnameshell[dire] = fpath + '%sshell_' % fprefix + dire +'_'+ str(n).zfill(8)
         
         
         # unpack useful tree data
@@ -972,7 +973,7 @@ def write_data(field,path,n,t,tree):
                 header  = {}
                 subarray= {}
 
-                for dir in dirBC:
+                for dire in dirBC:
                         wposition = {'i':dmpi.ibeg,
                                      'j':dmpi.jbeg,
                                      'k':dmpi.kbeg}
@@ -994,7 +995,7 @@ def write_data(field,path,n,t,tree):
 
 
                         for d in extpos:
-                                if d != dir[0]:
+                                if d != dire[0]:
                                         if position[d][0] == 1:
                                                 index[d][0]= 0                                  
                                                 sizeloc[d] = sizeloc[d] + hlo
@@ -1004,32 +1005,32 @@ def write_data(field,path,n,t,tree):
                                                 index[d][1]= index[d][1] + hlo
                                                 sizeloc[d] = sizeloc[d]  + hlo                               
 
-                        sizeglb[dir[0]] = hlo
+                        sizeglb[dire[0]] = hlo
 
                         # header
                         headsize = 7; head = np.empty(headsize,dtype=wp)
                         head[:]  = [headsize,n,t,sizeglb['i'],sizeglb['j'],sizeglb['k'],nvar] # implicit type conversion        
                 
                         if iMpi:
-                                header[dir] = MPIWP.Create_contiguous(headsize)
-                                header[dir].Commit()    
-                                fh[dir] = MPI.File.Open(dmpi.comm_torus,fnameshell[dir],MPI.MODE_WRONLY|MPI.MODE_CREATE)
-                                fh[dir].Set_view(0,MPIWP,header[dir])
-                                if ioproc: fh[dir].Write_at(0,head)
-                                header[dir].Free()      
-                                fh[dir].Close()
+                                header[dire] = MPIWP.Create_contiguous(headsize)
+                                header[dire].Commit()    
+                                fh[dire] = MPI.File.Open(dmpi.comm_torus,fnameshell[dire],MPI.MODE_WRONLY|MPI.MODE_CREATE)
+                                fh[dire].Set_view(0,MPIWP,header[dire])
+                                if ioproc: fh[dire].Write_at(0,head)
+                                header[dire].Free()      
+                                fh[dire].Close()
                                         
-                        if (position[dir[0]][0] == 1 and dir[1] == '1') or (position[dir[0]][1] == nglb[dir[0]] and dir[1:] == 'max' ):
+                        if (position[dire[0]][0] == 1 and dire[1] == '1') or (position[dire[0]][1] == nglb[dire[0]] and dire[1:] == 'max' ):
 
-                                sizeglb[dir[0]] = hlo
-                                sizeloc[dir[0]] = hlo
+                                sizeglb[dire[0]] = hlo
+                                sizeloc[dire[0]] = hlo
 
-                                if dir[1:] == 'max':
-                                        index[dir[0]]   = [index[dir[0]][1],index[dir[0]][1]+hlo]       
+                                if dire[1:] == 'max':
+                                        index[dire[0]]   = [index[dire[0]][1],index[dire[0]][1]+hlo]       
                                 else:                                   
-                                        index[dir[0]]   = [0,hlo]                       
+                                        index[dire[0]]   = [0,hlo]                       
 
-                                wposition[dir[0]] = 1
+                                wposition[dire[0]] = 1
 
                                 # body
                                 if ndim == 3:
@@ -1058,20 +1059,20 @@ def write_data(field,path,n,t,tree):
                                                                                                         ,np.newaxis
                                                                                                         ,np.newaxis,np.newaxis].copy(),axis=3)                                                             
                                 if iMpi:
-                                        fh[dir]  = MPI.File.Open(dmpi.combc[dir],fnameshell[dir],MPI.MODE_WRONLY|MPI.MODE_CREATE)
+                                        fh[dire]  = MPI.File.Open(dmpi.combc[dire],fnameshell[dire],MPI.MODE_WRONLY|MPI.MODE_CREATE)
                                         subarray = MPIWP.Create_subarray((  sizeglb['i'],    sizeglb['j'],    sizeglb['k'],  nvar),
                                                                                                          (  sizeloc['i'],    sizeloc['j'],    sizeloc['k'],  nvar),
                                                                                                          (wposition['i']-1,wposition['j']-1,wposition['k']-1,   0))
                                         subarray.Commit()
                                         disp = MPIWP.Get_size()*headsize
-                                        fh[dir].Set_view(disp,MPIWP,subarray)
-                                        fh[dir].Write_all(dat)
+                                        fh[dire].Set_view(disp,MPIWP,subarray)
+                                        fh[dire].Write_all(dat)
                                         subarray.Free()
-                                        fh[dir].Close()
+                                        fh[dire].Close()
                                 else:
-                                        with open(fnameshell[dir],"wb") as fh[dir]:
-                                                np.concatenate((head,np.reshape(dat,(sizeglb['i']*sizeglb['j']*sizeglb['k']*nvar)))).tofile(fh[dir])
-                                        fh[dir].closed  
+                                        with open(fnameshell[dire],"wb") as fh[dire]:
+                                                np.concatenate((head,np.reshape(dat,(sizeglb['i']*sizeglb['j']*sizeglb['k']*nvar)))).tofile(fh[dire])
+                                        fh[dire].closed 
                                         
 
 # =============================================================================
