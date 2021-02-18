@@ -939,21 +939,25 @@ def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fals
 		
 			output.write(updateRHS(rhsvar,exp_rhs,update=update)+'\n\n')
 		
-		tmpvar = ''
+		tmp_list = []
+		# Add all variables to a big list
 		for var1 in locvar: 
 			for var2 in var1:
-				if not tmpvar: 
-					tmpvar = tmpvar + ' ' +var2
-				else:
-					tmpvar = tmpvar + ',' + var2
-					
-			tmpvar = tmpvar + ' &\n            '
-		
-		tmpvar = tmpvar.rstrip()
+				tmp_list.append(var2)
 
-		if(tmpvar !=''): 
+		# vpl = Variables per line, meaning how many variables
+		# should be printed in one line
+		vpl = 4
+		if(len(tmp_list) != 0):
 			localvar.write('\n\n real(wp) :: ')
-			localvar.write(tmpvar[:-1])
+			output_list = []
+			for i in range(int(len(tmp_list)/vpl)+1):
+				output_list.append(", ".join(tmp_list[i*vpl:(i+1)*vpl]))
+			# it could be that the last entry is empty, in such a case
+			# delete it
+			if(output_list[-1] == ''): del output_list[-1]
+			# join all entries in the list according to the Fortran free format
+			localvar.write(', &\n'.join(output_list))
 	
 		rhs.hlo_rhs = hlo_rhs	
 		rhs.stencil = max(rhs.stencil,Stencil)
