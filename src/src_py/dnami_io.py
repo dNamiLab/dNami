@@ -10,6 +10,17 @@ def write_grid(tree):
         nxgb, nygb, nzgb = grid['size']['nxgb'], grid['size']['nygb'], grid['size']['nzgb']
         Lx  , Ly  , Lz   = grid['geom']['Lx']  , grid['geom']['Ly']  , grid['geom']['Lz']
         x   , y   , z    = grid['geom']['x']   , grid['geom']['y']   , grid['geom']['z']
+
+        # Check for any non-periodic directions and extend them by 2*hlo
+        bc = tree['bc']['allbc']
+        hlo = tree['num']['hlo']
+        if ('i1' in bc) or ('imax' in bc):
+                nxgb += 2*hlo
+        elif ('j1' in bc) or ('jmax' in bc):
+                nygb += 2*hlo
+        elif ('k1' in bc) or ('kmax' in bc):
+                nzgb += 2*hlo
+
         # write grid to file
         if tree['mpi']['dMpi'].ioproc:
                 head = np.empty(6,dtype=wp)
