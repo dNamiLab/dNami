@@ -329,8 +329,8 @@ def read_restart(tree,fname='restart.bin'):
                 if ndim == 3:   
                         dirBC = dirBC + ['j1','jmax','k1','kmax']
 
-                for dir in dirBC:
-                        fnameshell[dir] = 'restartshell_'+dir
+                for direction in dirBC:
+                        fnameshell[direction] = 'restartshell_'+dir
 
         if fnameshell != {}     :
 
@@ -344,41 +344,10 @@ def read_restart(tree,fname='restart.bin'):
             header  = {}
             subarray= {}
 
-            # for dir in dirBC:
-
-            #     wposition = {'i':dmpi.ibeg,
-            #                  'j':dmpi.jbeg,
-            #                  'k':dmpi.kbeg}
-
-            #     if ndim == 3:             
-            #             sizeglb = {'i':nxgb + 2*hlo,'j':nygb + 2*hlo,'k': nzgb + 2*hlo}
-            #             extpos = ['i','j','k']
-            #     elif ndim == 2: 
-            #             sizeglb = {'i':nxgb + 2*hlo,'j':nygb + 2*hlo,'k': nzgb }
-            #             extpos = ['i','j']
-            #     elif ndim ==1:
-            #             sizeglb = {'i':nxgb + 2*hlo,'j':nygb ,'k': nzgb }
-            #             extpos = ['i']                                          
-
-            #     # sizeglb = {'i':nxgb ,'j':nygb ,'k': nzgb }
-            #     sizeloc = {'i':nx  ,'j':ny  ,'k':nz  }
-            #     index   = {'i':[hlo,hlo+nx]  ,'j':[hlo,hlo+ny]  ,'k':[hlo,hlo+nz] }
-
-
-            #     for d in extpos:
-            #             if d != dir[0]:
-            #                     if position[d][0] == 1:
-            #                             index[d][0]= 0                                  
-            #                             sizeloc[d] = sizeloc[d] + hlo
-            #                     else:
-            #                             wposition[d] =  wposition[d] + hlo
-            #                     if position[d][1] == nglb[d]:
-            #                             index[d][1]= index[d][1] + hlo
-            #                             sizeloc[d] = sizeloc[d]  + hlo
             headsize = 7           
             for direction in dirBC:
                 
-                with open(fnameshell[dir],"rb") as fh:
+                with open(fnameshell[direction],"rb") as fh:
                         head = np.fromfile(fh,dtype=wp,count=headsize)
                         if ndim == 3:
                             if direction == 'i1' or direction == 'imax':
@@ -393,11 +362,9 @@ def read_restart(tree,fname='restart.bin'):
                         elif ndim == 2:
                             if direction == 'i1' or direction == 'imax':
                                 dat  = np.fromfile(fh,dtype=wp,count=hlo*(nygb+2*hlo)*nvar)
-                                # dat = np.ones(hlo*(nygb+2*hlo)*nvar)*1000
                                 dat  = np.reshape(dat,(hlo,nygb+2*hlo,nvar))
                             else:
                                 dat  = np.fromfile(fh,dtype=wp,count=hlo*(nxgb+2*hlo)*nvar)
-                                # dat = 10001*np.ones(hlo*(nxgb+2*hlo)*nvar)
                                 dat  = np.reshape(dat,(nxgb+2*hlo,hlo,nvar))
                         else: # 1D case
                             dat  = np.reshape(dat,(hlo,nvar))
@@ -1115,7 +1082,7 @@ def globalMinMax(tree,a,s):
                                 sys.exit()
                 else:
                         print(s+'min,max:',globmin,globmax)
-        return
+        return globmin, globmax
 
 def globalMax(tree,a,s):
         # get the global max value of array 'a' with string tag 's'
@@ -1135,7 +1102,7 @@ def globalMax(tree,a,s):
         
         if ioproc: print(s+' max:',globmax)
         
-        return
+        return globmax
 
 # FOR CONSTANT CFL RUNS
 
