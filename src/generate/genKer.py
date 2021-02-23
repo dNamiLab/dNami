@@ -335,6 +335,13 @@ def dNamiVar(var,rangei,rangej,rangek):
 							   2:'(',
 							   1:'('}}} 
 
+	domainBorder = {'face':{'i1'  : 1-5,
+							'imax': 'nx+5',
+						   	'j1'  : 1-5,
+						   	'jmax': 'ny+5',
+						   	'k1'  : 1-5,
+						   	'kmax': 'nz+5'}}					   
+
 	dvar  = var
 
 	if var[0:3] == 'd1_' or var[0:3] == 'd2_':
@@ -355,9 +362,25 @@ def dNamiVar(var,rangei,rangej,rangek):
 			dvar = 'qst('+rangei+',indvarsst('+str(varstored[var]['ind'])+'))'	
 	elif var in varbc:
 		for loc in ['face','edge']:	
-			if loc in varbc[var]:				
+			if loc in varbc[var]:	
+				
+				import sympy as sym
+
+				rangeisym = sym.sympify(rangei)
+				rangejsym = sym.sympify(rangej)
+				rangeksym = sym.sympify(rangek)
+				
+				rangeloc  = {'i':rangeisym,
+							 'j':rangejsym,
+							 'k':rangeksym}
+
 				loctype = ''.join(sorted(varbc[var][loc].replace('1','').replace('max','')))
-				dvar = 'q'+loc+'_'+loctype+sizebc[loc][loctype][dim]+','+str(varbc[var]['ind'])+')'	
+				if rangeloc[loctype] == sym.sympify(domainBorder[loc][varbc[var][loc]]):
+					dvar = 'q'+loc+'_'+loctype+sizebc[loc][loctype][dim]+','+str(varbc[var]['ind'])+')'
+				elif var in coefficients:
+					dvar = 'param_float('+str(coefficients[var])+' + 5)' 				
+				elif var in varloc:
+					dvar = op_to_dNami(varloc[var],rangei,rangej,rangek)		
 
 	elif var in coefficients:
 		dvar = 'param_float('+str(coefficients[var])+' + 5)' 				
