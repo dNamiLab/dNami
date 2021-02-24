@@ -274,7 +274,8 @@ intparam,fltparam,data = (dtree['libs']['fort']['integers'],
 if 'qstored' in dtree['eqns']['qvec']['views'].keys():
         dMpi.swap(q,hlo,dtree)
         dMpi.swap(qstored,hlo,dtree)
-        dn.dnamiF.stored(intparam,fltparam,data,1)        
+        #dn.dnamiF.stored(intparam,fltparam,data,1)        
+        dn.stored(intparam, fltparam, data, 1)
 
 if dMpi.ioproc:
     print(' -------------------------- ' )
@@ -306,12 +307,16 @@ for n in range(ni,nitmax+ni):
             dMpi.swap(q,hlo,dtree) 
             if 'qstored' in dtree['eqns']['qvec']['views'].keys():
                     dMpi.swap(qstored,hlo,dtree)
-                    dn.dnamiF.stored(intparam,fltparam,data)        
-            dn.dnamiF.time_march(intparam,fltparam,data)    
+                    #dn.dnamiF.stored(intparam,fltparam,data)        
+                    dn.stored(intparam, fltparam, data) 
+            #dn.dnamiF.time_march(intparam,fltparam,data)    
+            dn.time_march(intparam,fltparam,data)
 
         if np.mod(n,mod_filter) == 0:
-            dn.dnamiF.filter(1,intparam,fltparam,data)
-            dn.dnamiF.filter(2,intparam,fltparam,data)
+            #dn.dnamiF.filter(1,intparam,fltparam,data)
+            #dn.dnamiF.filter(2,intparam,fltparam,data)
+            dn.filter(1, intparam, fltparam, data)
+            dn.filter(2, intparam, fltparam, data)
 
         if np.mod(n,mod_rstart) == 0:
             dn.dnami_io.write_restart(n,ti,0,dtree)
