@@ -68,7 +68,22 @@ env = Environment(tools=None, CC=cc, CXX=cxx, AR=AR, CCFLAGS=[], CXXFLAGS=[],
                   FORTRAN=f90compiler,
                   LIBPATH=libraryDirs,
                   LIBS=libraries,
-                  ENV=getEnvForScons())
+                  ENV=getEnvForScons(),
+                  ARCOMSTR="Creating a static library  : $TARGET",
+                  RANLIBCOMSTR="Indexing the static library: $TARGET",
+                  SHLINKCOMSTR="Linking: $TARGET",
+                  SHCCCOMSTR="Compiling the C file      : $SOURCE ---> $TARGET",
+                  SHFORTRANCOMSTR="Compiling the Fortran file: $SOURCE     ---> $TARGET",
+                  FORTRANCOMSTR="Calling the preprocessor; $TARGET",
+                  FORTRANPPCOMSTR="Calling the preprocessor; $TARGET",
+                  SHFORTRANPPCOMSTR="Calling the preprocessor; $TARGET",
+                  F90COMSTR="Calling the preprocessor; $TARGET",
+                  SHF90COMSTR="Calling the preprocessor; $TARGET",
+                  SHF90PPCOMSTR="Calling the preprocessor; $TARGET",
+                  F90PPCOMSTR="Calling the preprocessor; $TARGET")
+
+
+
 
 if f90compiler == 'ifort':
    env.Replace(FORTRANFLAGS= f90Args )
