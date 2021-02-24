@@ -325,7 +325,7 @@ intparam,fltparam,data = (dtree['libs']['fort']['integers'],
 if 'qstored' in dtree['eqns']['qvec']['views'].keys():
         dMpi.swap(q,hlo,dtree)
         dMpi.swap(qstored,hlo,dtree)
-        dn.dnamiF.stored(intparam,fltparam,data,1)        
+        dn.stored(intparam,fltparam,data,1)
 
 if not restart:
     # -- Write first restart (and first initial state in live_view)
@@ -370,17 +370,17 @@ for n in range(ni,nitmax+ni):
             dMpi.swap(q,hlo,dtree) 
             if 'qstored' in dtree['eqns']['qvec']['views'].keys():
                     dMpi.swap(qstored,hlo,dtree)
-                    dn.dnamiF.stored(intparam,fltparam,data)
-            dn.dnamiF.time_march(intparam,fltparam,data)
+                    dn.stored(intparam,fltparam,data)
+            dn.time_march(intparam,fltparam,data)
 
         #Filtering
         if np.mod(n,mod_filter) == 0:
             dMpi.swapX(q,hlo,dtree)
-            dn.dnamiF.filter(1,intparam,fltparam,data)
+            dn.filter(1,intparam,fltparam,data)
             dMpi.swapY(q,hlo,dtree)
-            dn.dnamiF.filter(2,intparam,fltparam,data)
+            dn.filter(2,intparam,fltparam,data)
             dMpi.swapZ(q,hlo,dtree)
-            dn.dnamiF.filter(3,intparam,fltparam,data)
+            dn.filter(3,intparam,fltparam,data)
 
         #Output to restart
         if np.abs(ti-tr) < 0.5*dt:  
