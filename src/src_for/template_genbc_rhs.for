@@ -5,7 +5,7 @@
 !     
 !====================================================================================================
 
-subroutine phyBCNAME(param_float,hlo,neq,neqst,ind,idloop,idarray,nx,ny,nz,sizeblck,q,qst,q1,q2,rhs,nvar_f,nvar_e,qface_i,qface_j,qface_k,qedge_ij,qedge_jk,qedge_ik)
+subroutine phyBCNAME(param_float,hlo,neq,neqst,ind,idloop,idarray,nx,ny,nz,sizeblck,q,qst,rhs,nvar_f,nvar_e,qface_i,qface_j,qface_k,qedge_ij,qedge_jk,qedge_ik)
 
   implicit none
 
@@ -22,7 +22,7 @@ subroutine phyBCNAME(param_float,hlo,neq,neqst,ind,idloop,idarray,nx,ny,nz,sizeb
   integer, intent(in) :: sizeblck(3)
   integer, intent(in) :: nvar_f(3),nvar_e(3)
     
-#include "includeRHS_globVar_rk3.f90"
+#include "includeRHS_globVar_BC.f90"
 
 #include "includeqbc_var.f90"
 
@@ -41,7 +41,7 @@ subroutine phyBCNAME(param_float,hlo,neq,neqst,ind,idloop,idarray,nx,ny,nz,sizeb
   indvars   = ind(1:neq)
   indvarsst = ind(1+neq:neq+neqst) 
 
-!f2py intent(in)    :: q1,q2,qst,nx,ny,nz,rhs,nrk
+!f2py intent(in)    :: qst,nx,ny,nz,rhs,nrk
 !f2py intent(inout) :: q
 
       
