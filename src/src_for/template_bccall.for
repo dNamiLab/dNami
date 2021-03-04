@@ -5,7 +5,7 @@
 !====================================================================================================
 
 subroutine boundarySchemeBCNAME(param_float,hlo,ind,idarray,neq,neqst,nx,ny,nz,sizeblck,q,qst,rhs,nvar_f,nvar_e,qface_i,qface_j,qface_k,qedge_ij,qedge_jk,qedge_ik)
-
+use iso_c_binding, only: c_float, c_double, c_int
   implicit none
 
 #include "dtypes.h"
