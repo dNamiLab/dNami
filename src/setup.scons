@@ -144,7 +144,7 @@ senv = env.Clone(FORTRANFLAGS=freeFormFlag+' -cpp '+f90Args,
                  LIBS=['m','rhs'],
                  BUILD_ROOT=Dir('#').abspath)
 
-sl = senv.SharedLibrary(target='libdnami',source=["./src_for/dnami_clayer.c","./src_for/dnamiF.for"])
+sl = senv.SharedLibrary(target='libdnami',source=["./src_for/dnami_clayer.c","./src_for/dnamiF.for"],CPPPATH=[includeDirs[0]+'gen/'])
 si = senv.Install(os.path.join('$BUILD_ROOT',InstallLoc),sl)
 Depends(si,lib1)
 

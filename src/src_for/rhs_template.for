@@ -1,5 +1,6 @@
 subroutine cmprhs(param_float,ind,idloop,idarray,neq,neqst,sizeblck,q,qst,rhs,nvar_f,nvar_e,qface_i,qface_j,qface_k,qedge_ij,qedge_jk,qedge_ik)
 
+use iso_c_binding, only: c_float, c_double, c_int
 implicit none
 
 #include "dtypes.h"
@@ -38,6 +39,7 @@ end subroutine cmprhs
 
 subroutine cmpstored(param_float,ind,idloop,idarray,neq,neqst,sizeblck,q,qst,nvar_f,nvar_e,qface_i,qface_j,qface_k,qedge_ij,qedge_jk,qedge_ik)
 
+use iso_c_binding, only: c_float, c_double, c_int
 implicit none
 
 #include "dtypes.h"
@@ -76,6 +78,7 @@ end subroutine cmpstored
 
 subroutine cmpstoredstatic(param_float,ind,idloop,idarray,neq,neqst,sizeblck,q,qst,nvar_f,nvar_e,qface_i,qface_j,qface_k,qedge_ij,qedge_jk,qedge_ik)
 
+use iso_c_binding, only: c_float, c_double, c_int
 implicit none
 
 #include "dtypes.h"

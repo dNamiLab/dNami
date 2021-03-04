@@ -3271,12 +3271,18 @@ def gendtype():
 
 	from genRhs import incPATH,wp
 
-	dtype = open(incPATH+'/dtypes.h','w')
+	dtype   = open(incPATH+'/dtypes.h','w')
+	# header file for the C-Layer to make it possible to pass double or float
+	c_dtype = open(incPATH+'/c_dtypes.h','w')
 
 	if   wp == 'float64':
-		dtype.write('integer,parameter :: wp = kind(0.0D0) ! working precision')
+		dtype.write('real(kind=c_double),parameter :: dummy = 0.0D0 ! dummy constant for correctly obtaining the precision size \n')
+		dtype.write('integer,parameter :: wp = kind(dummy) ! working precision \n')
+		c_dtype.write('#define wp double // working precision \n')
 	elif wp == 'float32':
-		dtype.write('integer,parameter :: wp = kind(0.0E0) ! working precision')
+		dtype.write('real(kind=c_float),parameter :: dummy = 0.0E0 ! ! dummy constant for correctly obtaining the precision size  \n')
+		dtype.write('integer,parameter :: wp = kind(dummy) ! working precision \n')
+		c_dtype.write('#define wp float // working precision \n')
 	else:
 		import sys
 		print('[error](gendtype) working precision not supported'+'\n'
