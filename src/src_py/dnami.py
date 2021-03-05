@@ -46,6 +46,33 @@ dNami.filter.argtypes=[(ctypes.c_int),
                        np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags=mem_order),
                        np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags=mem_order)]
 
+dNami.pack.argtypes=[np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags=mem_order),
+                     np.ctypeslib.ndpointer(dtype=iwp),
+                     ctypes.c_int,
+                     ctypes.c_int,
+                     ctypes.c_int,
+                     ctypes.c_int,
+                     ctypes.c_int,
+                     ctypes.c_int,
+                     ctypes.c_int,
+                     ctypes.c_int,
+                     ctypes.c_int,
+                     ctypes.c_int ]
+
+dNami.unpack.argtypes=[np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags=mem_order),
+                       np.ctypeslib.ndpointer(dtype=iwp),
+                       ctypes.c_int,
+                       ctypes.c_int,
+                       ctypes.c_int,
+                       ctypes.c_int,
+                       ctypes.c_int,
+                       ctypes.c_int,
+                       ctypes.c_int,
+                       ctypes.c_int,
+                       ctypes.c_int,
+                       ctypes.c_int ]
+
+
 # Create wrapper functions in Python, these wrapper functions make
 # is easier for the user to call the Fortran functions, because
 # Fortran functions always pass by reference

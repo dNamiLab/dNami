@@ -136,45 +136,16 @@ class type_mpi:
 					  'j1':True,'jmax':True,
 					  'k1':True,'kmax':True}
 
-		# import the shared library from the dnami.py file
-		# and set the interface for the pack and unpack functions
-		from dnami import dNami
-		self.dNami_mpi = dNami
-		#ctypes.POINTER
-		self.dNami_mpi.pack.argtypes=[np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS'),
-						np.ctypeslib.ndpointer(dtype=np.float64),
-						ctypes.c_int,
-						ctypes.c_int,
-						ctypes.c_int,
-						ctypes.c_int,
-						ctypes.c_int,
-						ctypes.c_int,
-						ctypes.c_int,
-						ctypes.c_int,
-						ctypes.c_int,
-						ctypes.c_int ]
-
-		self.dNami_mpi.unpack.argtypes=[np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS'),
-						np.ctypeslib.ndpointer(dtype=np.float64),
-						ctypes.c_int,
-						ctypes.c_int,
-						ctypes.c_int,
-						ctypes.c_int,
-						ctypes.c_int,
-						ctypes.c_int,
-						ctypes.c_int,
-						ctypes.c_int,
-						ctypes.c_int,
-						ctypes.c_int ]
-
 	# these are wrapper functions to make the usage of the Fortran functions 
 	# easier, without these wrapper functions one would always have to use
 	# ctypes.byref(.....) because Fortran just accpets pass by reference
 	def pack(self,buf,f,nx,nh_nx,nh,nh_ny,nh1,nh_nz,nx_2_nh,ny_2_nh,nz_2_nh,nv):
-	    self.dNami_mpi.pack(buf,f, nx, nh_nx, nh, nh_ny, nh1, nh_nz, nx_2_nh, ny_2_nh, nz_2_nh, nv)
+	    from dnami import dNami
+	    dNami.pack(buf,f, nx, nh_nx, nh, nh_ny, nh1, nh_nz, nx_2_nh, ny_2_nh, nz_2_nh, nv)
 
 	def unpack(self,buf,f,nx,nh_nx,nh,nh_ny,nh1,nh_nz,nx_2_nh,ny_2_nh,nz_2_nh,nv):
-	    self.dNami_mpi.unpack(buf,f, nx, nh_nx, nh, nh_ny, nh1, nh_nz, nx_2_nh, ny_2_nh, nz_2_nh, nv)
+	    from dnami import dNami
+	    dNami.unpack(buf,f, nx, nh_nx, nh, nh_ny, nh1, nh_nz, nx_2_nh, ny_2_nh, nz_2_nh, nv)
 
 	def showTorus(self):
 		# visualise torus
