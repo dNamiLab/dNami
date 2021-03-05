@@ -1,7 +1,5 @@
 subroutine time_march(param_int, param_float,data_float)&
 bind(c,name="time_march_fortran")
-  use iso_c_binding, only: c_double, c_int
-  implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -76,8 +74,6 @@ bind(c,name="time_march_fortran")
 
   subroutine stored(param_int,param_float,data_float,type_st)&
 bind(c,name="stored_fortran")
-  use iso_c_binding, only: c_double, c_int
-  implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -159,7 +155,6 @@ bind(c,name="stored_fortran")
                         qface_i , qface_j ,qface_k,&
                         qedge_ij, qedge_jk,qedge_ik)
 
-  implicit none
 
 #include "dtypes.h"
 #include "param_fort.h"
@@ -289,7 +284,6 @@ enddo ! END cache blocking k
                       qface_i , qface_j ,qface_k,&
                       qedge_ij, qedge_jk,qedge_ik)
 
-  implicit none
 
 #include "dtypes.h"
 #include "param_fort.h"
@@ -427,8 +421,6 @@ enddo ! END cache blocking k
 
 subroutine filter(dir,param_int,param_float,data_float)&
 bind(c,name="filter_fortran")
-  use iso_c_binding, only: c_double, c_int
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -485,7 +477,6 @@ real(c_double), intent(inout) ::  data_float(*)
 
 subroutine flt_x(param_float,hlo,neq,nx,ny,nz,sizeblck,nbc,bc,q,q2)
 
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -605,7 +596,6 @@ idloop(6) = nz
 
 subroutine flt_y(param_float,hlo,neq,nx,ny,nz,sizeblck,nbc,bc,q,q2)
 
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -729,7 +719,6 @@ idloop(6) = nz
 
  subroutine flt_z(param_float,hlo,neq,nx,ny,nz,sizeblck,nbc,bc,q,q2)
 
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -852,7 +841,6 @@ idloop(6) = nz
 
 subroutine bc(dir,param_int,param_float,data_float)!param_float,hlo,nrk,neq,indvars,nx,ny,nz,q,q1,q2,rhs)
 
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -930,7 +918,6 @@ integer, intent(in)   :: dir
 
 subroutine periodic_x(param_float,hlo,neq,nx,ny,nz,sizeblck,q,q2)
 
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -997,7 +984,6 @@ enddo ! END cache blocking k
 
 subroutine periodic_y(param_float,hlo,neq,nx,ny,nz,sizeblck,q,q2)
 
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -1066,7 +1052,6 @@ enddo ! END cache blocking k
 
  subroutine periodic_z(param_float,hlo,neq,nx,ny,nz,sizeblck,q,q2)
 
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -1135,8 +1120,6 @@ idloop(1) = bi
 
 subroutine pack(buf,f,ibeg,iend,jbeg,jend,kbeg,kend,sizex,sizey,sizez,sizenv)&
 bind(c,name="pack_fortran")
-  use iso_c_binding, only: c_double, c_int
-implicit none
 
 #include "dtypes.h"
 
@@ -1174,8 +1157,6 @@ end subroutine pack
 
 subroutine unpack(buf,f,ibeg,iend,jbeg,jend,kbeg,kend,sizex,sizey,sizez,sizenv)&
 bind(c,name="unpack_fortran")
-  use iso_c_binding, only: c_double, c_int
-implicit none
 
 #include "dtypes.h"
 
@@ -1212,8 +1193,6 @@ end subroutine unpack
 
  subroutine init(param_int,param_float,data_float)&
 bind(c,name="init_fortran")
-  use iso_c_binding, only: c_double, c_int
-  implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -1240,7 +1219,6 @@ bind(c,name="init_fortran")
 
 subroutine init_numa(param_float,hlo,nrk,neq,neqst,ind,nx,ny,nz,sizeblck,q,q1,q2,rhs,qst)
 
-  implicit none
 
 #include "dtypes.h"
 #include "param_fort.h"

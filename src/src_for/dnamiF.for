@@ -1,14 +1,12 @@
 subroutine time_march(param_int, param_float,data_float)&
 bind(c,name="time_march_fortran")
-  use iso_c_binding, only: c_float, c_double, c_int
-  implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
 
   integer(c_int),  intent(in)    ::   param_int(*)
-  real(wp), intent(in)    :: param_float(*)
-  real(wp), intent(inout) ::  data_float(*)
+  real(c_double), intent(in)    :: param_float(*)
+  real(c_double), intent(inout) ::  data_float(*)
 
   ! LOCAL VARIABLES
 
@@ -77,15 +75,13 @@ bind(c,name="time_march_fortran")
 
   subroutine stored(param_int,param_float,data_float,type_st)&
 bind(c,name="stored_fortran")
-  use iso_c_binding, only: c_float, c_double, c_int
-  implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
 
   integer,  intent(in)    ::   param_int(*)
-  real(wp), intent(in)    :: param_float(*)
-  real(wp), intent(inout) ::  data_float(*)
+  real(c_double), intent(in)    :: param_float(*)
+  real(c_double), intent(inout) ::  data_float(*)
   integer                 ::   type_st
  
  !f2py integer optional, intent(in)    :: type_st = 0
@@ -160,8 +156,6 @@ bind(c,name="stored_fortran")
                         qface_i , qface_j ,qface_k,&
                         qedge_ij, qedge_jk,qedge_ik)
 
-  use iso_c_binding, only: c_float, c_double, c_int
-  implicit none
 
 #include "dtypes.h"
 #include "param_fort.h"
@@ -298,8 +292,6 @@ enddo ! END cache blocking k
                       qface_i , qface_j ,qface_k,&
                       qedge_ij, qedge_jk,qedge_ik)
 
-  use iso_c_binding, only: c_float, c_double, c_int
-  implicit none
 
 #include "dtypes.h"
 #include "param_fort.h"
@@ -460,16 +452,14 @@ enddo ! END cache blocking k
 
 subroutine filter(dir,param_int,param_float,data_float)&
 bind(c,name="filter_fortran")
-  use iso_c_binding, only: c_float, c_double, c_int
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
 
 integer(c_int), intent(in)   :: dir
 integer(c_int), intent(in)    :: param_int(*)
-real(wp), intent(in)    :: param_float(*)
-real(wp), intent(inout) ::  data_float(*)
+real(c_double), intent(in)    :: param_float(*)
+real(c_double), intent(inout) ::  data_float(*)
 
 !f2py  intent(in)   :: param_int,param_float,dir
 !f2py intent(inout) :: data_float    
@@ -517,8 +507,6 @@ real(wp), intent(inout) ::  data_float(*)
 
 subroutine flt_x(param_float,hlo,neq,nx,ny,nz,sizeblck,nbc,bc,q,q2)
 
-use iso_c_binding, only: c_float, c_double, c_int
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -638,8 +626,6 @@ idloop(6) = nz
 
 subroutine flt_y(param_float,hlo,neq,nx,ny,nz,sizeblck,nbc,bc,q,q2)
 
-use iso_c_binding, only: c_float, c_double, c_int
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -763,8 +749,6 @@ idloop(6) = nz
 
  subroutine flt_z(param_float,hlo,neq,nx,ny,nz,sizeblck,nbc,bc,q,q2)
 
-use iso_c_binding, only: c_float, c_double, c_int
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -887,8 +871,6 @@ idloop(6) = nz
 
 subroutine bc(dir,param_int,param_float,data_float)!param_float,hlo,nrk,neq,indvars,nx,ny,nz,q,q1,q2,rhs)
 
-use iso_c_binding, only: c_float, c_double, c_int
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -966,8 +948,6 @@ integer, intent(in)   :: dir
 
 subroutine periodic_x(param_float,hlo,neq,nx,ny,nz,sizeblck,q,q2)
 
-use iso_c_binding, only: c_float, c_double, c_int
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -1034,8 +1014,6 @@ enddo ! END cache blocking k
 
 subroutine periodic_y(param_float,hlo,neq,nx,ny,nz,sizeblck,q,q2)
 
-use iso_c_binding, only: c_float, c_double, c_int
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -1104,8 +1082,6 @@ enddo ! END cache blocking k
 
  subroutine periodic_z(param_float,hlo,neq,nx,ny,nz,sizeblck,q,q2)
 
-use iso_c_binding, only: c_float, c_double, c_int
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -1174,13 +1150,11 @@ idloop(1) = bi
 
 subroutine pack(buf,f,ibeg,iend,jbeg,jend,kbeg,kend,sizex,sizey,sizez,sizenv)&
 bind(c,name="pack_fortran")
-  use iso_c_binding, only: c_float, c_double, c_int
-implicit none
 
 #include "dtypes.h"
 
-real(wp), intent(out):: buf(*)
-real(wp), intent(in) :: f(*)
+real(c_double), intent(out):: buf(*)
+real(c_double), intent(in) :: f(*)
 integer(c_int),intent(in)      :: ibeg,iend,jbeg,jend,kbeg,kend,sizex,sizey,sizez,sizenv
 
 integer :: sx,sy,sz,i,j,k,n,indbuf,indf
@@ -1213,13 +1187,11 @@ end subroutine pack
 
 subroutine unpack(buf,f,ibeg,iend,jbeg,jend,kbeg,kend,sizex,sizey,sizez,sizenv)&
 bind(c,name="unpack_fortran")
-  use iso_c_binding, only: c_float, c_double, c_int
-implicit none
 
 #include "dtypes.h"
 
-real(wp), intent(in) :: buf(*)
-real(wp), intent(out) :: f(*)
+real(c_double), intent(in) :: buf(*)
+real(c_double), intent(out) :: f(*)
 integer(c_int),intent(in)      :: ibeg,iend,jbeg,jend,kbeg,kend,sizex,sizey,sizez,sizenv
 
 integer :: sx,sy,sz,i,j,k,n,indbuf,indf
@@ -1251,15 +1223,13 @@ end subroutine unpack
 
  subroutine init(param_int,param_float,data_float)&
 bind(c,name="init_fortran")
-  use iso_c_binding, only: c_float, c_double, c_int
-  implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
 
   integer(c_int),  intent(in)    :: param_int(*)
-  real(wp), intent(in)    :: param_float(*)
-  real(wp), intent(inout) ::  data_float(*)
+  real(c_double), intent(in)    :: param_float(*)
+  real(c_double), intent(inout) ::  data_float(*)
 
   call init_numa(param_float                                            ,&
                  param_int(iadrHLO), param_int(iadrNRK)                 ,&
@@ -1279,8 +1249,6 @@ bind(c,name="init_fortran")
 
 subroutine init_numa(param_float,hlo,nrk,neq,neqst,ind,nx,ny,nz,sizeblck,q,q1,q2,rhs,qst)
 
-  use iso_c_binding, only: c_float, c_double, c_int
-  implicit none
 
 #include "dtypes.h"
 #include "param_fort.h"
