@@ -365,7 +365,7 @@ for n in range(ni,nitmax+ni):
         ti = ti + dt
 
         #RK loop
-        for nrk in range(1,4):
+        for nrk in range(1,dtree['num']['rk_stages']+1):
             intparam[7] = nrk
             dMpi.swap(q,hlo,dtree) 
             if 'qstored' in dtree['eqns']['qvec']['views'].keys():

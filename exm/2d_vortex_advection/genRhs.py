@@ -1,7 +1,7 @@
 import sys
 import re
 import numpy as np
-from genKer import rhsinfo, genrk3, genrk3update, genFilter, genBC, append_Rhs, genbcsrc
+from genKer import rhsinfo, genrk3, genrk3update, genFilter, genBC, append_Rhs, genbcsrc, genrk_Williamson
 import os 
 
 wp = 'float64'
@@ -14,13 +14,16 @@ instpath = os.environ['INSTALLPATH']
 incPATH  = instpath+'/src_for/includes/gen/'
 
 def main():
-      
+
     from genKer import rhs_info    
     rhs = rhs_info()
-
+    RK_type = 'standard'
 # Generate LHS:
-    genrk3(len(varsolved)      ,rhs=rhs) 
-    genrk3update(len(varsolved),rhs=rhs)
+    if RK_type == 'standard':
+        genrk3(len(varsolved)      ,rhs=rhs)
+        genrk3update(len(varsolved),rhs=rhs)
+    else:
+        genrk_Williamson(len(varsolved),rhs=rhs, order=3, SSP=False)
 
 # Generate RHS:
     Save_eqns = {'divF':divF.copy()}

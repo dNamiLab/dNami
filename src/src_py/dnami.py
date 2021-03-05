@@ -114,7 +114,7 @@ def create_tree():
 	dtree['usr']   = None
 	dtree['ios']   = None
 	
-	from rhsinfo import dim, stencil, order, coefficients, varname, varsolved, varstored, varbc, wp,hlo_rhs
+	from rhsinfo import dim, stencil, order, coefficients, varname, varsolved, varstored, varbc, wp,hlo_rhs, rk_stages
 
 	dtree['eqns']['qvec']['solved'] = []
 	dtree['eqns']['qvec']['stored'] = []
@@ -141,6 +141,7 @@ def create_tree():
 	dtree['num']['deriv']['stencil'] = stencil
 	dtree['num']['deriv']['hlo']     = hlo_rhs #int((stencil-1)/2)
 	dtree['num']['deriv']['order']   = order
+	dtree['num']['rk_stages'] 		 = rk_stages
 	
 	# if dtree['num']['filtr']['hlo'] != None:
 	# 	dtree['num']['hlo'] = max(dtree['num']['deriv']['hlo'],dtree['num']['filtr']['hlo'])
