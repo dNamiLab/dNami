@@ -367,6 +367,7 @@ def read_restart(tree,fname='restart.bin'):
                                 dat  = np.fromfile(fh,dtype=wp,count=hlo*(nxgb+2*hlo)*nvar)
                                 dat  = np.reshape(dat,(nxgb+2*hlo,hlo,nvar))
                         else: # 1D case
+                            dat  = np.fromfile(fh,dtype=wp,count=hlo*nvar)
                             dat  = np.reshape(dat,(hlo,nvar))
                 fh.closed
                 # Beginning and end indices of the local MPI chunks
