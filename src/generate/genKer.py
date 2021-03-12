@@ -494,6 +494,26 @@ def genVname(vname,i='i',j='j',k='k'):
 	vname = vname.strip() +indi+indj+indk
 	return vname.strip()
 
+# Write the local variables in the function header
+def writeVariables(locvar,localvar,vpl=3):
+	tmp_list = []
+	# Add all variables to a big list
+	for var1 in locvar:
+		for var2 in var1:
+			tmp_list.append(var2)
+	# vpl = Variables per line, meaning how many variables
+	# should be declared in a single line
+	if(len(tmp_list) != 0):
+		localvar.write('\n\n real(wp) :: ')
+		output_list = []
+		for i in range(int(len(tmp_list)/vpl)+1):
+			output_list.append(", ".join(tmp_list[i*vpl:(i+1)*vpl]))
+		# it could be that the last entry is empty, in such a case
+		# delete it
+		if(output_list[-1] == ''): del output_list[-1]
+		# join all entries in the list according to the Fortran free format
+		localvar.write(', &\n'.join(output_list))
+
 def der(vnamebg,order,stencil,varname='derv',dirBC=None,indbc=None,bc=None):
 
 	if not(bc):
@@ -721,21 +741,7 @@ def compute_stored(StoredVar,Stencil,Order,output,localvar,update=False,rhs=None
 		
 			output.write(updateStored(vstored,exp_stored,update=update)+'\n\n')
 		
-		tmpvar = ''
-		for var1 in locvar: 
-			for var2 in var1:
-				if not tmpvar: 
-					tmpvar = tmpvar + ' ' +var2
-				else:
-					tmpvar = tmpvar + ',' + var2
-					
-			tmpvar = tmpvar + ' &\n            '
-		
-		tmpvar = tmpvar.rstrip()
-			
-		if(tmpvar !=''): 
-			localvar.write('\n\n real(wp) :: ')
-			localvar.write(tmpvar[:-1])
+		writeVariables(locvar,localvar,2)
 
 		rhs.hlo_rhs = hlo_rhs	
 		rhs.stencil = max(rhs.stencil,Stencil)
@@ -952,26 +958,9 @@ def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fals
 			exp_rhs = exp_rhs + ' ( ' + op_to_dNami(Flx[rhsvar]) + ' ) '
 		
 			output.write(updateRHS(rhsvar,exp_rhs,update=update)+'\n\n')
-		
-		tmp_list = []
-		# Add all variables to a big list
-		for var1 in locvar: 
-			for var2 in var1:
-				tmp_list.append(var2)
 
-		# vpl = Variables per line, meaning how many variables
-		# should be declared in a single line
-		vpl = 3
-		if(len(tmp_list) != 0):
-			localvar.write('\n\n real(wp) :: ')
-			output_list = []
-			for i in range(int(len(tmp_list)/vpl)+1):
-				output_list.append(", ".join(tmp_list[i*vpl:(i+1)*vpl]))
-			# it could be that the last entry is empty, in such a case
-			# delete it
-			if(output_list[-1] == ''): del output_list[-1]
-			# join all entries in the list according to the Fortran free format
-			localvar.write(', &\n'.join(output_list))
+		writeVariables(locvar,localvar)
+		
 	
 		rhs.hlo_rhs = hlo_rhs	
 		rhs.stencil = max(rhs.stencil,Stencil)
@@ -4037,21 +4026,7 @@ def gen_eqns_bc(Eqns,output,localvar,
 
 					loop_create('end',output,bc=bc,edge=edge,corner=corner)
 			
-					tmpvar = ''
-					for var1 in locvar: 
-						for var2 in var1:
-							if not tmpvar: 
-								tmpvar = tmpvar + ' ' +var2
-							else:
-								tmpvar = tmpvar + ',' + var2
-								
-						tmpvar = tmpvar + ' &\n            '
-					
-					tmpvar = tmpvar.rstrip()
-					if(tmpvar !=''):
-						localvar.write('\n\n real(wp) :: ')						
-						localvar.write(tmpvar[:-1])
-
+					writeVariables(locvar,localvar,2)
 						
 
 
