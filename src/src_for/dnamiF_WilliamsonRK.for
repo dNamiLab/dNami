@@ -1,7 +1,5 @@
 subroutine time_march(param_int, param_float,data_float)&
 bind(c,name="time_march_fortran")
-  use iso_c_binding, only: c_double, c_int
-  implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -48,7 +46,7 @@ bind(c,name="time_march_fortran")
   shiftedgeij = shiftfacek  + nedgeij
   shiftedgejk = shiftedgeij + nedgejk
 
-  call rk3_stepk(param_float                                                          ,&
+  call rk_stepk(param_float                                                          ,&
                  param_int(iadrHLO), param_int(iadrNRK)                               ,&
                  param_int(iadrNVAR)                                                  ,&
                  param_int(iadrNVARST)                                                ,&
@@ -61,7 +59,6 @@ bind(c,name="time_march_fortran")
                  nvar_e(1),nvar_e(2),nvar_e(3),&
                  data_float(1)                                                        ,& ! q
                  data_float(1+param_int(iadrNDIMTOT)  )                               ,& ! q1
-                 data_float(1+param_int(iadrNDIMTOT)*2)                               ,& ! q2 
                  data_float(1+param_int(iadrNDIMTOT)*3)                               ,& ! rhs
                  data_float(1+param_int(iadrNDIMTOT)*4)                               ,& ! stored     (if any)
                  data_float(1+param_int(iadrNDIMTOT)*4 + shiftstore)                  ,& ! qbcface_i  (if any)
@@ -77,8 +74,6 @@ bind(c,name="time_march_fortran")
 
   subroutine stored(param_int,param_float,data_float,type_st)&
 bind(c,name="stored_fortran")
-  use iso_c_binding, only: c_double, c_int
-  implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -160,7 +155,6 @@ bind(c,name="stored_fortran")
                         qface_i , qface_j ,qface_k,&
                         qedge_ij, qedge_jk,qedge_ik)
 
-  implicit none
 
 #include "dtypes.h"
 #include "param_fort.h"
@@ -179,18 +173,11 @@ bind(c,name="stored_fortran")
   integer, intent(in) :: ind(1:neq+neqst)
   integer, intent(in) :: sizeblck(3)
   integer, intent(in) :: bc(nbc),nbc
-
-  real(wp),  dimension(1:3) :: rk1 = (/ 2.0_wp/ 3.0_wp, &
-                                        5.0_wp/12.0_wp, &
-                                        3.0_wp/ 5.0_wp /)
-  real(wp),  dimension(1:3) :: rk2 = (/ 1.0_wp/ 4.0_wp, &
-                                        3.0_wp/20.0_wp, &
-                                        3.0_wp/ 5.0_wp /)
-
-  real(wp) :: one_over_rho
   
-#include "includeF_globVarStored.f90"
+  real(wp) :: one_over_rho
 
+#include "includeRK_coeffs.f90"
+#include "includeF_globVarStored.f90"
 #include "includeqbc_varrk.f90"
 
   
@@ -289,15 +276,14 @@ enddo ! END cache blocking k
  end subroutine cmp_stored
 
 
- subroutine rk3_stepk(param_float,hlo,nrk,neq,neqst,ind,nx,ny,nz,sizeblck,&
+ subroutine rk_stepk(param_float,hlo,nrk,neq,neqst,ind,nx,ny,nz,sizeblck,&
                       nbc,bc,&
                       nfacei,nfacej,nfacek,&
                       nedgeij,nedgejk,nedgeik,&
-                      q,q1,q2,rhs,qst,& 
+                      q,q1,rhs,qst,& 
                       qface_i , qface_j ,qface_k,&
                       qedge_ij, qedge_jk,qedge_ik)
 
-  implicit none
 
 #include "dtypes.h"
 #include "param_fort.h"
@@ -318,18 +304,10 @@ enddo ! END cache blocking k
   
 
   integer, intent(in) :: bc(nbc),nbc
-
-  real(wp),  dimension(1:3) :: rk1 = (/ 2.0_wp/ 3.0_wp, &
-                                        5.0_wp/12.0_wp, &
-                                        3.0_wp/ 5.0_wp /)
-  real(wp),  dimension(1:3) :: rk2 = (/ 1.0_wp/ 4.0_wp, &
-                                        3.0_wp/20.0_wp, &
-                                        3.0_wp/ 5.0_wp /)
-
   real(wp) :: one_over_rho
   
+#include "includeRK_coeffs.f90"
 #include "includeRHS_globVar_rk3.f90"
-
 #include "includeqbc_varrk.f90"
   
   integer :: idloop(6),idarray(6),idrhs(6),indvars(neq),indvarsst(neqst)
@@ -340,8 +318,8 @@ enddo ! END cache blocking k
   indvars   = ind(1:neq)
   indvarsst = ind(1+neq:neq+neqst) 
 
-!f2py intent(in)    :: q1,q2,nx,ny,nz,rhs,nrk,qst,nvar_f,nvar_e,neq,nbc
-!f2py intent(inout) :: q
+!f2py intent(in)    :: nx,ny,nz,rhs,nrk,qst,nvar_f,nvar_e,neq,nbc
+!f2py intent(inout) :: q, q1
 
 nvar_f(1) = nfacei
 nvar_f(2) = nfacej
@@ -415,24 +393,9 @@ idloop(5) = bk
 idloop(3) = bj
 idloop(1) = bi 
 
-
-if (nrk == 1) then
-
 #include "LOOP_BEGIN"
 
 #include "primitive_to_conservative.f90"
-
-#include "LOOP_END"
-
-endif  
-
-#include "LOOP_BEGIN"
-
-#include "includeRK3.f90"       
-     
-#include "LOOP_END"
-
-#include "LOOP_BEGIN"
 
 #include "includeRK3update.f90"       
      
@@ -447,19 +410,17 @@ enddo ! END cache blocking k
 
 #include "include_bcq.f90"
 
-! print*,'rk3_stepk',q(:,ny+hlo,1)
+! print*,'rk_stepk',q(:,ny+hlo,1)
 
 
 !$OMP END PARALLEL
 
 
 
- end subroutine rk3_stepk
+ end subroutine rk_stepk
 
 subroutine filter(dir,param_int,param_float,data_float)&
 bind(c,name="filter_fortran")
-  use iso_c_binding, only: c_double, c_int
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -471,6 +432,7 @@ real(c_double), intent(inout) ::  data_float(*)
 
 !f2py  intent(in)   :: param_int,param_float,dir
 !f2py intent(inout) :: data_float    
+
  if     (dir == 1) then
 
     call flt_x(param_float                                                          ,&
@@ -515,7 +477,6 @@ real(c_double), intent(inout) ::  data_float(*)
 
 subroutine flt_x(param_float,hlo,neq,nx,ny,nz,sizeblck,nbc,bc,q,q2)
 
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -635,7 +596,6 @@ idloop(6) = nz
 
 subroutine flt_y(param_float,hlo,neq,nx,ny,nz,sizeblck,nbc,bc,q,q2)
 
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -759,7 +719,6 @@ idloop(6) = nz
 
  subroutine flt_z(param_float,hlo,neq,nx,ny,nz,sizeblck,nbc,bc,q,q2)
 
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -882,7 +841,6 @@ idloop(6) = nz
 
 subroutine bc(dir,param_int,param_float,data_float)!param_float,hlo,nrk,neq,indvars,nx,ny,nz,q,q1,q2,rhs)
 
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -960,7 +918,6 @@ integer, intent(in)   :: dir
 
 subroutine periodic_x(param_float,hlo,neq,nx,ny,nz,sizeblck,q,q2)
 
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -1027,7 +984,6 @@ enddo ! END cache blocking k
 
 subroutine periodic_y(param_float,hlo,neq,nx,ny,nz,sizeblck,q,q2)
 
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -1096,7 +1052,6 @@ enddo ! END cache blocking k
 
  subroutine periodic_z(param_float,hlo,neq,nx,ny,nz,sizeblck,q,q2)
 
-implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -1165,8 +1120,6 @@ idloop(1) = bi
 
 subroutine pack(buf,f,ibeg,iend,jbeg,jend,kbeg,kend,sizex,sizey,sizez,sizenv)&
 bind(c,name="pack_fortran")
-  use iso_c_binding, only: c_double, c_int
-implicit none
 
 #include "dtypes.h"
 
@@ -1204,8 +1157,6 @@ end subroutine pack
 
 subroutine unpack(buf,f,ibeg,iend,jbeg,jend,kbeg,kend,sizex,sizey,sizez,sizenv)&
 bind(c,name="unpack_fortran")
-  use iso_c_binding, only: c_double, c_int
-implicit none
 
 #include "dtypes.h"
 
@@ -1242,8 +1193,6 @@ end subroutine unpack
 
  subroutine init(param_int,param_float,data_float)&
 bind(c,name="init_fortran")
-  use iso_c_binding, only: c_double, c_int
-  implicit none  
 
 #include "dtypes.h"
 #include "param_fort.h" 
@@ -1270,7 +1219,6 @@ bind(c,name="init_fortran")
 
 subroutine init_numa(param_float,hlo,nrk,neq,neqst,ind,nx,ny,nz,sizeblck,q,q1,q2,rhs,qst)
 
-  implicit none
 
 #include "dtypes.h"
 #include "param_fort.h"
@@ -1287,8 +1235,7 @@ subroutine init_numa(param_float,hlo,nrk,neq,neqst,ind,nx,ny,nz,sizeblck,q,q1,q2
   integer, intent(in) :: ind(1:neq+neqst)
   integer, intent(in) :: sizeblck(3)
   
-#include "includeRHS_globVar_rk3.f90"
-
+#include "includeRHS_globVar_init.f90"
   
   integer :: idloop(6),idarray(6),indvars(neq),indvarsst(neqst)
 
@@ -1296,8 +1243,8 @@ subroutine init_numa(param_float,hlo,nrk,neq,neqst,ind,nx,ny,nz,sizeblck,q,q1,q2
   indvars   = ind(1:neq)
   indvarsst = ind(1+neq:neq+neqst) 
 
-!f2py intent(in)    :: q1,q2,a,nx,ny,nz,rhs,nrk
-!f2py intent(inout) :: q
+!f2py intent(in)    :: a,nx,ny,nz,nrk
+!f2py intent(inout) :: q,q1,q2,rhs
 
 !$OMP PARALLEL DEFAULT(SHARED) private(idloop)
 

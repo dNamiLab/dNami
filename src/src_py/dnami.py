@@ -22,24 +22,56 @@ dllabspath = os.path.join(pdnamiFile,"pymod",libname)
 dNami      = ctypes.cdll.LoadLibrary(dllabspath)
 
 # set the functions signature for the four dnami functions
-dNami.init.argtypes=[np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags='C_CONTIGUOUS'),
-                     np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS'),
-                     np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS')]
+from rhsinfo import wp
+iwp = np.float64 # default precision
+if wp == 'float32': iwp = np.float32
 
-dNami.stored.argtypes=[np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags='C_CONTIGUOUS'),
-                       np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS'),
-                       np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS'),
+mem_order='F'
+dNami.init.argtypes=[np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags=mem_order),
+                     np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags=mem_order),
+                     np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags=mem_order)]
+
+dNami.stored.argtypes=[np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags=mem_order),
+                       np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags=mem_order),
+                       np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags=mem_order),
                        ctypes.c_int]
                        #ctypes.POINTER(ctypes.c_int32)]
 
-dNami.time_march.argtypes=[np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags='C_CONTIGUOUS'),
-                           np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS'),
-                           np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS')]
+dNami.time_march.argtypes=[np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags=mem_order),
+                           np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags=mem_order),
+                           np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags=mem_order)]
 
 dNami.filter.argtypes=[(ctypes.c_int),
-                       np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags='C_CONTIGUOUS'),
-                       np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS'),
-                       np.ctypeslib.ndpointer(dtype=np.float64,ndim=1,flags='C_CONTIGUOUS')]
+                       np.ctypeslib.ndpointer(dtype=np.int32,ndim=1,flags=mem_order),
+                       np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags=mem_order),
+                       np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags=mem_order)]
+
+dNami.pack.argtypes=[np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags=mem_order),
+                     np.ctypeslib.ndpointer(dtype=iwp),
+                     ctypes.c_int,
+                     ctypes.c_int,
+                     ctypes.c_int,
+                     ctypes.c_int,
+                     ctypes.c_int,
+                     ctypes.c_int,
+                     ctypes.c_int,
+                     ctypes.c_int,
+                     ctypes.c_int,
+                     ctypes.c_int ]
+
+dNami.unpack.argtypes=[np.ctypeslib.ndpointer(dtype=iwp,ndim=1,flags=mem_order),
+                       np.ctypeslib.ndpointer(dtype=iwp),
+                       ctypes.c_int,
+                       ctypes.c_int,
+                       ctypes.c_int,
+                       ctypes.c_int,
+                       ctypes.c_int,
+                       ctypes.c_int,
+                       ctypes.c_int,
+                       ctypes.c_int,
+                       ctypes.c_int,
+                       ctypes.c_int ]
+
 
 # Create wrapper functions in Python, these wrapper functions make
 # is easier for the user to call the Fortran functions, because
@@ -109,7 +141,7 @@ def create_tree():
 	dtree['usr']   = None
 	dtree['ios']   = None
 	
-	from rhsinfo import dim, stencil, order, coefficients, varname, varsolved, varstored, varbc, wp,hlo_rhs
+	from rhsinfo import dim, stencil, order, coefficients, varname, varsolved, varstored, varbc, wp,hlo_rhs, rk_stages
 
 	dtree['eqns']['qvec']['solved'] = []
 	dtree['eqns']['qvec']['stored'] = []
@@ -136,6 +168,7 @@ def create_tree():
 	dtree['num']['deriv']['stencil'] = stencil
 	dtree['num']['deriv']['hlo']     = hlo_rhs #int((stencil-1)/2)
 	dtree['num']['deriv']['order']   = order
+	dtree['num']['rk_stages'] 		 = rk_stages
 	
 	# if dtree['num']['filtr']['hlo'] != None:
 	# 	dtree['num']['hlo'] = max(dtree['num']['deriv']['hlo'],dtree['num']['filtr']['hlo'])

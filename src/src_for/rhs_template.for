@@ -1,6 +1,5 @@
 subroutine cmprhs(param_float,ind,idloop,idarray,neq,neqst,sizeblck,q,qst,rhs,nvar_f,nvar_e,qface_i,qface_j,qface_k,qedge_ij,qedge_jk,qedge_ik)
 
-implicit none
 
 #include "dtypes.h"
 #include "param_fort.h"
@@ -38,7 +37,6 @@ end subroutine cmprhs
 
 subroutine cmpstored(param_float,ind,idloop,idarray,neq,neqst,sizeblck,q,qst,nvar_f,nvar_e,qface_i,qface_j,qface_k,qedge_ij,qedge_jk,qedge_ik)
 
-implicit none
 
 #include "dtypes.h"
 #include "param_fort.h"
@@ -76,7 +74,6 @@ end subroutine cmpstored
 
 subroutine cmpstoredstatic(param_float,ind,idloop,idarray,neq,neqst,sizeblck,q,qst,nvar_f,nvar_e,qface_i,qface_j,qface_k,qedge_ij,qedge_jk,qedge_ik)
 
-implicit none
 
 #include "dtypes.h"
 #include "param_fort.h"

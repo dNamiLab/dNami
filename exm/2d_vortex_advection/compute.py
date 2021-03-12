@@ -296,12 +296,14 @@ mod_rstart = 1e10
 from timeit import default_timer as timer
 t0 = timer()
 tini = ti
+# NumPy slice for the domain without halos
+domain = np.s_[hlo:nx+hlo,hlo:ny+hlo]
 
 for n in range(ni,nitmax+ni):
         ti = ti + dt
 
         #RK loop
-        for nrk in range(1,4):
+        for nrk in range(1,dtree['num']['rk_stages']+1):
             intparam[7] = nrk
             dMpi.swap(q,hlo,dtree) 
             if 'qstored' in dtree['eqns']['qvec']['views'].keys():
@@ -325,22 +327,22 @@ for n in range(ni,nitmax+ni):
                     print('iteration',n,' with time t =',ti)
             e = et - .5*(u*u+v*v)
             p = eos_p(rho,e)
-            c = eos_sos(rho[hlo:nx+hlo,hlo:ny+hlo],p[hlo:nx+hlo,hlo:ny+hlo])
+            c = eos_sos(rho[domain],p[domain])
             U = np.sqrt(u*u + v*v)
-            dn.dnami_io.globalMinMax(dtree,rho[hlo:nx+hlo,hlo:ny+hlo],'r')
-            dn.dnami_io.globalMinMax(dtree,u[hlo:nx+hlo,hlo:ny+hlo],'u')
-            dn.dnami_io.globalMinMax(dtree,v[hlo:nx+hlo,hlo:ny+hlo],'v')
-            dn.dnami_io.globalMinMax(dtree,et[hlo:nx+hlo,hlo:ny+hlo],'et')
+            dn.dnami_io.globalMinMax(dtree,rho[domain],'r')
+            dn.dnami_io.globalMinMax(dtree,u[domain],'u')
+            dn.dnami_io.globalMinMax(dtree,v[domain],'v')
+            dn.dnami_io.globalMinMax(dtree,et[domain],'et')
 
             if dMpi.ioproc:
                     print('convective CFL numbers')
                     sys.stdout.flush()
-            cfl = dt*np.abs(U[hlo:nx+hlo,hlo:ny+hlo])/dx
+            cfl = dt*np.abs(U[domain])/dx
             dn.dnami_io.globalMax(dtree,cfl,'cfl-x')
             if dMpi.ioproc:
                     print('acoustic CFL numbers')
                     sys.stdout.flush()
-            cfl = dt*(np.abs(U[hlo:nx+hlo,hlo:ny+hlo])+c)/dx
+            cfl = dt*(np.abs(U[domain])+c)/dx
             dn.dnami_io.globalMax(dtree,cfl,'cfl-x')
 
 t1 = timer()

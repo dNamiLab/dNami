@@ -2,6 +2,7 @@ import re
 import os
 import numpy as np
 import sys
+import shutil
 
 dir_path = os.getcwd()
 
@@ -901,7 +902,7 @@ def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fals
 				dummy  = open(incPATH+'filterbc_'+d+'.f90' ,'a+')									
 
 			gendtype()
-			globvar()
+			globvar(rhs)
 			loop(lbeg,lend)
 			geninit(init,len(varsolved),rhs=rhs)
 			if consvar != []:
@@ -2141,7 +2142,7 @@ def loop_create(type,input,bc='all',edge='all',corner='all'):
 		elif type=='end':	
 			if((bc != 'i') and (edge != 'i') and (corner != 'i')):input.write('   enddo'+'\n')		
 
-def globvar():
+def globvar(rhs):
 
 	from genRhs import dim, incPATH
 
@@ -2158,6 +2159,8 @@ def globvar():
 	globalvarRhs   = open(incPATH+'includeRHS_globVar.f90','w')  
 	globalvarRk3   = open(incPATH+'includeRHS_globVar_rk3.f90','w')
 	globalvarFlt   = open(incPATH+'includeRHS_globVar_filter.f90','w')
+	globalvarBC	   = open(incPATH+'includeRHS_globVar_BC.f90','w')
+	globalvarinit  = open(incPATH+'includeRHS_globVar_init.f90','w')
 	storedglobvar  = open(incPATH+'includeRHS_globVarStored.f90','w')
 	storedglobvarF = open(incPATH+'includeF_globVarStored.f90','w')
 	qbc            = open(incPATH+'includeqbc_var.f90','w')
@@ -2316,37 +2319,59 @@ def globvar():
 		# vglob.write('!dir$ ASSUME_ALIGNED rhs: 64'+'\n')
 		# vglob.write('!dir$ ASSUME_ALIGNED q: 64'+'\n')
 
-	if dim == 3:
-		globalvarRk3.write('real(wp),intent(inout) :: q(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
-		globalvarRk3.write('                         q1(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
-		globalvarRk3.write('                         q2(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
-		globalvarRk3.write('                        rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')	
-		if varstored!= {}:
-			globalvarRk3.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neqst)'+'\n')	
-		else:	
-			globalvarRk3.write('                        qst(1)'+'\n')	
-	elif dim == 2 :
-		globalvarRk3.write('real(wp),intent(inout) ::  q(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
-		globalvarRk3.write('                          q1(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
-		globalvarRk3.write('                          q2(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
-		globalvarRk3.write('                         rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')			
-		if varstored!= {}:
-			globalvarRk3.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,neqst)'+'\n')	
-		else:	
-			globalvarRk3.write('                        qst(1)'+'\n')	
+	if rhs.RK_type == 'standard':
+		if dim == 3:
+			globalvarRk3.write('real(wp),intent(inout) :: q(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
+			globalvarRk3.write('                         q1(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
+			globalvarRk3.write('                         q2(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
+			globalvarRk3.write('                        rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')	
+			if varstored!= {}:
+				globalvarRk3.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neqst)'+'\n')	
+			else:	
+				globalvarRk3.write('                        qst(1)'+'\n')	
+		elif dim == 2 :
+			globalvarRk3.write('real(wp),intent(inout) ::  q(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
+			globalvarRk3.write('                          q1(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
+			globalvarRk3.write('                          q2(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
+			globalvarRk3.write('                         rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')			
+			if varstored!= {}:
+				globalvarRk3.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,neqst)'+'\n')	
+			else:	
+				globalvarRk3.write('                        qst(1)'+'\n')	
+		else:
+			globalvarRk3.write('real(wp),intent(inout) ::  q(1-hlo:nx+hlo,neq),&'+'\n')
+			globalvarRk3.write('                          q1(1-hlo:nx+hlo,neq),&'+'\n')
+			globalvarRk3.write('                          q2(1-hlo:nx+hlo,neq),&'+'\n')
+			globalvarRk3.write('                         rhs(1-hlo:nx+hlo,neq),&'+'\n')	
+			if varstored!= {}:
+				globalvarRk3.write('                        qst(1-hlo:nx+hlo,neqst)'+'\n')	
+			else:	
+				globalvarRk3.write('                        qst(1)'+'\n')
 	else:
-		globalvarRk3.write('real(wp),intent(inout) ::  q(1-hlo:nx+hlo,neq),&'+'\n')
-		globalvarRk3.write('                          q1(1-hlo:nx+hlo,neq),&'+'\n')
-		globalvarRk3.write('                          q2(1-hlo:nx+hlo,neq),&'+'\n')
-		globalvarRk3.write('                         rhs(1-hlo:nx+hlo,neq),&'+'\n')	
-		if varstored!= {}:
-			globalvarRk3.write('                        qst(1-hlo:nx+hlo,neqst)'+'\n')	
-		else:	
-			globalvarRk3.write('                        qst(1)'+'\n')	
-		# vglob.write('!dir$ ASSUME_ALIGNED q: 64'+'\n')
-		# vglob.write('!dir$ ASSUME_ALIGNED q1: 64'+'\n')
-		# vglob.write('!dir$ ASSUME_ALIGNED q2: 64'+'\n')								
-		# vglob.write('!dir$ ASSUME_ALIGNED rhs: 64'+'\n')		
+		if dim == 3:
+			globalvarRk3.write('real(wp),intent(inout) :: q(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
+			globalvarRk3.write('                         q1(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
+			globalvarRk3.write('                        rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')	
+			if varstored!= {}:
+				globalvarRk3.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neqst)'+'\n')	
+			else:	
+				globalvarRk3.write('                        qst(1)'+'\n')	
+		elif dim == 2 :
+			globalvarRk3.write('real(wp),intent(inout) ::  q(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
+			globalvarRk3.write('                          q1(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
+			globalvarRk3.write('                         rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')			
+			if varstored!= {}:
+				globalvarRk3.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,neqst)'+'\n')	
+			else:	
+				globalvarRk3.write('                        qst(1)'+'\n')	
+		else:
+			globalvarRk3.write('real(wp),intent(inout) ::  q(1-hlo:nx+hlo,neq),&'+'\n')
+			globalvarRk3.write('                          q1(1-hlo:nx+hlo,neq),&'+'\n')
+			globalvarRk3.write('                         rhs(1-hlo:nx+hlo,neq),&'+'\n')	
+			if varstored!= {}:
+				globalvarRk3.write('                        qst(1-hlo:nx+hlo,neqst)'+'\n')	
+			else:	
+				globalvarRk3.write('                        qst(1)'+'\n')		
 		
 	if dim == 3:
 		globalvarFlt.write('real(wp),intent(inout) :: q(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
@@ -2359,8 +2384,57 @@ def globvar():
 		globalvarFlt.write('real(wp),intent(inout) ::  q(1-hlo:nx+hlo,neq),&'+'\n')			
 		globalvarFlt.write('                          q2(1-hlo:nx+hlo,neq)'+'\n')
 			
-		# vglob.write('!dir$ ASSUME_ALIGNED q2: 64'+'\n')			
-		# vglob.write('!dir$ ASSUME_ALIGNED q: 64'+'\n')			
+	# Global variables for the boundary conditions
+	if dim == 3:
+		globalvarBC.write('real(wp),intent(inout) :: q(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
+		globalvarBC.write('                         rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
+		if varstored!= {}:
+			globalvarBC.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neqst)'+'\n')	
+		else:	
+			globalvarBC.write('                        qst(1)'+'\n')				
+	elif dim == 2 :
+		globalvarBC.write('real(wp),intent(inout) ::  q(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')			
+		globalvarBC.write('                          rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
+		if varstored!= {}:
+			globalvarBC.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,neqst)'+'\n')	
+		else:	
+			globalvarBC.write('                        qst(1)'+'\n')	
+	else:
+		globalvarBC.write('real(wp),intent(inout) ::  q(1-hlo:nx+hlo,neq),&'+'\n')			
+		globalvarBC.write('                          rhs(1-hlo:nx+hlo,neq),&'+'\n')
+		if varstored!= {}:
+			globalvarBC.write('                        qst(1-hlo:nx+hlo,neqst)'+'\n')	
+		else:	
+			globalvarBC.write('                        qst(1)'+'\n')
+
+	# Global variables for the initialisation routine
+	if dim == 3:
+		globalvarinit.write('real(wp),intent(inout) :: q(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
+		globalvarinit.write('                         q1(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
+		globalvarinit.write('                         q2(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
+		globalvarinit.write('                        rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')	
+		if varstored!= {}:
+			globalvarinit.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neqst)'+'\n')	
+		else:	
+			globalvarinit.write('                        qst(1)'+'\n')	
+	elif dim == 2 :
+		globalvarinit.write('real(wp),intent(inout) ::  q(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
+		globalvarinit.write('                          q1(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
+		globalvarinit.write('                          q2(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
+		globalvarinit.write('                         rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')			
+		if varstored!= {}:
+			globalvarinit.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,neqst)'+'\n')	
+		else:	
+			globalvarinit.write('                        qst(1)'+'\n')	
+	else:
+		globalvarinit.write('real(wp),intent(inout) ::  q(1-hlo:nx+hlo,neq),&'+'\n')
+		globalvarinit.write('                          q1(1-hlo:nx+hlo,neq),&'+'\n')
+		globalvarinit.write('                          q2(1-hlo:nx+hlo,neq),&'+'\n')
+		globalvarinit.write('                         rhs(1-hlo:nx+hlo,neq),&'+'\n')	
+		if varstored!= {}:
+			globalvarinit.write('                        qst(1-hlo:nx+hlo,neqst)'+'\n')	
+		else:	
+			globalvarinit.write('                        qst(1)'+'\n')			
 	
 # define derivatives operators :
 
@@ -3250,6 +3324,7 @@ def rhsinfo(rhs):
 	hlo_rhs      = rhs.hlo_rhs  
 	bc_info      = rhs.bc_info     
 	varbc        = rhs.varbc
+	rk_stages    = rhs.rk_stages
 
 
 	instpath = os.environ['INSTALLPATH']
@@ -3266,17 +3341,28 @@ def rhsinfo(rhs):
 	rhsinf.write('hlo_rhs = '+str(hlo_rhs)+'\n')
 	rhsinf.write('bc_info = '+str(bc_info)+'\n')
 	rhsinf.write('varbc = '+str(varbc)+'\n')
+	rhsinf.write('rk_stages = '+str(rk_stages)+'\n')
 
 def gendtype():
 
 	from genRhs import incPATH,wp
 
-	dtype = open(incPATH+'/dtypes.h','w')
+	dtype   = open(incPATH+'/dtypes.h','w')
+	# header file for the C-Layer to make it possible to pass double or float
+	c_dtype = open(incPATH+'/c_dtypes.h','w')
 
 	if   wp == 'float64':
-		dtype.write('integer,parameter :: wp = kind(0.0D0) ! working precision')
+		dtype.write('use iso_c_binding, only: c_double, c_int       ! dummy constant for correctly obtaining the precision size \n')
+		dtype.write('implicit none                                  !                                                           \n')
+		dtype.write('real(kind=c_double),parameter :: dummy = 0.0D0 ! dummy constant for correctly obtaining the precision size \n')
+		dtype.write('integer,parameter :: wp = kind(dummy) ! working precision \n')
+		c_dtype.write('#define wp double // working precision \n')
 	elif wp == 'float32':
-		dtype.write('integer,parameter :: wp = kind(0.0E0) ! working precision')
+		dtype.write('use iso_c_binding, only: c_float, c_int       ! dummy constant for correctly obtaining the precision size \n')
+		dtype.write('implicit none                                 !                                                           \n')
+		dtype.write('real(kind=c_float),parameter :: dummy = 0.0E0 ! dummy constant for correctly obtaining the precision size  \n')
+		dtype.write('integer,parameter :: wp = kind(dummy) ! working precision \n')
+		c_dtype.write('#define wp float // working precision \n')
 	else:
 		import sys
 		print('[error](gendtype) working precision not supported'+'\n'
@@ -3504,8 +3590,11 @@ def genFilter(stencil,order,nvar,dirBC='',indbc='',fltbeg=2,rhs=None):
 def genrk3(nvar,rhs=None,bc=[False,[]],rk3=None):
 
 	from genRhs import incPATH
-
+	# Copy the correct template .for file
+	shutil.copy(dir_path+'/src_for/dnamiF_standardRK.for', dir_path + '/src_for/dnamiF.for')
 	dim = rhs.dim
+	rhs.RK_order, rhs.rk_stages = 3, 3
+	rhs.RK_type = 'standard'
 	
 	if not rk3:
 		rk3 = open(incPATH+'includeRK3.f90','w')
@@ -3542,6 +3631,9 @@ def genrk3update(nvar,rhs=None,bc=[False,[]], updaterk3=None):
 
 	from genRhs import incPATH,consvar
 	dim = rhs.dim
+	rhs.RK_order = 3
+	rhs.RK_type = 'standard'
+
 	if not updaterk3:
 		updaterk3   = open(incPATH+'includeRK3update.f90','w')
 	
@@ -3567,6 +3659,70 @@ def genrk3update(nvar,rhs=None,bc=[False,[]], updaterk3=None):
 
 		if consvar != []: genP2C(updaterk3,'primitive',rhs=rhs,bc=bc)
 
+def genrk_Williamson(nvar,rhs=None,bc=[False,[]], updaterk3=None, order=3, SSP=False):
+
+	from genRhs import incPATH,consvar
+
+	# Copy the correct template .for file
+	shutil.copy(dir_path+'/src_for/dnamiF_WilliamsonRK.for', dir_path + '/src_for/dnamiF.for')
+	dim = rhs.dim
+	rhs.RK_order = order
+	rhs.RK_type = 'Williamson'
+
+	if not updaterk3:
+		updaterk3   = open(incPATH+'includeRK3update.f90','w')
+	# Write the coefficients depending on the order of the scheme
+	rk_coefficients = open(incPATH+'includeRK_coeffs.f90','w')
+	if order == 3:
+	    stages = 3
+	    rhs.rk_stages = stages
+	    A, B = np.zeros(stages), np.zeros(stages)
+	    if SSP:
+	        A[0], A[1], A[2] = 0.0, -2.91549252463879, -9.35173755728890e-8
+	        B[0], B[1], B[2] = 0.924574000000000, 0.287713063186749, 0.626538109512740
+	    else:  
+	        A[0], A[1], A[2] = 0.0, -5./9.0, -153./128.0
+	        B[0], B[1], B[2] = 1./3.0, 15./16.0, 8./15.0
+	elif order == 4:
+	    stages = 5
+	    rhs.rk_stages = stages
+	    A, B = np.zeros(stages), np.zeros(stages)
+	    A[0], A[1], A[2], A[3], A[4] = 0, -0.4178904745, -1.192151694643, -1.697784692471, -1.514183444257
+	    B[0], B[1], B[2], B[3], B[4] = 0.1496590219993, 0.3792103129999, 0.8229550293869, 0.6994504559488, 0.1530572479681
+	else:
+		raise NotImplementedError("Only 3rd and 4th order Runge-Kutta schemes are available.")
+	A_str = ', '.join(['%s_wp' % str(coeff) for coeff in A])
+	B_str = ', '.join(['%s_wp' % str(coeff) for coeff in B])
+	rk_coefficients.write('real(wp), dimension(1:'+str(stages)+') :: rkA = (/ %s /)\n' % A_str)
+	rk_coefficients.write('real(wp), dimension(1:'+str(stages)+') :: rkB = (/ %s /)\n\n' % B_str)
+
+	# Write the RK update
+	modvar = range(1,nvar+1)
+	if bc[0]:
+		modvar = bc[1]
+
+	if dim == 3:
+		for nv in modvar:
+			updaterk3.write('q1(i,j,k,'+str(nv)+') = param_float(fadrTIMESTEP)*rhs(i,j,k,'+str(nv)+') + rkA(nrk)*q1(i,j,k,'+str(nv)+')'+'\n\n')
+			updaterk3.write('q(i,j,k,'+str(nv)+') = q(i,j,k,'+str(nv)+') + rkB(nrk)*q1(i,j,k,'+str(nv)+')'+'\n\n')
+			
+		if consvar != []: genP2C(updaterk3,'primitive',rhs=rhs,bc=bc)
+
+
+	elif dim == 2 :
+		for nv in modvar:
+			updaterk3.write('q1(i,j,'+str(nv)+') = param_float(fadrTIMESTEP)*rhs(i,j,'+str(nv)+') + rkA(nrk)*q1(i,j,'+str(nv)+')'+'\n\n')
+			updaterk3.write('q(i,j,'+str(nv)+') = q(i,j,'+str(nv)+') + rkB(nrk)*q1(i,j,'+str(nv)+')'+'\n\n')
+			
+		if consvar != []: genP2C(updaterk3,'primitive',rhs=rhs,bc=bc)
+	else:	
+		for nv in modvar:
+			updaterk3.write('q1(i,'+str(nv)+') = param_float(fadrTIMESTEP)*rhs(i,'+str(nv)+') + rkA(nrk)*q1(i,'+str(nv)+')'+'\n\n')
+			updaterk3.write('q(i,'+str(nv)+') = q(i,'+str(nv)+') + rkB(nrk)*q1(i,'+str(nv)+')'+'\n\n')
+			
+		if consvar != []: genP2C(updaterk3,'primitive',rhs=rhs,bc=bc)
+
+
 def genP2C(output,conserv,rhs=None,bc=[False,[]]):
 
 	from genRhs import consvar
@@ -3575,25 +3731,31 @@ def genP2C(output,conserv,rhs=None,bc=[False,[]]):
 	varsolved = rhs.varsolved
 	varname = rhs.varname
 
+	# Change to convert q to conservative instead of q1 for the alternative RK algorithm
+	if rhs.RK_type == 'standard':
+		lhs_var = 'q1'
+	else:
+		lhs_var = 'q'
+
 	modvar = consvar
 	if bc[0]:
 		modvar = bc[1]
 
 	if conserv == 'conservative':
 		if dim == 3:			
-			output.write('q1(i,j,k,'+str(varname['rho'])+') = q(i,j,k,'+str(varname['rho'])+')'+'\n')
+			output.write('%s(i,j,k,' % lhs_var +str(varname['rho'])+') = q(i,j,k,'+str(varname['rho'])+')'+'\n')
 			for nv in modvar:
-				output.write('q1(i,j,k,'+str(nv)+') = q(i,j,k,'+str(nv)+')*q(i,j,k,'+str(varname['rho'])+')'+'\n')			
+				output.write('%s(i,j,k,' % lhs_var +str(nv)+') = q(i,j,k,'+str(nv)+')*q(i,j,k,'+str(varname['rho'])+')'+'\n')			
 	
 		elif dim == 2:
-			output.write('q1(i,j,'+str(varname['rho'])+') = q(i,j,'+str(varname['rho'])+')'+'\n')
+			output.write('%s(i,j,' % lhs_var +str(varname['rho'])+') = q(i,j,'+str(varname['rho'])+')'+'\n')
 			for nv in modvar:
-				output.write('q1(i,j,'+str(nv)+') = q(i,j,'+str(nv)+')*q(i,j,'+str(varname['rho'])+')'+'\n')
+				output.write('%s(i,j,' % lhs_var +str(nv)+') = q(i,j,'+str(nv)+')*q(i,j,'+str(varname['rho'])+')'+'\n')
 
 		elif dim == 1:	
-			output.write('q1(i,'+str(varname['rho'])+') = q(i,'+str(varname['rho'])+')'+'\n')
+			output.write('%s(i,' % lhs_var +str(varname['rho'])+') = q(i,'+str(varname['rho'])+')'+'\n')
 			for nv in modvar:
-				output.write('q1(i,'+str(nv)+') = q(i,'+str(nv)+')*q(i,'+str(varname['rho'])+')'+'\n')
+				output.write('%s(i,' % lhs_var +str(nv)+') = q(i,'+str(nv)+')*q(i,'+str(varname['rho'])+')'+'\n')
 	
 	elif conserv == 'primitive':
 		if dim == 3:
@@ -3612,15 +3774,15 @@ def genP2C(output,conserv,rhs=None,bc=[False,[]]):
 	elif conserv == 'standard':
 		if dim == 3:			
 			for nv in varsolved:
-				output.write('q1(i,j,k,'+str(varname[nv])+') = q(i,j,k,'+str(varname[nv])+')'+'\n')			
+				output.write('%s(i,j,k,' % lhs_var +str(varname[nv])+') = q(i,j,k,'+str(varname[nv])+')'+'\n')			
 	
 		elif dim == 2:
 			for nv in varsolved:
-				output.write('q1(i,j,'+str(varname[nv])+') = q(i,j,'+str(varname[nv])+')'+'\n')
+				output.write('%s(i,j,' % lhs_var +str(varname[nv])+') = q(i,j,'+str(varname[nv])+')'+'\n')
 
 		elif dim == 1:	
 			for nv in varsolved:
-				output.write('q1(i,'+str(varname[nv])+') = q(i,'+str(varname[nv])+')'+'\n')
+				output.write('%s(i,' % lhs_var +str(varname[nv])+') = q(i,'+str(varname[nv])+')'+'\n')
 
 def geninit(output,nvar,rhs=None):
 

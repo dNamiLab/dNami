@@ -330,7 +330,7 @@ def read_restart(tree,fname='restart.bin'):
                         dirBC = dirBC + ['j1','jmax','k1','kmax']
 
                 for direction in dirBC:
-                        fnameshell[direction] = 'restartshell_'+dir
+                        fnameshell[direction] = 'restartshell_'+direction
 
         if fnameshell != {}     :
 
