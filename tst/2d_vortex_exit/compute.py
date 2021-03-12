@@ -43,7 +43,7 @@ with_dt   = dn.cst(1.0e-3) # time step
 filtr_amp = dn.cst(0.1)    # filter amplitude
 
 # ... as fast as possible!
-with_proc = [4,4]          # mpi proc. topology
+with_proc = [1,1]          # mpi proc. topology
 
 # ===================================================================== PREPARE
 
@@ -245,4 +245,5 @@ if dMpi.ioproc:
 pmax = dn.dnami_io.globalMax(dtree,p[domain],'')
 if dMpi.ioproc:
     print(' ----------------------------------------------- ' )
-
+# -- Write out
+np.savetxt('out.dat',np.asarray([pmax]))

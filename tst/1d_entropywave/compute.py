@@ -196,10 +196,10 @@ for n in range(ni,nitmax+ni):
         for nrk in range(1,4):
             intparam[7] = nrk
             dMpi.swap(q,hlo,dtree) 
-            dn.dnamiF.time_march(intparam,fltparam,data)    
+            dn.time_march(intparam,fltparam,data)    
 
         if np.mod(n,mod_filter) == 0:
-            dn.dnamiF.filter(1,intparam,fltparam,data)
+            dn.filter(1,intparam,fltparam,data)
 
         if np.mod(n,mod_rstart) == 0:
             dn.dnami_io.write_restart(n,ti,0,dtree)
