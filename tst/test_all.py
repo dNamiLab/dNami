@@ -104,7 +104,7 @@ for test in test_list:
         test_stat[test] = f'{bcolors.FAIL}FAIL{bcolors.ENDC}'
 
     # -- Clean wrk for next test
-    #cmd = 'rm -r ../wrk/*'
+    cmd = 'rm -r ../wrk/*'
     subprocess.run(cmd,shell=True,capture_output=True)
 
 print('All done. Synopsis:')
