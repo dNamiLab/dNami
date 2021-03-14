@@ -43,7 +43,7 @@ with_dt   = dn.cst(1.0e-3) # time step
 filtr_amp = dn.cst(0.1)    # filter amplitude
 
 # ... as fast as possible!
-with_proc = [1,1]          # mpi proc. topology
+with_proc = [2,2]          # mpi proc. topology
 
 # ===================================================================== PREPARE
 

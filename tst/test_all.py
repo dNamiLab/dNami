@@ -15,6 +15,10 @@
 #
 #                             - 12/03/21  Stephen Winn 
 # 
+#  To do:
+#    o add code generation tests
+#    o refine pass/fail conditions for some tests
+#    o check process.stdout for errors properly
 #  ===================================================
 # ---------------------------------------------------
 import glob
@@ -66,23 +70,60 @@ for test in test_list:
 
     # -- Run copy script
     cmd = 'cd ' + test+ '; ./copy.sh >> ' + test_log 
-    subprocess.run(cmd,shell=True,capture_output=True)
-    print(' Copied.')
+    try:
+        process = subprocess.run(cmd,shell=True,capture_output=True,text=True)
+    except Exception as e:
+        print('Error at copy: ', e)
+        test_stat[test] = f'{bcolors.FAIL}COPY FAIL{bcolors.ENDC}'
+        continue
+    else:
+        print(' Copied.')
 
     # -- Compile 
     cmd = 'cd ../src; ./install_clean.sh >> ' + test_log
-    subprocess.run(cmd,shell=True,capture_output=True)
-    print(' Compiled.')
+    try:
+        process = subprocess.run(cmd,shell=True,capture_output=True,text=True)
+    except Exception as e:
+        print('Error at compilation: ', e)
+        test_stat[test] = f'{bcolors.FAIL}COMPILATION FAIL{bcolors.ENDC}'
+        continue
+    else:
+        print(' Compiled.')
 
     # -- Run 
+    # Get mpi proc number:
+    lines = open('../wrk/compute.py').readlines()
+    for line in lines:
+        if 'with_proc' in line:
+            break
+    nproc = line.split('[')[1].split(']')[0]
+    if ',' in nproc:
+        nproc = nproc.split(',')
+        nnproc = 1
+        for dproc in nproc:
+            nnproc *= int(dproc)
+    else:
+        nnproc = int(nproc)
+    if nnproc == 1:
+        print(' Single processor used.')
+    else:
+        print(f' {nnproc} processors used.')
+    nnproc = str(nnproc)
+    # Command 
     cmd = 'cd ../src; \
         export  INSTALLPATH=$PWD; \
         export  PYTHONPATH=$PYTHONPATH:$INSTALLPATH/src_py; \
         export  PYTHONPATH=$PYTHONPATH:$INSTALLPATH/pymod; \
         export  PYTHONPATH=$PYTHONPATH:$INSTALLPATH/generate/; \
-        cd ../wrk; python3 compute.py >> ' + test_log
-    subprocess.run(cmd,shell=True,capture_output=True)
-    print(' Ran.')
+        cd ../wrk; mpirun -n ' + nnproc + ' python3 compute.py >> ' + test_log
+    try:
+        process = subprocess.run(cmd,shell=True,capture_output=True,text=True)
+    except Exception as e:
+        print('Error at runtime: ', e)
+        test_stat[test] = f'{bcolors.FAIL}RUN FAIL{bcolors.ENDC}'
+        continue
+    else:
+        print(' Ran.')
 
     # -- Compare and declare valid or not
     try:
@@ -106,6 +147,8 @@ for test in test_list:
     # -- Clean wrk for next test
     cmd = 'rm -r ../wrk/*'
     subprocess.run(cmd,shell=True,capture_output=True)
+
+    print('')
 
 print('All done. Synopsis:')
 
