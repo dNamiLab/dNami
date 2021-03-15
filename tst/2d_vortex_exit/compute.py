@@ -245,5 +245,6 @@ if dMpi.ioproc:
 pmax = dn.dnami_io.globalMax(dtree,p[domain],'')
 if dMpi.ioproc:
     print(' ----------------------------------------------- ' )
-# -- Write out
-np.savetxt('out.dat',np.asarray([pmax]))
+# -- Write out with ioproc:
+if dMpi.ioproc:
+    np.savetxt('out.dat',np.asarray([pmax]))

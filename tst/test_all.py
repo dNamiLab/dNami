@@ -9,13 +9,13 @@
 # 
 #    o each test case comes with a 'copy.sh' file 
 #    o each compute specifies the number of precessors
-#      as 'with_proc = [X,X,X]'
-#    o each test case prints a .dat file and each test
-#      case contains a reference file 
+#      as 'with_proc = [X,X,X]' 
+#    o each test case prints an out.dat file and each
+#      test case contains a reference.dat file 
 #
 #                             - 12/03/21  Stephen Winn 
 # 
-#  To do:
+#  TO DO:
 #    o add code generation tests
 #    o refine pass/fail conditions for some tests
 #    o check process.stdout for errors properly
@@ -71,7 +71,7 @@ for test in test_list:
     # -- Run copy script
     cmd = 'cd ' + test+ '; ./copy.sh >> ' + test_log 
     try:
-        process = subprocess.run(cmd,shell=True,capture_output=True,text=True)
+        process = subprocess.run(cmd,shell=True,capture_output=True,text=True,check=True)
     except Exception as e:
         print('Error at copy: ', e)
         test_stat[test] = f'{bcolors.FAIL}COPY FAIL{bcolors.ENDC}'
@@ -82,7 +82,7 @@ for test in test_list:
     # -- Compile 
     cmd = 'cd ../src; ./install_clean.sh >> ' + test_log
     try:
-        process = subprocess.run(cmd,shell=True,capture_output=True,text=True)
+        process = subprocess.run(cmd,shell=True,capture_output=True,text=True,check=True)
     except Exception as e:
         print('Error at compilation: ', e)
         test_stat[test] = f'{bcolors.FAIL}COMPILATION FAIL{bcolors.ENDC}'
@@ -117,8 +117,8 @@ for test in test_list:
         export  PYTHONPATH=$PYTHONPATH:$INSTALLPATH/generate/; \
         cd ../wrk; mpirun -n ' + nnproc + ' python3 compute.py >> ' + test_log
     try:
-        process = subprocess.run(cmd,shell=True,capture_output=True,text=True)
-    except Exception as e:
+        process = subprocess.run(cmd,shell=True,capture_output=True,text=True,check=True)
+    except subprocess.CalledProcessError as e:
         print('Error at runtime: ', e)
         test_stat[test] = f'{bcolors.FAIL}RUN FAIL{bcolors.ENDC}'
         continue
@@ -146,10 +146,11 @@ for test in test_list:
 
     # -- Clean wrk for next test
     cmd = 'rm -r ../wrk/*'
-    subprocess.run(cmd,shell=True,capture_output=True)
+    subprocess.run(cmd,shell=True,capture_output=True,text=True,check=True)
 
     print('')
 
+print('===================================================================')
 print('All done. Synopsis:')
 
 for key in test_stat.keys():
