@@ -1152,7 +1152,9 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 										if varbc[var]['static']:
 											staticvarbc[var] = varbc[var]['symb']
 										else:
-											dynamicvarbc[var] = varbc[var]['symb']		
+											dynamicvarbc[var] = varbc[var]['symb']
+
+									addvarbc = False				
 
 	
 								var2process = {'storedstatic':staticstored, 
@@ -1248,7 +1250,10 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 									else:
 										dynamicvarbc[var] = varbc[var]['symb']		
 
-	
+								addvarbc = False		
+
+								
+
 							var2process = {'storedstatic':staticstored, 
 										   'stored'      :dynamicstored,
 										   'varbcstatic' :staticvarbc,
@@ -4088,7 +4093,8 @@ def gen_eqns_bc(Eqns,output,localvar,
 							output.write('!'.ljust(60,'~')+'\n\n')	
 							
 							# generates BC layers :			
-				
+
+
 							[Out,locvar,history]  = genSymbDer1_bc(DirDic,Eqns[eqn],output,locvar,order=Order,stencil=Stencil,indi=indiri,indj=indirj,indk=indirk,vname=vnametmp,history=history,dhistory=dhistory)			
 							[Out,locvar,history2] = genSymbDer2_bc(DirDic,Out,output,locvar,order=4,stencil=5,indi=indiri,indj=indirj,indk=indirk,vname=vnametmp,history=history2)
 							
