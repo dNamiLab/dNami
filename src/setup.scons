@@ -39,10 +39,12 @@ if COMPILER=="Intel":
   f90Args   = f90Args + ' -qopt-report5 -qopt-report-phase=loop,vec,cg,openmp  -qopt-report-embed '
   freeFormFlag='-free'
 elif COMPILER=="Fujitsu":
-  f90compiler = 'frt'
-  ccompiler   = 'fcc'
+  f90compiler = 'frtpx'
+  ccompiler   = 'fccpx'
   f90Args0  = '-fPIC -Free'
-  f90Args   = f90Args0+' '+'-Kfast -O3'
+  disable_warnings= '-f2006,8209,2008'
+  #TODO remove the parallel option when compiling on the Ko-Fugaku system
+  f90Args   = disable_warnings+' '+f90Args0+' '+'-Kfast,parallel -O3'
   #f90Args   = f90Args0+' '+'-Kfast -O3 -KA64FX -KSVE -KARMV8_3_A -Kzfill=100 -Kprefetch_sequential=soft -Kprefetch_line=8 -Kprefetch_line_L2=16 -Knounroll'
   freeFormFlag='-Free'
 else:
