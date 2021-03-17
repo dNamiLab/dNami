@@ -76,18 +76,18 @@ def sympy2dNami(expr):
           crossder   = True 
           dervSympy.append(i)
           if (len(i.args) == 3):
-            dervdNami.append('[ {'+str(i.args[0])+' }_1'+str(i.args[1][0])+']_1'+str(i.args[2][0]))
+            dervdNami.append('[ {'+str(i.args[0])+' }_1'+str(i.args[1][0])+']_1'+str(i.args[2][0])+' ')
           elif (len(i.args) == 2):
-            dervdNami.append('[ '+str(i.args[0])+' ]_1'+str(i.args[1][0])) 
+            dervdNami.append('[ '+str(i.args[0])+' ]_1'+str(i.args[1][0])+' ') 
         else:
           dervSympy.append(i)
           if (len(i.args) == 3) or crosscount > 2:
             print("Derivation Order > 2 NRY")
             import sys
             sys.exit()
-            dervdNami.append('[ {'+str(i.args[0])+' }_1'+str(i.args[1][0])+']_1'+str(i.args[2][0]))
+            dervdNami.append('[ {'+str(i.args[0])+' }_1'+str(i.args[1][0])+']_1'+str(i.args[2][0])+' ')
           elif (len(i.args) == 2):
-            dervdNami.append('{ '+str(i.args[0])+' }_1'+str(i.args[1][0]))
+            dervdNami.append('{ '+str(i.args[0])+' }_1'+str(i.args[1][0])+' ')
         crosscount = crosscount + len(i.args) - 1
         if crosscount > 2:
           print("Derivation Order > 2 NRY",i)

@@ -286,12 +286,29 @@ def dNamiVar(var,rangei,rangej,rangek):
 	except:
 		varbc = {}
 
-	knownbcs = []
+	bcbydir   = {'face':{'i' :[],'j' :[],'k' :[]},
+	    	     'edge':{'ij':[],'jk':[],'ik':[]}}
+
 	for v in varbc:
-		knownbcs.append(varbc[v]['ind'])
-	from collections import Counter	
-	if 	not (Counter(Counter(knownbcs).values())[1] == len(knownbcs)):
-		exception('Several occurrences of identical indices for "varbc". This ambiguity is not managed yet — generation aborted.',message='error')
+		if 'face' in varbc[v]:	
+			loctype = ''.join(sorted(varbc[v]['face'].replace('1','').replace('max','')))
+			# print(v,loctype,varbc[v])
+			bcbydir['face'][loctype].append(varbc[v]['ind'])
+		elif 'edge' in varbc[v]:
+			loctype = ''.join(sorted(varbc[v]['edge'].replace('1','').replace('max','')))
+			bcbydir['edge'][loctype].append(varbc[v]['ind'])
+		else:
+			exception('Missing bc location for variable '+v+' in varbc (must contain a \'face\' or \'edge\' key)',message='error')
+					
+		
+	
+	for dirloc in bcbydir:
+		for dir in bcbydir[dirloc]:
+			knownbcs = bcbydir[dirloc][dir]
+			
+			from collections import Counter	
+			if 	not (Counter(Counter(knownbcs).values())[1] == len(knownbcs)):
+				exception('Several occurrences of identical indices for a given bc location (i.e. face or edge) in "varbc". This ambiguity is not managed yet — generation aborted.',message='error')
 
 	try:
 		from genRhs import varstored
