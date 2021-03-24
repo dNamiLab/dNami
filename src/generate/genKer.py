@@ -1611,7 +1611,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 											addvarbc = False
 											for var in varbc:
 												if 'face' in varbc[var]:
-													if varbc[var]['face'] == dir1: addvarbc = True
+													if varbc[var]['face'] == dir1 and layer1==0: addvarbc = True
 												elif 'edge' in varbc[var]:
 													if varbc[var]['edge'] == dir1+dir2: addvarbc = True
 												else:
@@ -1621,7 +1621,9 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 													if varbc[var]['static']:
 														staticvarbc[var] = varbc[var]['symb']
 													else:
-														dynamicvarbc[var] = varbc[var]['symb']	
+														dynamicvarbc[var] = varbc[var]['symb']
+
+												addvarbc = False			
 	
 											var2process['varbcstatic'] = staticvarbc
 											var2process['varbc']       = dynamicvarbc
@@ -1658,7 +1660,9 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 													addvarbc = False
 													for var in varbc:
 														if 'face' in varbc[var]:
-															if varbc[var]['face'] == dir1: addvarbc = True
+															if varbc[var]['face'] == dir1 and layer1==0: addvarbc = True
+															if varbc[var]['face'] == dir2 and layer2==0: addvarbc = True
+
 														elif 'edge' in varbc[var]:
 															if varbc[var]['edge'] == dir1+dir2: addvarbc = True
 														else:
@@ -1668,7 +1672,8 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 															if varbc[var]['static']:
 																staticvarbc[var] = varbc[var]['symb']
 															else:
-																dynamicvarbc[var] = varbc[var]['symb']	
+																dynamicvarbc[var] = varbc[var]['symb']
+														addvarbc = False			
 		
 													var2process['varbcstatic'] = staticvarbc
 													var2process['varbc']       = dynamicvarbc
@@ -2192,7 +2197,8 @@ def genBC_calls(rhs):
 									if varbc[var]['static']:
 										staticvarbc[var] = varbc[var]['symb']
 									else:
-										dynamicvarbc[var] = varbc[var]['symb']	
+										dynamicvarbc[var] = varbc[var]['symb']
+								addvarbc = False			
 	
 							var2process['varbcstatic'] = staticvarbc
 							var2process['varbc']       = dynamicvarbc
@@ -2319,6 +2325,7 @@ def genBC_calls(rhs):
 						staticvarbc[var] = varbc[var]['symb']
 					else:
 						dynamicvarbc[var] = varbc[var]['symb']	
+				addvarbc = False		
 	
 			var2process['varbcstatic'] = staticvarbc
 			var2process['varbc']       = dynamicvarbc
