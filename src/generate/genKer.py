@@ -1611,7 +1611,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 											addvarbc = False
 											for var in varbc:
 												if 'face' in varbc[var]:
-													if varbc[var]['face'] == dir1 and layer1==0: addvarbc = True
+													if varbc[var]['face'] == dir1 : addvarbc = True
 												elif 'edge' in varbc[var]:
 													if varbc[var]['edge'] == dir1+dir2: addvarbc = True
 												else:
