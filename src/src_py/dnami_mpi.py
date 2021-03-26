@@ -150,25 +150,30 @@ class type_mpi:
 	def showTorus(self):
 		# visualise torus
 		if self.ioproc:
-			print('\033[1;104m'+'proc id|   with coords  | ibeg jbeg kbeg |      x-,     y-,     z-  neighbours'+'\033[0m')
-			print('\033[1;104m'+'       |                | iend jend kend |      x+,     y+,     z+   (proc id)'+'\033[0m')		
-			print("\033[1;30;47m{0:7d}|({1:4d},{2:4d},{3:4d})| {4:4d} {5:4d} {6:4d} | {7:7d},{8:7d},{9:7d}\033[0m".format(self.procid,self.coords[0],self.coords[1],self.coords[2],self.ibeg,self.jbeg,self.kbeg,self.neighxm,self.neighym,self.neighzm))
+			root_name = self.MPIlib.Get_processor_name()
+			print('\033[1;104m'+'proc id|   with coords  | ibeg jbeg kbeg |      x-,     y-,     z-  neighbours|    Node  '+'\033[0m')
+			print('\033[1;104m'+'       |                | iend jend kend |      x+,     y+,     z+   (proc id)|    name  '+'\033[0m')
+			print("\033[1;30;47m{0:7d}|({1:4d},{2:4d},{3:4d})| {4:4d} {5:4d} {6:4d} | {7:7d},{8:7d},{9:7d} {10}\033[0m".format(self.procid,self.coords[0],self.coords[1],self.coords[2],self.ibeg,self.jbeg,self.kbeg,self.neighxm,self.neighym,self.neighzm,root_name))
 			print("\033[1;30;47m       |                | {0:4d} {1:4d} {2:4d} | {3:7d},{4:7d},{5:7d}\033[0m".format(self.iend,self.jend,self.kend,self.neighxp,self.neighyp,self.neighzp))
 			for pro in range(1,self.nprocs):	
 				data = np.empty(16,dtype='i')
 				#self.comm_torus.Recv([data,MPI.INT],source=pro,tag=pro)
+				from array import array
 				self.comm_torus.Recv(data,source=pro,tag=pro)
+				pname = self.comm_torus.recv(source=pro,tag=pro)
 				if (pro % 2) == 0:
-					print("\033[1;30;47m{0:7d}|({1:4d},{2:4d},{3:4d})| {4:4d} {5:4d} {6:4d} | {7:7d},{8:7d},{9:7d}\033[0m".format(data[0],data[1],data[2],data[3],data[4],data[6],data[8],data[10],data[12],data[14]))
+					print("\033[1;30;47m{0:7d}|({1:4d},{2:4d},{3:4d})| {4:4d} {5:4d} {6:4d} | {7:7d},{8:7d},{9:7d} {10}\033[0m".format(data[0],data[1],data[2],data[3],data[4],data[6],data[8],data[10],data[12],data[14],pname))
 					print("\033[1;30;47m       |                | {0:4d} {1:4d} {2:4d} | {3:7d},{4:7d},{5:7d}\033[0m".format(data[5],data[7],data[9],data[11],data[13],data[15]))
 				else:
-					print("\033[1;37;40m{0:7d}|({1:4d},{2:4d},{3:4d})| {4:4d} {5:4d} {6:4d} | {7:7d},{8:7d},{9:7d}\033[0m".format(data[0],data[1],data[2],data[3],data[4],data[6],data[8],data[10],data[12],data[14]))
+					print("\033[1;37;40m{0:7d}|({1:4d},{2:4d},{3:4d})| {4:4d} {5:4d} {6:4d} | {7:7d},{8:7d},{9:7d} {10}\033[0m".format(data[0],data[1],data[2],data[3],data[4],data[6],data[8],data[10],data[12],data[14],pname))
 					print("\033[1;37;40m       |                | {0:4d} {1:4d} {2:4d} | {3:7d},{4:7d},{5:7d}\033[0m".format(data[5],data[7],data[9],data[11],data[13],data[15]))
 		else:
-			data = np.empty(16,dtype='i')
+			data  = np.empty(16,dtype='i')
+			pname = self.MPIlib.Get_processor_name()
 			data[:] = [self.procid,self.coords[0],self.coords[1],self.coords[2],self.ibeg,self.iend,self.jbeg,self.jend,self.kbeg,self.kend,self.neighxm,self.neighxp,self.neighym,self.neighyp,self.neighzm,self.neighzp]
 			#self.comm_torus.Send([data,MPI.INT],dest=0,tag=self.procid)
 			self.comm_torus.Send(data,dest=0,tag=self.procid)
+			self.comm_torus.send(pname,dest=0,tag=self.procid)
 
 	# swap "conceptual" sketch with references to local python indices:
 	#
