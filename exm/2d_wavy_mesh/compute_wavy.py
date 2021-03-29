@@ -58,7 +58,8 @@ alpha    = dn.cst(1./0.4) # Cv/R
 L = dn.cst(1.0) 
 with_length = [L,L]         # domain length in each direction
 #with_grid   = [96,48]   # number of points in each direction
-with_grid   = [81,46]   # number of points in each direction
+#with_grid   = [81,46]   # number of points in each direction
+with_grid   = [100,50]   # number of points in each direction
 
 # ... and time ...
 #with_dt   = dn.cst(7.5e-4) # time step
@@ -68,7 +69,7 @@ nitmax = int(720*0.5/0.5916/with_dt)
 filtr_amp = dn.cst(0.1)    # filter amplitude
 
 # ... as fast as possible!
-with_proc     = [9,2] # mpi proc. topology
+with_proc     = [4,5] # mpi proc. topology
 
 # ===================================================================== PREPARE
 
@@ -277,15 +278,16 @@ if dMpi.ioproc:
 
 mod_filter = 1 
 mod_output = 1000 
-mod_rstart = 100000 
+mod_rstart = 1000 
 
 #scheme = '11_10'
 #scheme = '9_8'
 #scheme = '7_6'
 #scheme = '5_4'
-scheme = '3_2'
+#scheme = '3_2'
 
-rpath = f'./restarts_{scheme}/'
+#rpath = f'./restarts_{scheme}/'
+rpath = f'./restarts/'
 
 try:
     import os
