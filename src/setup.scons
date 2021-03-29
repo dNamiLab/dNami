@@ -4,6 +4,7 @@ import distutils.sysconfig, os,sys
 COMPILER="GCC"
 #COMPILER="Intel"
 #COMPILER="Fujitsu"
+#COMPILER="FLANG"
 
 
 # Setting libraryDirs and libraries ===========================================
@@ -39,12 +40,20 @@ if COMPILER=="Intel":
   f90Args   = f90Args + ' -qopt-report5 -qopt-report-phase=loop,vec,cg,openmp  -qopt-report-embed '
   freeFormFlag='-free'
 elif COMPILER=="Fujitsu":
-  f90compiler = 'frt'
-  ccompiler   = 'fcc'
+  f90compiler = 'frtpx'
+  ccompiler   = 'fccpx'
   f90Args0  = '-fPIC -Free'
-  f90Args   = f90Args0+' '+'-Kfast -O3'
+  disable_warnings= '-f2006,8209,2008'
+  #TODO remove the parallel option when compiling on the Ko-Fugaku system
+  f90Args   = disable_warnings+' '+f90Args0+' '+'-Kfast,parallel -O3'
   #f90Args   = f90Args0+' '+'-Kfast -O3 -KA64FX -KSVE -KARMV8_3_A -Kzfill=100 -Kprefetch_sequential=soft -Kprefetch_line=8 -Kprefetch_line_L2=16 -Knounroll'
   freeFormFlag='-Free'
+elif COMPILER=="FLANG":
+  f90compiler = 'flang'
+  ccompiler   = 'clang'
+  f90Args0  = '-fPIC'
+  f90Args   = f90Args0+' '+'-O3 -march=znver2 -flto ' #-ftree-vectorize -mavx2 -mfma'
+  freeFormFlag='-ffree-form'
 else:
   f90compiler = 'gfortran'
   ccompiler   = 'gcc'
@@ -150,10 +159,10 @@ cppsrc      = env.CPPRFOR(target=src)
 # Clone the initial env. and compile/build dNami as a shared library
 senv = env.Clone(FORTRANFLAGS=freeFormFlag+' -cpp '+f90Args,
                  FORTRANPATH=['#'+includeDirs[0], '#'+includeDirs[0]+'gen'],
-                 #LINK=f90compiler,
+                 LINK=f90compiler,
                  CC=ccompiler,
                  CCFLAGS='-O3',
-                 LINK=ccompiler,
+                 #LINK=ccompiler,
                  SHOBJSUFFIX='.o',
                  #LINKFLAGS=['-O3','-fPIC','-shared','-Wl,-soname,libtest.so'],
                  LINKFLAGS=['-O3'],
