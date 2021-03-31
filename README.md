@@ -36,6 +36,7 @@ The following `Python` packages are needed:
 3. `matlibplot`
 4. `numpy`
 5. `scons` 
+6. `SymPy (1.1.1 or 1.7.1)`
 
 In addition the following software is needed:
 1. MPI (`OpenMPI` or `Intel-MPI` recommended)
