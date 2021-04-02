@@ -39,13 +39,12 @@ class rhs_info:
 		try:
 			from genRhs import varsolved
 		except:
-			print(color('[error] varsolved not defined',message=error))	
-			sys.exit()		
+			exception('varsolved not defined',message='error')
+
 		try:
 			from genRhs import varname
 		except:
-			print(color('[error] varname not defined',message=error))	
-			sys.exit()
+			exception('varname not defined',message='error')
 
 		self.wp     	  = wp     	 
 		self.dim     	  = dim     	 
@@ -300,6 +299,31 @@ def dNamiVar(var,rangei,rangej,rangek):
 		from genRhs import varbc
 	except:
 		varbc = {}
+
+	bcbydir   = {'face':{'i' :[],'j' :[],'k' :[]},
+	    	     'edge':{'ij':[],'jk':[],'ik':[]}}
+
+	for v in varbc:
+		if 'face' in varbc[v]:	
+			loctype = ''.join(sorted(varbc[v]['face'].replace('1','').replace('max','')))
+			# print(v,loctype,varbc[v])
+			bcbydir['face'][loctype].append(varbc[v]['ind'])
+		elif 'edge' in varbc[v]:
+			loctype = ''.join(sorted(varbc[v]['edge'].replace('1','').replace('max','')))
+			bcbydir['edge'][loctype].append(varbc[v]['ind'])
+		else:
+			exception('Missing bc location for variable '+v+' in varbc (must contain a \'face\' or \'edge\' key)',message='error')
+					
+		
+	
+	for dirloc in bcbydir:
+		for dir in bcbydir[dirloc]:
+			knownbcs = bcbydir[dirloc][dir]
+			
+			from collections import Counter	
+			if 	not (Counter(Counter(knownbcs).values())[1] == len(knownbcs)):
+				exception('Several occurrences of identical indices for a given bc location (i.e. face or edge) in "varbc". This ambiguity is not managed yet — generation aborted.',message='error')
+
 	try:
 		from genRhs import varstored
 	except:
@@ -315,13 +339,13 @@ def dNamiVar(var,rangei,rangej,rangek):
 	try:
 		from genRhs import varsolved
 	except:
-		print(color('[error] varsolved not defined',message=error))	
-		sys.exit()		
+		exception('varsolved not defined',message='error')
+
 	try:
 		from genRhs import varname
 	except:
-		print(color('[error] varname not defined',message=error))	
-		sys.exit()			
+		exception('varname not defined',message='error')	
+
 
 	sizebc   = {'face':{'i'  :{3:'('+rangej+','+rangek,
 							   2:'('+rangej,
@@ -342,7 +366,15 @@ def dNamiVar(var,rangei,rangej,rangek):
 							   2:'(',
 							   1:'('}}} 
 
+	domainBorder = {'face':{'i1'  : 1-5,
+							'imax': 'nx+5',
+						   	'j1'  : 1-5,
+						   	'jmax': 'ny+5',
+						   	'k1'  : 1-5,
+						   	'kmax': 'nz+5'}}					   
+
 	dvar  = var
+
 	if var[0:3] == 'd1_' or var[0:3] == 'd2_':
 		dvar = genVname(var,rangei,rangej,rangek)
 	elif var in varname:
@@ -361,8 +393,25 @@ def dNamiVar(var,rangei,rangej,rangek):
 			dvar = 'qst('+rangei+',indvarsst('+str(varstored[var]['ind'])+'))'	
 	elif var in varbc:
 		for loc in ['face','edge']:	
-			if loc in varbc[var]:
-				dvar = 'q'+loc+'_'+varbc[var][loc]+sizebc[loc][varbc[var][loc]][dim]+','+str(varbc[var]['ind'])+')'	
+			if loc in varbc[var]:	
+				
+				import sympy as sym
+
+				rangeisym = sym.sympify(rangei)
+				rangejsym = sym.sympify(rangej)
+				rangeksym = sym.sympify(rangek)
+				
+				rangeloc  = {'i':rangeisym,
+							 'j':rangejsym,
+							 'k':rangeksym}
+
+				loctype = ''.join(sorted(varbc[var][loc].replace('1','').replace('max','')))
+				if rangeloc[loctype] == sym.sympify(domainBorder[loc][varbc[var][loc]]):
+					dvar = 'q'+loc+'_'+loctype+sizebc[loc][loctype][dim]+','+str(varbc[var]['ind'])+')'
+				elif var in coefficients:
+					dvar = 'param_float('+str(coefficients[var])+' + 5)' 				
+				elif var in varloc:
+					dvar = op_to_dNami(varloc[var],rangei,rangej,rangek)		
 
 	elif var in coefficients:
 		dvar = 'param_float('+str(coefficients[var])+' + 5)' 				
@@ -436,9 +485,7 @@ def genNbg(expr, dir , stencil, i='i',j='j',k='k',vname='v',dirBc=None,indbc='',
 
 	if (np.mod((stencil-1),2)==1) :
 		import sys 
-		print('[error](genNbg) Wrong stencil length for centrered finite differences'+'\n'
-		      '                given value = ',stencil,' (set in genRhs.py)')
-		sys.exit()
+		exception('[error](genNbg) Wrong stencil length for centrered finite differences'+'\n                given value = '+str(stencil)+' (set in genRhs.py)',message='error')
 
 
 	if(dirBc != None):
@@ -515,6 +562,8 @@ def writeVariables(locvar,localvar,vpl=3):
 		localvar.write(', &\n'.join(output_list))
 
 def der(vnamebg,order,stencil,varname='derv',dirBC=None,indbc=None,bc=None):
+	if stencil not in derDic:
+		exception('Wrong stencil length for centrered finite differences'+'\n        given value = '+str(stencil)+' (set in genRhs.py)',message='error')
 
 	if not(bc):
 		if(len(vnamebg)!= stencil):
@@ -685,8 +734,45 @@ def updateStored(vname,expr,i='i',j='j',k='k',update=False):
 		storedout = stored + ' = ' + ' ' + expr
 	else:
 		storedout = stored + ' = ' + stored + ' ' + expr	
-
+	
 	return storedout
+	
+
+def updateVarbc(vname,expr,i='i',j='j',k='k',update=False):
+	
+	from genRhs import varbc, dim
+
+	sizebc   = {'face':{'i'  :{3:'('+j+','+k,
+							   2:'('+j,
+							   1:'('},
+						'j'  :{3:'('+i+','+k,
+							   2:'('+i,
+							   1:'('},
+						'k'  :{3:'('+i+','+k,
+							   2:'('+i,
+							   1:'('}},
+				'edge':{'ij' :{3:'('+k,
+							   2:'(',
+							   1:'('},
+						'jk' :{3:'('+i,
+							   2:'(',
+							   1:'('},
+						'ik' :{3:'('+j,
+							   2:'(',
+							   1:'('}}} 
+
+	for loc in ['face','edge']:	
+		if loc in varbc[vname]:
+			loctype = ''.join(sorted(varbc[vname][loc].replace('1','').replace('max','')))
+			qbc = 'q'+loc+'_'+loctype+sizebc[loc][loctype][dim]+','+str(varbc[vname]['ind'])+')'	
+
+	if not update:	
+		qbcout = qbc + ' = ' + ' ' + expr
+	else:
+		qbcout = qbc + ' = ' + qbc + ' ' + expr	
+	
+	return qbcout
+	
 
 def compute_stored(StoredVar,Stencil,Order,output,localvar,update=False,rhs=None):		
 
@@ -749,7 +835,7 @@ def compute_stored(StoredVar,Stencil,Order,output,localvar,update=False,rhs=None
 
 		loop_create('end',output)
 
-def compute_storedbc(StoredVar,Stencil,Order,output,localvar,dirBC,update=False,rhs=None):		
+def compute_storedbc(StoredVar,Stencil,Order,output,localvar,dirBC,update=False,updateqbc=False,rhs=None):		
 
 		# if update and rhs != None:
 		hlo_rhs      = rhs.hlo_rhs
@@ -802,18 +888,25 @@ def compute_storedbc(StoredVar,Stencil,Order,output,localvar,dirBC,update=False,
 		locvar = []
 
 		# output.write(comment('Start building RHS layers for BC (3D): '+dirBC))
+		
+		updatest = True
+		layerend = hlo_rhs
+		if updateqbc: 
+		   updatest = False
+		   layerend = 1
 
-		for layer in range(0,hlo_rhs): #BC layers 
+		for layer in range(0,layerend): #BC layers 
 
 			DirDic[dirBC[0]]['indbc'] = layer
-			
+
 			gen_eqns_bc(StoredVar,output,localvar,
 			            rhsname,Order=Order,Stencil=Stencil,
-			            indi    =indi,indj =indj,indk =indk,
-			            DirDic  = DirDic,
-			            vname   = rhsname,
-			            update  = update,
-			            updatest= True)
+			            indi     =indi,indj =indj,indk =indk,
+			            DirDic   = DirDic,
+			            vname    = rhsname,
+			            update   = update,
+			            updatest = updatest,
+			            updateqbc= updateqbc)
 
 def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=False):		
 
@@ -822,9 +915,10 @@ def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fals
 		dim = rhs.dim
 		wp  = rhs.wp
 		coefficients = rhs.coefficients
-		varname = rhs.varname
-		varstored = rhs.varstored
-		varsolved = rhs.varsolved
+		varname      = rhs.varname
+		varstored    = rhs.varstored
+		varbc        = rhs.varbc
+		varsolved    = rhs.varsolved
 
 
 
@@ -844,6 +938,12 @@ def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fals
 		Path(incPATH+'include_StoredVarStatic.f90').touch()
 		Path(incPATH+'includeRHS_locVarStoredStatic.f90').touch()
 
+		Path(incPATH+'include_qbcVar.f90').touch()
+		Path(incPATH+'includeRHS_locVarqbc.f90').touch()
+
+		Path(incPATH+'include_qbcVarStatic.f90').touch()
+		Path(incPATH+'includeRHS_locVarqbcStatic.f90').touch()
+
 		Path(incPATH+'include_bccmpstored.f90').touch()
 		Path(incPATH+'include_bccmpstoredstatic.f90').touch()
 
@@ -860,9 +960,8 @@ def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fals
 				storedincludeStatic  = open(stincludenpathstatic,'w')
 				storedlocalvarStatic = open(stlocalvarpathstatic,'w')				
 			else:
-				print(color('[error]')+' Stored variables already generated. \n        '
-					        'dNami can\'t generate stored variables with multiple numerical parameters (yet!)...')
-				sys.exit()
+				exception('Stored variables already generated. \n        '
+					      'dNami can\'t generate stored variables with multiple numerical parameters (yet!)...',message='error')
 			
 			static  = {}
 			dynamic = {}
@@ -876,11 +975,13 @@ def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fals
 			compute_stored(dynamic,Stencil,Order,storedinclude,storedlocalvar, update=False,rhs=rhs)
 			if static:
 				compute_stored(static,Stencil,Order,storedincludeStatic,storedlocalvarStatic, update=False,rhs=rhs)
+			exception('varstored generated with parameters (stencil, order): ('+str(Stencil)+','+str(Order)+')',message='com')	
+			# print(color('varstored generated with parameters (stencil, order): ('+str(Stencil)+','+str(Order)+')'))
 
-			print(color('varstored generated with parameters (stencil, order): ('+str(Stencil)+','+str(Order)+')'))
 		elif varstored != {}:
-			print(color('varstored not generated'))	
-			
+			exception('varstored not generated',message='com')	
+
+
 		if update == False:
 			rhs_for        = open(incPATH[:-13]+'rhs.for','w')
 			rhs_template   = open(incPATH[:-13]+'rhs_template.for','r')
@@ -900,6 +1001,9 @@ def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fals
 
 			dummy  = open(incPATH+'selectstoredbc.f90'   ,'a+')
 			dummy  = open(incPATH+'selectstoredstaticbc.f90'   ,'a+')
+
+			dummy  = open(incPATH+'selectvarbcbc.f90'   ,'a+')
+			dummy  = open(incPATH+'selectvarbcstaticbc.f90'   ,'a+')
 
 			for d in ['x','y','z']:
 				dummy  = open(incPATH+'selectfilterbc_'+d+'.f90' ,'a+')
@@ -972,16 +1076,17 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 
 		from genRhs import incPATH
 
-		dim = rhs.dim
-		wp  = rhs.wp
+		dim          = rhs.dim
+		wp           = rhs.wp
 		coefficients = rhs.coefficients
-		varname = rhs.varname
-		varstored = rhs.varstored
-		varsolved = rhs.varsolved
+		varname      = rhs.varname
+		varstored    = rhs.varstored
+		varsolved    = rhs.varsolved
+		varbc        = rhs.varbc
 
 		if rhs.stencil == 1:
-			print(color('[error] RHS must be defined before BCs'))
-			sys.exit()
+			exception('RHS must be defined before BCs',message='error')
+
 		else:	
 			hlo_rhs     = rhs.hlo_rhs
 			stencil_rhs = rhs.stencil
@@ -1003,7 +1108,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 						 cornerperm[d1+d2] = d2+d1
 
 		if len(rhs.bc_info[1].values()) != 0:
-			print(rhs.bc_info[1].values())
+			# print(rhs.bc_info[1].values())
 			bcnum = max(max(rhs.bc_info[1].values()))
 		else:
 			bcnum = 0	
@@ -1029,10 +1134,10 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 							for bckey2 in setbc[1][bcname][bcdir]:
 								bctype = bckey2
 								if bctype in bc_info[bcname][bcdirinf]:
-									print('[error] bc already generated for: '+bcname+' with type '+bctype+' in dir '+bcdir)
-									sys.exit()
+									exception('bc already generated for: '+bcname+' with type '+bctype+' in dir '+bcdir,message='error')
+
 								else:                 # new type for direction bcdir of bcname 
-									print('NEW TYPE')
+									# print('NEW TYPE')
 									newtype = True
 									bc_info[bcname][bcdirinf].append(bctype)
 
@@ -1045,19 +1150,41 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 							if bcdir == cornerperm[bcdir]:
 
 								# generate static/dynamic stored variables:			
-								
-								# from genRhs import varstored
 	
-								static  = {}
-								dynamic = {}
-	
+								staticstored  = {}
+								dynamicstored = {}
+								staticvarbc   = {}
+								dynamicvarbc  = {}
+
 								for var in varstored:
 									if varstored[var]['static']:
-										static[var] = varstored[var]['symb']
+										staticstored[var] = varstored[var]['symb']
 									else:
-										dynamic[var] = varstored[var]['symb']
+										dynamicstored[var] = varstored[var]['symb']
+
+								addvarbc = False
+
+								for var in varbc:
+									if 'face' in varbc[var]:
+										if varbc[var]['face'] == bcdir: addvarbc = True
+									elif 'edge' in varbc[var]:
+										if varbc[var]['edge'] == bcdir: addvarbc = True
+									else:
+										addvarbc = False
+
+									if addvarbc:	
+										if varbc[var]['static']:
+											staticvarbc[var] = varbc[var]['symb']
+										else:
+											dynamicvarbc[var] = varbc[var]['symb']
+
+									addvarbc = False				
+
 	
-								var2process = {'storedstatic':static, 'stored':dynamic}
+								var2process = {'storedstatic':staticstored, 
+											   'stored'      :dynamicstored,
+											   'varbcstatic' :staticvarbc,
+											   'varbc'       :dynamicvarbc}
 	
 								for k in var2process:
 									if var2process[k] != {}:
@@ -1090,12 +1217,18 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 										indrange = {'i':indrangei,
 										            'j':indrangej,
 										            'k':indrangek}	
-		
-										compute_storedbc(var2process[k],Stencil,Order,loopst,locst,bcdir,update=update,rhs=rhs)
+										
+										updateqbc = False
+										
+										if k[0:5] == 'varbc': updateqbc = True
+										
+										compute_storedbc(var2process[k],Stencil,Order,loopst,locst,bcdir,update=update,updateqbc=updateqbc, rhs=rhs)
 			
 										create_bcsubroutine(st,k+'_faces_'+bcdir,
 														 'include_BClocVar_'+k+'_'+bcdir+'.f90',
-														 'include_BCLoops_'+k+'_' +bcdir+'.f90',indrange)	
+														 'include_BCLoops_'+k+'_' +bcdir+'.f90',indrange)
+
+
 								
 
 				else: # new bc name
@@ -1111,15 +1244,44 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 							# generate static/dynamic stored variables:			
 								
 							# from genRhs import varstored
-							static  = {}
-							dynamic = {}
+							
+							# generate static/dynamic stored variables:			
+	
+							staticstored  = {}
+							dynamicstored = {}
+							staticvarbc   = {}
+							dynamicvarbc  = {}
+
 							for var in varstored:
 								if varstored[var]['static']:
-									static[var] = varstored[var]['symb']
+									staticstored[var] = varstored[var]['symb']
 								else:
-									dynamic[var] = varstored[var]['symb']
-							
-							var2process = {'storedstatic':static, 'stored':dynamic}
+									dynamicstored[var] = varstored[var]['symb']
+
+							addvarbc = False
+
+							for var in varbc:
+								if 'face' in varbc[var]:
+									if varbc[var]['face'] == bcdir: addvarbc = True
+								elif 'edge' in varbc[var]:
+									if varbc[var]['edge'] == bcdir: addvarbc = True
+								else:
+									addvarbc = False
+
+								if addvarbc:	
+									if varbc[var]['static']:
+										staticvarbc[var] = varbc[var]['symb']
+									else:
+										dynamicvarbc[var] = varbc[var]['symb']		
+
+								addvarbc = False		
+
+								
+
+							var2process = {'storedstatic':staticstored, 
+										   'stored'      :dynamicstored,
+										   'varbcstatic' :staticvarbc,
+										   'varbc'       :dynamicvarbc}
 	
 							for k in var2process:
 								if var2process[k] != {}:
@@ -1151,8 +1313,12 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 									indrange = {'i':indrangei,
 									            'j':indrangej,
 									            'k':indrangek}	
-	
-									compute_storedbc(var2process[k],Stencil,Order,loopst,locst,bcdir,update=update,rhs=rhs)
+
+									updateqbc = False
+										
+									if k[0:5] == 'varbc': updateqbc = True
+
+									compute_storedbc(var2process[k],Stencil,Order,loopst,locst,bcdir,update=update,updateqbc=updateqbc,rhs=rhs)
 		
 									create_bcsubroutine(st,k+'_faces_'+bcdir,
 													 'include_BClocVar_'+k+'_'+bcdir+'.f90',
@@ -1261,9 +1427,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 			else:	
 
 				if setbc[0]:
-
-					print(color('[error] Update not supported for physical BCs',message='error'))
-					sys.exit()
+					exception('Update not supported for physical BCs',message='error')
 	
 				
 				else:
@@ -1352,16 +1516,26 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 		if not setbc[0]: 
 
 			if stored:
-				# from genRhs import varstored
-				static  = {}
-				dynamic = {}
+
+
+
+				staticstored  = {}
+				dynamicstored = {}
+				staticvarbc   = {}
+				dynamicvarbc  = {}
+
 				for var in varstored:
 					if varstored[var]['static']:
-						static[var]  = varstored[var]['symb']
+						staticstored[var] = varstored[var]['symb']
 					else:
-						dynamic[var] = varstored[var]['symb']
-				
-				var2process  = {'storedstatic':static, 'stored':dynamic}	
+						dynamicstored[var] = varstored[var]['symb']	
+
+	
+				var2process = {'storedstatic':staticstored, 
+							   'stored'      :dynamicstored,
+							   'varbcstatic' :staticvarbc,
+							   'varbc'       :dynamicvarbc}
+
 				slcbc_stored = {} 
 
 
@@ -1435,6 +1609,33 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 											edgecallname_stored = {}
 											efname_stored       = {}
 											bcall_stored        = {}      
+
+											var2process['varbcstatic'] = {}
+											var2process['varbc']       = {}	
+											staticvarbc = {}
+											dynamicvarbc= {}
+
+											addvarbc = False
+											for var in varbc:
+												if 'face' in varbc[var]:
+													if varbc[var]['face'] == dir1 : addvarbc = True
+												elif 'edge' in varbc[var]:
+													if varbc[var]['edge'] == dir1+dir2: addvarbc = True
+												else:
+													addvarbc = False
+								
+												if addvarbc:	
+													if varbc[var]['static']:
+														staticvarbc[var] = varbc[var]['symb']
+													else:
+														dynamicvarbc[var] = varbc[var]['symb']
+
+												addvarbc = False			
+	
+											var2process['varbcstatic'] = staticvarbc
+											var2process['varbc']       = dynamicvarbc
+												
+	
 											for k in var2process:
 												if var2process[k] != {}:
 													edgecallname_stored[k] = k+'_edges_'+dir1+'_'+dir2+'_'+str(layer1)
@@ -1455,7 +1656,39 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 											# stored open include edges static/dynamic
 											if stored:	
 												localvar_stored = {}
-												output_stored       = {}      
+												output_stored       = {} 
+
+												var2process['varbcstatic'] = {}
+												var2process['varbc']       = {}	
+												staticvarbc = {}
+												dynamicvarbc= {}
+	
+												if layer1*layer2 == 0:
+													addvarbc = False
+													for var in varbc:
+														if 'face' in varbc[var]:
+															if varbc[var]['face'] == dir1 and layer1==0: addvarbc = True
+															if varbc[var]['face'] == dir2 and layer2==0: addvarbc = True
+
+														elif 'edge' in varbc[var]:
+															if varbc[var]['edge'] == dir1+dir2: addvarbc = True
+														else:
+															addvarbc = False
+									
+														if addvarbc:	
+															if varbc[var]['static']:
+																staticvarbc[var] = varbc[var]['symb']
+															else:
+																dynamicvarbc[var] = varbc[var]['symb']
+														addvarbc = False			
+		
+													var2process['varbcstatic'] = staticvarbc
+													var2process['varbc']       = dynamicvarbc
+												else:
+													var2process['varbcstatic'] = {}
+													var2process['varbc']       = {}	
+	
+	
 												for k in var2process:
 													if var2process[k] != {}:
 														localvar_stored[k] = open(incPATH+'include_'+k+'_edges_'+dir1+'_'+dir2+'_'+str(layer1)+'_'+str(layer2)+'_BClocVar.f90','a+')
@@ -1491,13 +1724,21 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 														for v in var2process[k]:
 															vname_st[v] = v
 
+														updateqbc = False
+														updatest  = True
+												
+														if k[0:5] == 'varbc': 
+															updateqbc = True
+															updatest  = False
+
 														gen_eqns_bc(var2process[k],output_stored[k],localvar_stored[k],
 												            vname_st,Order=Order,Stencil=Stencil,
 												            indi     = indi,indj = indj,indk = indk,
 												            DirDic   = DirDic,
 												            vname    = vname_st,
 												            update   = False,
-												            updatest = True)
+												            updateqbc= updateqbc,
+												            updatest = updatest)
 
 #														
 #											Create the second layer of subroutines with the newly generated eqns (for layer 2)	            											
@@ -1780,7 +2021,7 @@ def genBC_calls(rhs):
 	varname = rhs.varname
 	varstored = rhs.varstored
 	varsolved = rhs.varsolved
-
+	varbc     = rhs.varbc
 	
 	hlo_rhs = rhs.hlo_rhs
 	stencil_rhs = rhs.stencil
@@ -1806,15 +2047,22 @@ def genBC_calls(rhs):
 			if bcdir in list(bc_info[bcname].keys()):
 				bcphy_all[bcdir][bcname] = bc_info[bcname][bcdir] 
 
-	static  = {}
-	dynamic = {}	
+	staticstored  = {}
+	dynamicstored = {}
+	staticvarbc   = {}
+	dynamicvarbc  = {}
+
 	for var in varstored:
 		if varstored[var]['static']:
-			static[var]  = varstored[var]['symb']
+			staticstored[var] = varstored[var]['symb']
 		else:
-			dynamic[var] = varstored[var]['symb']
-	
-	var2process   = {'storedstatic':static, 'stored':dynamic}	
+			dynamicstored[var] = varstored[var]['symb']	
+
+	var2process = {'storedstatic':staticstored, 
+				   'stored'      :dynamicstored,
+				   'varbcstatic' :staticvarbc,
+				   'varbc'       :dynamicvarbc}
+
 	slcbc_stored  = {} 
 	efname_stored = {}
 
@@ -1935,22 +2183,43 @@ def genBC_calls(rhs):
 	
 								edone.append(dir1+dir2)
 	
-								# corner phy bc (NRY)
-								# NRY
 							
 
 
-
-
 # # Stored OPEN select and static/dyn extraction	
+							var2process['varbcstatic'] = {}
+							var2process['varbc']       = {}	
+							staticvarbc = {}
+							dynamicvarbc= {}
+							addvarbc = False
+							for var in varbc:
+								if 'face' in varbc[var]:
+									if varbc[var]['face'] == dir1: addvarbc = True
+								elif 'edge' in varbc[var]:
+									if varbc[var]['edge'] == dir1+dir2: addvarbc = True
+								else:
+									addvarbc = False
+							
+								if addvarbc:	
+									if varbc[var]['static']:
+										staticvarbc[var] = varbc[var]['symb']
+									else:
+										dynamicvarbc[var] = varbc[var]['symb']
+								addvarbc = False			
 	
+							var2process['varbcstatic'] = staticvarbc
+							var2process['varbc']       = dynamicvarbc
+
 							for k in var2process:
 								if var2process[k] != {}:
 
 									slcbc_stored[k] = open(incPATH+'select'+k+'bc.f90','a+')
 									slcbc_stored[k].write('CASE ('+str(bcnum)+')\n')
-
-									for layer1 in range(0,hlo_rhs): #BC layers dir1
+									if k[0:5] == 'varbc': 										
+									   layerend = 1
+									else:
+									   layerend = hlo_rhs   
+									for layer1 in range(0,layerend): #BC layers dir1
 										efname_stored[k] = open(incPATH+'bcsrc_'+k+'_edgescall_'+dir1+'_'+dir2+'_'+str(layer1)+'.for','r')
 										slcbc_stored[k].write('      call '+efname_stored[k].readlines()[8][10:])								
 
@@ -1989,7 +2258,6 @@ def genBC_calls(rhs):
 
 
 # # ADDS NORMAL-TO-BOUNDARY FILTERS FOR BC DIRECTION:
-
 	for dir1 in bcdir_all:
 		if dir1 not in edgeBCs:
 		
@@ -2018,8 +2286,7 @@ def genBC_calls(rhs):
 				slcbcflt.write('   '+l)
 			for l in uplines:
 				slcbcfltup.write('   '+l)		
-	
-	
+		
 # #		extends in-plane filtering along the bc:
 			
 			slcbcflt.close()
@@ -2045,7 +2312,31 @@ def genBC_calls(rhs):
 				slcbd.write('   '+bounds[axebd])		
 							   	
 # # GENERATE STATIC/DYNAMIC STORED VARIABLES:			
-								
+			var2process['varbcstatic'] = {}
+			var2process['varbc']       = {}	
+			staticvarbc = {}
+			dynamicvarbc= {}
+
+
+			addvarbc = False
+			for var in varbc:
+				if 'face' in varbc[var]:
+					if varbc[var]['face'] == dir1: addvarbc = True
+				elif 'edge' in varbc[var]:
+					if varbc[var]['edge'] == dir1: addvarbc = True
+				else:
+					addvarbc = False
+			
+				if addvarbc:	
+					if varbc[var]['static']:
+						staticvarbc[var] = varbc[var]['symb']
+					else:
+						dynamicvarbc[var] = varbc[var]['symb']	
+				addvarbc = False		
+	
+			var2process['varbcstatic'] = staticvarbc
+			var2process['varbc']       = dynamicvarbc
+					
 			for k in var2process:
 				if var2process[k] != {}:	
 	
@@ -2208,10 +2499,11 @@ def globvar(rhs):
 	for v in varbc:
 		for bcloc in ['face','edge']:
 			if bcloc in varbc[v]:
-				nvbc[bcloc][varbc[v][bcloc]] = nvbc[bcloc][varbc[v][bcloc]] + 1
+				loctype = ''.join(sorted(varbc[v][bcloc].replace('1','').replace('max','')))
+				nvbc[bcloc][loctype] = nvbc[bcloc][loctype] + 1
 
-	qbc_out = 'real(wp),intent(in) ::'
-	qbcrk_out = 'real(wp),intent(in) ::'
+	qbc_out = 'real(wp),intent(inout) ::'
+	qbcrk_out = 'real(wp),intent(inout) ::'
 
 	for bcloc in ['face','edge']:
 			for dir in nvbc[bcloc]:
@@ -2504,15 +2796,12 @@ def genSymbDer1(exp,output,locvar,
 						if(dim < 3):
 							if (v=='z' and derexp.group(0) != []):
 								nsymb = list(re.finditer(der1n[v], exp))
-								print('[error] wrong symbolic equation : ask for z derivatives (',nsymb[i].group(0),') with dim =',dim)
-								import sys
-								sys.exit()
+								exception('wrong symbolic equation : ask for z derivatives ('+str(nsymb[i].group(0))+') with dim ='+str(dim),message='error')
+
 						elif(dim < 2):		
 							if  (v=='y' and derexp.group(0) != []):
 								nsymb = list(re.finditer(der1n[v], exp))
-								print('[error] wrong symbolic equation : ask for y derivatives (',nsymb[i].group(0),') with dim =',dim)
-								import sys
-								sys.exit()		
+								exception('wrong symbolic equation : ask for y derivatives ('+str(nsymb[i].group(0))+') with dim ='+str(dim),message='error')	
 
 						dsubdname = {'x':[[],[]],'y':[[],[]],'z':[[],[]]}
 
@@ -2544,15 +2833,12 @@ def genSymbDer1(exp,output,locvar,
 									if(dim < 3):
 										if (vv=='z' and derexp.group(0) != []):
 											nsymb = list(re.finditer(dder1n[vv], exp))
-											print('[error] wrong symbolic equation : ask for z derivatives (',nsymb[di].group(0),') with dim =',dim)
-											import sys
-											sys.exit()
+											exception('wrong symbolic equation : ask for z derivatives ('+str(nsymb[di].group(0))+') with dim ='+str(dim),message='error')
+
 									elif(dim < 2):		
 										if  (vv=='y' and derexp.group(0) != []):
 											nsymb = list(re.finditer(dder1n[vv], exp))
-											print('[error] wrong symbolic equation : ask for y derivatives (',nsymb[di].group(0),') with dim =',dim)
-											import sys
-											sys.exit()				
+											exception('wrong symbolic equation : ask for y derivatives ('+str(nsymb[di].group(0))+') with dim ='+str(dim),message='error')			
 
 									hlo = int((stencil-1)/2)
 						
@@ -2728,15 +3014,13 @@ def genSymbDer2(exp,output,locvar,
 						if(dim < 3):
 							if (v=='z' and derexp.group(0) != []):
 								nsymb = list(re.finditer(der2n[v+v], exp))
-								print('[error] wrong symbolic equation : ask for z derivatives (',nsymb[i].group(0),') with dim =',dim)
-								import sys
-								sys.exit()
+								exception('wrong symbolic equation : ask for z derivatives ('+str(nsymb[i].group(0))+') with dim ='+str(dim),message='error')
+
 						elif(dim < 2):		
 							if  (v=='y' and derexp.group(0) != []):
 								nsymb = list(re.finditer(der2n[v+v], exp))
-								print('[error] wrong symbolic equation : ask for y derivatives (',nsymb[i].group(0),') with dim =',dim)
-								import sys
-								sys.exit()
+								exception('wrong symbolic equation : ask for y derivatives ('+str(nsymb[i].group(0))+') with dim ='+str(dim),message='error')
+
 	
 						hlo = int((stencil-1)/2)
 			
@@ -2824,15 +3108,12 @@ def genSymbDer1_bc(bcdic,exp,output,locvar,
 						if(dim < 3):
 							if (v=='z' and derexp.group(0) != []):
 								nsymb = list(re.finditer(der1n[v], exp))
-								print('[error] wrong symbolic equation : ask for z derivatives (',nsymb[i].group(0),') with dim =',dim)
-								import sys
-								sys.exit()
+								exception('wrong symbolic equation : ask for z derivatives ('+str(nsymb[i].group(0))+') with dim ='+str(dim),message='error')
+
 						elif(dim < 2):		
 							if  (v=='y' and derexp.group(0) != []):
 								nsymb = list(re.finditer(der1n[v], exp))
-								print('[error] wrong symbolic equation : ask for y derivatives (',nsymb[i].group(0),') with dim =',dim)
-								import sys
-								sys.exit()		
+								exception('wrong symbolic equation : ask for y derivatives ('+str(nsymb[i].group(0))+') with dim ='+str(dim),message='error')
 
 						dsubdname = {'x':[[],[]],'y':[[],[]],'z':[[],[]]}
 
@@ -2868,15 +3149,13 @@ def genSymbDer1_bc(bcdic,exp,output,locvar,
 									if(dim < 3):
 										if (vv=='z' and derexp.group(0) != []):
 											nsymb = list(re.finditer(dder1n[vv], exp))
-											print('[error] wrong symbolic equation : ask for z derivatives (',nsymb[di].group(0),') with dim =',dim)
-											import sys
-											sys.exit()
+											exception('wrong symbolic equation : ask for z derivatives ('+str(nsymb[di].group(0))+') with dim ='+str(dim),message='error')
+
 									elif(dim < 2):		
 										if  (vv=='y' and derexp.group(0) != []):
 											nsymb = list(re.finditer(dder1n[vv], exp))
-											print('[error] wrong symbolic equation : ask for y derivatives (',nsymb[di].group(0),') with dim =',dim)
-											import sys
-											sys.exit()				
+											exception('wrong symbolic equation : ask for y derivatives ('+str(nsymb[di].group(0))+') with dim ='+str(dim),message='error')
+				
 
 									hlo = int((stencil-1)/2)
 						
@@ -3234,15 +3513,13 @@ def genSymbDer2_bc(bcdic,exp,output,locvar,
 						if(dim < 3):
 							if (v=='z' and derexp.group(0) != []):
 								nsymb = list(re.finditer(der2n[v+v], exp))
-								print('[error] wrong symbolic equation : ask for z derivatives (',nsymb[i].group(0),') with dim =',dim)
-								import sys
-								sys.exit()
+								exception('wrong symbolic equation : ask for z derivatives ('+str(nsymb[i].group(0))+') with dim ='+str(dim),message='error')
+
 						elif(dim < 2):		
 							if  (v=='y' and derexp.group(0) != []):
 								nsymb = list(re.finditer(der2n[v+v], exp))
-								print('[error] wrong symbolic equation : ask for y derivatives (',nsymb[i].group(0),') with dim =',dim)
-								import sys
-								sys.exit()
+								exception('wrong symbolic equation : ask for y derivatives ('+str(nsymb[i].group(0))+') with dim ='+str(dim),message='error')
+
 	
 						hlo = int((stencil-1)/2)
 
@@ -3354,9 +3631,9 @@ def gendtype():
 		c_dtype.write('#define wp float // working precision \n')
 	else:
 		import sys
-		print('[error](gendtype) working precision not supported'+'\n'
-		      '                  given value = ',wp,' (set in genRhs.py)')
-		sys.exit()		
+		exception('gendtype) working precision not supported'+'\n'
+		      '                  given value = '+str(wp)+' (set in genRhs.py)',message='error')
+
 
 def genFilter(stencil,order,nvar,dirBC='',indbc='',fltbeg=2,rhs=None):
 
@@ -3489,8 +3766,8 @@ def genFilter(stencil,order,nvar,dirBC='',indbc='',fltbeg=2,rhs=None):
 			fltbc = open(incPATH+'filterbc_'+axes[dirBC[0]]+'.f90'       ,'a+') # set to empty		
 
 		if rhs.stencil == 1:
-			print(color('[error]','error')+' RHS must be defined before BCs')
-			sys.exit()
+			exception('RHS must be defined before BCs',message='error')
+
 		else:	
 			hlo_rhs = rhs.hlo_rhs		
 
@@ -3803,8 +4080,8 @@ def genbcsrc(nvar,rhs=None):
 	from genRhs import incPATH
 
 	if rhs == None:
-		print("[error] BC can't be generated before RHS")
-		sys.exit()
+		exception("BC can't be generated before RHS",message='error')
+
 	else:	
 		hlo_rhs = rhs.hlo_rhs
 		order   = rhs.order
@@ -3937,7 +4214,8 @@ def gen_eqns_bc(Eqns,output,localvar,
 	            vname   = 'symb',
 	            update  = False,
 	            updateq = False,
-	            updatest= False):
+	            updatest= False,
+	            updateqbc=False):
 					
 					from genRhs import dim
 					
@@ -3993,36 +4271,40 @@ def gen_eqns_bc(Eqns,output,localvar,
 						indirk = indk+'{:+d}'.format(-DirDic['k']['indbc'])	
 
 					for eqn in  Eqns.keys():
-
-						vnametmp = vname[eqn].strip() # '_' + str(bcnum)
-
-						output.write(comment('building source terms in RHS for layer '+str(DirDic['i']['indbc'])+' '+str(DirDic['j']['indbc'])+' '+str(DirDic['k']['indbc'])+' '+eqname[eqn]))
-					
-						op  = Eqns[eqn].replace(" ", "")+'\n'
+						if Eqns[eqn].replace(' ',''):
+							vnametmp = vname[eqn].strip() # '_' + str(bcnum)
+	
+							output.write(comment('building source terms in RHS for layer '+str(DirDic['i']['indbc'])+' '+str(DirDic['j']['indbc'])+' '+str(DirDic['k']['indbc'])+' '+eqname[eqn]))
 						
-						output.write('!'.ljust(60,'~')+'\n')
-						output.write('!'+'\n')
-						output.write('! '+op)
-						output.write('!'+'\n')	
-						output.write('!'.ljust(60,'~')+'\n\n')	
-						
-						# generates BC layers :			
-			
-						[Out,locvar,history]  = genSymbDer1_bc(DirDic,Eqns[eqn],output,locvar,order=Order,stencil=Stencil,indi=indiri,indj=indirj,indk=indirk,vname=vnametmp,history=history,dhistory=dhistory)			
-						[Out,locvar,history2] = genSymbDer2_bc(DirDic,Out,output,locvar,order=4,stencil=5,indi=indiri,indj=indirj,indk=indirk,vname=vnametmp,history=history2)
-						
-						output.write(comment('Update BC terms for layer '+str(DirDic['i']['indbc'])+' '+str(DirDic['j']['indbc'])+' '+str(DirDic['k']['indbc'])+' '+eqname[eqn]))
+							op  = Eqns[eqn].replace(" ", "")+'\n'
+							
+							output.write('!'.ljust(60,'~')+'\n')
+							output.write('!'+'\n')
+							output.write('! '+op)
+							output.write('!'+'\n')	
+							output.write('!'.ljust(60,'~')+'\n\n')	
+							
+							# generates BC layers :			
 
-						if updateq:
-							exp_rhs =  op_to_dNami(Out,i=indiri,j=indirj,k=indirk) 
-							output.write(updateRHS(eqn,exp_rhs,i=indiri,j=indirj,k=indirk,update=update,updateq=True)+'\n\n')
-						elif updatest:
-							exp_stored = op_to_dNami(Out,i=indiri,j=indirj,k=indirk) 
-							output.write(updateStored(eqn,exp_stored,i=indiri,j=indirj,k=indirk,update=update)+'\n\n')	
-						else:
-							exp_rhs = ' - '
-							exp_rhs = exp_rhs + ' ( ' + op_to_dNami(Out,i=indiri,j=indirj,k=indirk) + ' ) '
-							output.write(updateRHS(eqn,exp_rhs,i=indiri,j=indirj,k=indirk,update=update)+'\n\n')
+
+							[Out,locvar,history]  = genSymbDer1_bc(DirDic,Eqns[eqn],output,locvar,order=Order,stencil=Stencil,indi=indiri,indj=indirj,indk=indirk,vname=vnametmp,history=history,dhistory=dhistory)			
+							[Out,locvar,history2] = genSymbDer2_bc(DirDic,Out,output,locvar,order=4,stencil=5,indi=indiri,indj=indirj,indk=indirk,vname=vnametmp,history=history2)
+							
+							output.write(comment('Update BC terms for layer '+str(DirDic['i']['indbc'])+' '+str(DirDic['j']['indbc'])+' '+str(DirDic['k']['indbc'])+' '+eqname[eqn]))
+	
+							if updateq:
+								exp_rhs =  op_to_dNami(Out,i=indiri,j=indirj,k=indirk) 
+								output.write(updateRHS(eqn,exp_rhs,i=indiri,j=indirj,k=indirk,update=update,updateq=True)+'\n\n')
+							elif updatest:
+								exp_stored = op_to_dNami(Out,i=indiri,j=indirj,k=indirk) 
+								output.write(updateStored(eqn,exp_stored,i=indiri,j=indirj,k=indirk,update=update)+'\n\n')	
+							elif updateqbc:
+								exp_qbc = op_to_dNami(Out,i=indiri,j=indirj,k=indirk) 
+								output.write(updateVarbc(eqn,exp_qbc,i=indiri,j=indirj,k=indirk,update=update)+'\n\n')									
+							else:
+								exp_rhs = ' - '
+								exp_rhs = exp_rhs + ' ( ' + op_to_dNami(Out,i=indiri,j=indirj,k=indirk) + ' ) '
+								output.write(updateRHS(eqn,exp_rhs,i=indiri,j=indirj,k=indirk,update=update)+'\n\n')
 
 					loop_create('end',output,bc=bc,edge=edge,corner=corner)
 			
@@ -4036,3 +4318,11 @@ def color(str,message='com'):
 		return '\033[1;40;94m'+str+'\033[0m'
 	elif message == 'error':
 		return '\033[1;40;41m'+str+'\033[0m'
+
+def exception(str,message='com'):
+	if message == 'com':
+		print(color('[info]'+str,message='com'))
+	elif message == 'error':
+		print(color('[error] '+str,message='error'))
+		import sys
+		sys.exit()		
