@@ -269,7 +269,7 @@ real(c_double), intent(inout) ::  data_float(*)
                param_int(iadrVARS + param_int(iadrNVAR) + param_int(iadrNVARST) )   ,&
                param_int(iadrVARS + param_int(iadrNVAR) + param_int(iadrNVARST) + 1),&                             
                data_float(1)                                                        ,&
-               data_float(1+param_int(iadrNDIMTOT)*2)                                ) ! q2 is used for filter working array
+               data_float(1+param_int(iadrNDIMTOT)*1)                                ) ! q1 is used for filter working array
     
  elseif (dir == 2)then
 
@@ -281,7 +281,7 @@ real(c_double), intent(inout) ::  data_float(*)
                param_int(iadrVARS + param_int(iadrNVAR) + param_int(iadrNVARST) )   ,&
                param_int(iadrVARS + param_int(iadrNVAR) + param_int(iadrNVARST) + 1),&                                              
                data_float(1)                                                        ,&
-               data_float(1+param_int(iadrNDIMTOT)*2)                                ) ! q2 is used for filter working array
+               data_float(1+param_int(iadrNDIMTOT)*1)                                ) ! q1 is used for filter working array
 
  elseif (dir == 3)then
 
@@ -294,14 +294,14 @@ real(c_double), intent(inout) ::  data_float(*)
                param_int(iadrVARS + param_int(iadrNVAR) + param_int(iadrNVARST) )   ,&
                param_int(iadrVARS + param_int(iadrNVAR) + param_int(iadrNVARST) + 1),&                                               
                data_float(1)                                                        ,&
-               data_float(1+param_int(iadrNDIMTOT)*2)                                ) ! q2 is used for filter working array
+               data_float(1+param_int(iadrNDIMTOT)*1)                                ) ! q1 is used for filter working array
 
  endif
 
  end subroutine filter
 
 
-subroutine flt_x(param_float,hlo,neq,nx,ny,nz,sizeblck,nbc,bc,q,q2)
+subroutine flt_x(param_float,hlo,neq,nx,ny,nz,sizeblck,nbc,bc,q,q1)
 
 
 #include "dtypes.h"
@@ -420,7 +420,7 @@ idloop(6) = nz
 
  end subroutine flt_x
 
-subroutine flt_y(param_float,hlo,neq,nx,ny,nz,sizeblck,nbc,bc,q,q2)
+subroutine flt_y(param_float,hlo,neq,nx,ny,nz,sizeblck,nbc,bc,q,q1)
 
 
 #include "dtypes.h"
@@ -543,7 +543,7 @@ idloop(6) = nz
  end subroutine flt_y
 
 
- subroutine flt_z(param_float,hlo,neq,nx,ny,nz,sizeblck,nbc,bc,q,q2)
+ subroutine flt_z(param_float,hlo,neq,nx,ny,nz,sizeblck,nbc,bc,q,q1)
 
 
 #include "dtypes.h"
@@ -688,7 +688,7 @@ integer, intent(in)   :: dir
                     param_int(iadrNX),param_int(iadrNY) , param_int(iadrNZ),&
                     param_int(iadrCacheBLCK)                             ,&               
                     data_float(1)                                          ,&
-                    data_float(1+param_int(iadrNDIMTOT)*2)                   ) ! q2 is used for filter working array
+                    data_float(1+param_int(iadrNDIMTOT)*1)                   ) ! q2 is used for filter working array
     
  elseif (dir == 2)then
 
@@ -698,7 +698,7 @@ integer, intent(in)   :: dir
                     param_int(iadrNX),param_int(iadrNY) , param_int(iadrNZ),&
                     param_int(iadrCacheBLCK)                             ,&                              
                     data_float(1)                                          ,&
-                    data_float(1+param_int(iadrNDIMTOT)*2)                   ) ! q2 is used for filter working array
+                    data_float(1+param_int(iadrNDIMTOT)*1)                   ) ! q2 is used for filter working array
 
  elseif (dir == 3)then
 
@@ -709,7 +709,7 @@ integer, intent(in)   :: dir
                     param_int(iadrNX),param_int(iadrNY) , param_int(iadrNZ),&
                     param_int(iadrCacheBLCK)                             ,&                              
                     data_float(1)                                          ,&
-                    data_float(1+param_int(iadrNDIMTOT)*2)                   ) ! q2 is used for filter working array
+                    data_float(1+param_int(iadrNDIMTOT)*1)                   ) ! q2 is used for filter working array
 
  elseif (dir == 0 )then 
 
@@ -719,21 +719,21 @@ integer, intent(in)   :: dir
                     param_int(iadrNX),param_int(iadrNY) , param_int(iadrNZ),&
                     param_int(iadrCacheBLCK)                             ,&               
                     data_float(1)                                          ,&
-                    data_float(1+param_int(iadrNDIMTOT)*2)                   ) ! q2 is used for filter working array
+                    data_float(1+param_int(iadrNDIMTOT)*1)                   ) ! q2 is used for filter working array
   call periodic_y(param_float                                            ,&
                     param_int(iadrHLO)                                   ,&
                     param_int(iadrNVAR)                                  ,&
                     param_int(iadrNX),param_int(iadrNY) , param_int(iadrNZ),&
                     param_int(iadrCacheBLCK)                             ,&                              
                     data_float(1)                                          ,&
-                    data_float(1+param_int(iadrNDIMTOT)*2)                   ) ! q2 is used for filter working array
+                    data_float(1+param_int(iadrNDIMTOT)*1)                   ) ! q2 is used for filter working array
   call periodic_z(param_float                                            ,&
                     param_int(iadrHLO)                                   ,&
                     param_int(iadrNVAR)                                  ,&
                     param_int(iadrNX),param_int(iadrNY) , param_int(iadrNZ),&
                     param_int(iadrCacheBLCK)                             ,&                              
                     data_float(1)                                          ,&
-                    data_float(1+param_int(iadrNDIMTOT)*2)                   ) ! q2 is used for filter working array
+                    data_float(1+param_int(iadrNDIMTOT)*1)                   ) ! q2 is used for filter working array
 
     
  endif
@@ -742,7 +742,7 @@ integer, intent(in)   :: dir
 
  end subroutine bc
 
-subroutine periodic_x(param_float,hlo,neq,nx,ny,nz,sizeblck,q,q2)
+subroutine periodic_x(param_float,hlo,neq,nx,ny,nz,sizeblck,q,q1)
 
 
 #include "dtypes.h"
@@ -808,7 +808,7 @@ enddo ! END cache blocking k
  
  end subroutine periodic_x
 
-subroutine periodic_y(param_float,hlo,neq,nx,ny,nz,sizeblck,q,q2)
+subroutine periodic_y(param_float,hlo,neq,nx,ny,nz,sizeblck,q,q1)
 
 
 #include "dtypes.h"
@@ -876,7 +876,7 @@ enddo ! END cache blocking k
  end subroutine periodic_y
 
 
- subroutine periodic_z(param_float,hlo,neq,nx,ny,nz,sizeblck,q,q2)
+ subroutine periodic_z(param_float,hlo,neq,nx,ny,nz,sizeblck,q,q1)
 
 
 #include "dtypes.h"
