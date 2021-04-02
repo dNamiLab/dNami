@@ -2,7 +2,6 @@ import re
 import os
 import numpy as np
 import sys
-import shutil
 
 dir_path = os.getcwd()
 
@@ -2605,20 +2604,20 @@ def globvar(rhs):
 			globalvarRk3.write('real(wp),intent(inout) :: q(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
 			globalvarRk3.write('                         q1(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
 			globalvarRk3.write('                         q2(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
-			globalvarRk3.write('                        rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')	
+			globalvarRk3.write('                        rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
 			if varstored!= {}:
-				globalvarRk3.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neqst)'+'\n')	
-			else:	
-				globalvarRk3.write('                        qst(1)'+'\n')	
+				globalvarRk3.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neqst)'+'\n')
+			else:
+				globalvarRk3.write('                        qst(1)'+'\n')
 		elif dim == 2 :
 			globalvarRk3.write('real(wp),intent(inout) ::  q(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
 			globalvarRk3.write('                          q1(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
 			globalvarRk3.write('                          q2(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
-			globalvarRk3.write('                         rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')			
+			globalvarRk3.write('                         rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
 			if varstored!= {}:
-				globalvarRk3.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,neqst)'+'\n')	
-			else:	
-				globalvarRk3.write('                        qst(1)'+'\n')	
+				globalvarRk3.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,neqst)'+'\n')
+			else:
+				globalvarRk3.write('                        qst(1)'+'\n')
 		else:
 			globalvarRk3.write('real(wp),intent(inout) ::  q(1-hlo:nx+hlo,neq),&'+'\n')
 			globalvarRk3.write('                          q1(1-hlo:nx+hlo,neq),&'+'\n')
@@ -2632,27 +2631,27 @@ def globvar(rhs):
 		if dim == 3:
 			globalvarRk3.write('real(wp),intent(inout) :: q(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
 			globalvarRk3.write('                         q1(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
-			globalvarRk3.write('                        rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')	
+			globalvarRk3.write('                        rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
 			if varstored!= {}:
-				globalvarRk3.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neqst)'+'\n')	
-			else:	
-				globalvarRk3.write('                        qst(1)'+'\n')	
+				globalvarRk3.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neqst)'+'\n')
+			else:
+				globalvarRk3.write('                        qst(1)'+'\n')
 		elif dim == 2 :
 			globalvarRk3.write('real(wp),intent(inout) ::  q(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
 			globalvarRk3.write('                          q1(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
-			globalvarRk3.write('                         rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')			
+			globalvarRk3.write('                         rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
 			if varstored!= {}:
-				globalvarRk3.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,neqst)'+'\n')	
-			else:	
-				globalvarRk3.write('                        qst(1)'+'\n')	
+				globalvarRk3.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,neqst)'+'\n')
+			else:
+				globalvarRk3.write('                        qst(1)'+'\n')
 		else:
 			globalvarRk3.write('real(wp),intent(inout) ::  q(1-hlo:nx+hlo,neq),&'+'\n')
 			globalvarRk3.write('                          q1(1-hlo:nx+hlo,neq),&'+'\n')
-			globalvarRk3.write('                         rhs(1-hlo:nx+hlo,neq),&'+'\n')	
+			globalvarRk3.write('                         rhs(1-hlo:nx+hlo,neq),&'+'\n')
 			if varstored!= {}:
-				globalvarRk3.write('                        qst(1-hlo:nx+hlo,neqst)'+'\n')	
-			else:	
-				globalvarRk3.write('                        qst(1)'+'\n')		
+				globalvarRk3.write('                        qst(1-hlo:nx+hlo,neqst)'+'\n')
+			else:
+				globalvarRk3.write('                        qst(1)'+'\n')
 		
 	if dim == 3:
 		globalvarFlt.write('real(wp),intent(inout) :: q(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
@@ -2689,33 +2688,59 @@ def globvar(rhs):
 			globalvarBC.write('                        qst(1)'+'\n')
 
 	# Global variables for the initialisation routine
-	if dim == 3:
-		globalvarinit.write('real(wp),intent(inout) :: q(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
-		globalvarinit.write('                         q1(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
-		globalvarinit.write('                         q2(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
-		globalvarinit.write('                        rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')	
-		if varstored!= {}:
-			globalvarinit.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neqst)'+'\n')	
-		else:	
-			globalvarinit.write('                        qst(1)'+'\n')	
-	elif dim == 2 :
-		globalvarinit.write('real(wp),intent(inout) ::  q(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
-		globalvarinit.write('                          q1(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
-		globalvarinit.write('                          q2(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
-		globalvarinit.write('                         rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')			
-		if varstored!= {}:
-			globalvarinit.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,neqst)'+'\n')	
-		else:	
-			globalvarinit.write('                        qst(1)'+'\n')	
+	if rhs.RK_type == 'standard':
+		if dim == 3:
+			globalvarinit.write('real(wp),intent(inout) :: q(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
+			globalvarinit.write('                         q1(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
+			globalvarinit.write('                         q2(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
+			globalvarinit.write('                        rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
+			if varstored!= {}:
+				globalvarinit.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neqst)'+'\n')
+			else:
+				globalvarinit.write('                        qst(1)'+'\n')
+		elif dim == 2 :
+			globalvarinit.write('real(wp),intent(inout) ::  q(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
+			globalvarinit.write('                          q1(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
+			globalvarinit.write('                          q2(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
+			globalvarinit.write('                         rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
+			if varstored!= {}:
+				globalvarinit.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,neqst)'+'\n')
+			else:
+				globalvarinit.write('                        qst(1)'+'\n')
+		else:
+			globalvarinit.write('real(wp),intent(inout) ::  q(1-hlo:nx+hlo,neq),&'+'\n')
+			globalvarinit.write('                          q1(1-hlo:nx+hlo,neq),&'+'\n')
+			globalvarinit.write('                          q2(1-hlo:nx+hlo,neq),&'+'\n')
+			globalvarinit.write('                         rhs(1-hlo:nx+hlo,neq),&'+'\n')
+			if varstored!= {}:
+				globalvarinit.write('                        qst(1-hlo:nx+hlo,neqst)'+'\n')
+			else:
+				globalvarinit.write('                        qst(1)'+'\n')
 	else:
-		globalvarinit.write('real(wp),intent(inout) ::  q(1-hlo:nx+hlo,neq),&'+'\n')
-		globalvarinit.write('                          q1(1-hlo:nx+hlo,neq),&'+'\n')
-		globalvarinit.write('                          q2(1-hlo:nx+hlo,neq),&'+'\n')
-		globalvarinit.write('                         rhs(1-hlo:nx+hlo,neq),&'+'\n')	
-		if varstored!= {}:
-			globalvarinit.write('                        qst(1-hlo:nx+hlo,neqst)'+'\n')	
-		else:	
-			globalvarinit.write('                        qst(1)'+'\n')			
+		if dim == 3:
+			globalvarinit.write('real(wp),intent(inout) :: q(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
+			globalvarinit.write('                         q1(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
+			globalvarinit.write('                        rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
+			if varstored!= {}:
+				globalvarinit.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neqst)'+'\n')
+			else:
+				globalvarinit.write('                        qst(1)'+'\n')
+		elif dim == 2 :
+			globalvarinit.write('real(wp),intent(inout) ::  q(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
+			globalvarinit.write('                          q1(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
+			globalvarinit.write('                         rhs(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')
+			if varstored!= {}:
+				globalvarinit.write('                        qst(1-hlo:nx+hlo,1-hlo:ny+hlo,neqst)'+'\n')
+			else:
+				globalvarinit.write('                        qst(1)'+'\n')
+		else:
+			globalvarinit.write('real(wp),intent(inout) ::  q(1-hlo:nx+hlo,neq),&'+'\n')
+			globalvarinit.write('                          q1(1-hlo:nx+hlo,neq),&'+'\n')
+			globalvarinit.write('                         rhs(1-hlo:nx+hlo,neq),&'+'\n')
+			if varstored!= {}:
+				globalvarinit.write('                        qst(1-hlo:nx+hlo,neqst)'+'\n')
+			else:
+				globalvarinit.write('                        qst(1)'+'\n')
 	
 # define derivatives operators :
 
@@ -3591,6 +3616,7 @@ def rhsinfo(rhs):
 	bc_info      = rhs.bc_info     
 	varbc        = rhs.varbc
 	rk_stages    = rhs.rk_stages
+	rk_type      = rhs.RK_type
 
 
 	instpath = os.environ['INSTALLPATH']
@@ -3608,6 +3634,7 @@ def rhsinfo(rhs):
 	rhsinf.write('bc_info = '+str(bc_info)+'\n')
 	rhsinf.write('varbc = '+str(varbc)+'\n')
 	rhsinf.write('rk_stages = '+str(rk_stages)+'\n')
+	rhsinf.write('rk_type = \''+str(rk_type)+'\'\n')
 
 def gendtype():
 
@@ -3853,11 +3880,52 @@ def genFilter(stencil,order,nvar,dirBC='',indbc='',fltbeg=2,rhs=None):
 		up.close()
 		fltbc.close()	
 
-def genrk3(nvar,rhs=None,bc=[False,[]],rk3=None):
+# This function copies the building blocks of
+# the different RK schemes into place so they
+# can be found by the preprocessor.
+def copyRKtemplatesInPlace(srcFiles):
+	import shutil
+	src_path    = dir_path+'/src_for/includes/rk_schemes_templates/'
+	target_path = dir_path+'/src_for/includes/gen/'
 
+	# the following files will be created with the corresponding
+	# content of the source file
+	targetFiles= [
+	'rk_function_call.f90',
+	'includeRK_coeffs.f90',
+	'rk_scheme.f90',
+	'rk_call_init_numa.f90',
+	'rk_init_numa.f90',
+	'call_cmp_stored.f90']
+	#'includeRHS_globVar1.f90']
+	#'includeRK_function_header.f90',
+	#'include_nrk_eq1.f90',
+	#'include_nrk_endif.f90',
+	#'includeRK_function_end.f90',
+
+	assert(len(srcFiles)==len(targetFiles))
+
+	# copy the files into place
+	for sFile, tFile in zip(srcFiles,targetFiles):
+		shutil.copy(src_path+sFile, target_path+tFile)
+
+
+def genrk3(nvar,rhs=None,bc=[False,[]],rk3=None):
 	from genRhs import incPATH
-	# Copy the correct template .for file
-	shutil.copy(dir_path+'/src_for/dnamiF_standardRK.for', dir_path + '/src_for/dnamiF.for')
+	# the following files are located inside the
+	# /src_for/includes/rk_schemes_templates/ directory
+	srcFiles = [
+	'stdRK_call.for',
+	'includeStdRK_coeffs.f90',
+	'includeStandardRK.for',
+	'includeStandardRK_call_init_numa.for',
+	'includeStandardRK_init_numa.for',
+	'includeStandardRK_call_cmp_stored.for']
+
+	# Copy the building blocks of the standard rk scheme into
+	# the temporary directory
+	copyRKtemplatesInPlace(srcFiles)
+
 	dim = rhs.dim
 	rhs.RK_order, rhs.rk_stages = 3, 3
 	rhs.RK_type = 'standard'
@@ -3926,11 +3994,21 @@ def genrk3update(nvar,rhs=None,bc=[False,[]], updaterk3=None):
 		if consvar != []: genP2C(updaterk3,'primitive',rhs=rhs,bc=bc)
 
 def genrk_Williamson(nvar,rhs=None,bc=[False,[]], updaterk3=None, order=3, SSP=False):
-
 	from genRhs import incPATH,consvar
+	# the following files are located inside the 
+	# /src_for/includes/rk_schemes_templates/ directory
+	srcFiles = [
+	'willRK_call.for', 
+	'includeWillRK_coeffs.f90',
+	'includeWilliamsonRK.for',
+	'includeWilliamsonRK_call_init_numa.for',
+	'includeWilliamsonRK_init_numa.for',
+	'includeWilliamsonRK_call_cmp_stored.for']
 
-	# Copy the correct template .for file
-	shutil.copy(dir_path+'/src_for/dnamiF_WilliamsonRK.for', dir_path + '/src_for/dnamiF.for')
+	# Copy the building blocks of the Williamson rk scheme into
+	# the temporary directory
+	copyRKtemplatesInPlace(srcFiles)
+
 	dim = rhs.dim
 	rhs.RK_order = order
 	rhs.RK_type = 'Williamson'
@@ -4054,26 +4132,45 @@ def geninit(output,nvar,rhs=None):
 
 	dim = rhs.dim
 
-	if dim == 3:
-		for nv in range(1,nvar+1):
-			output.write(  'q(i,j,k,'+str(nv)+') = 0.0_wp'+'\n')
-			output.write( 'q1(i,j,k,'+str(nv)+') = 0.0_wp'+'\n')
-			output.write( 'q2(i,j,k,'+str(nv)+') = 0.0_wp'+'\n')
-			output.write('rhs(i,j,k,'+str(nv)+') = 0.0_wp'+'\n')
+	if rhs.RK_type == 'standard':
+		if dim == 3:
+			for nv in range(1,nvar+1):
+				output.write(  'q(i,j,k,'+str(nv)+') = 0.0_wp'+'\n')
+				output.write( 'q1(i,j,k,'+str(nv)+') = 0.0_wp'+'\n')
+				output.write( 'q2(i,j,k,'+str(nv)+') = 0.0_wp'+'\n')
+				output.write('rhs(i,j,k,'+str(nv)+') = 0.0_wp'+'\n')
 
-	elif dim == 2 :
-		for nv in range(1,nvar+1):
-			output.write(  'q(i,j,'+str(nv)+') = 0.0_wp'+'\n')
-			output.write( 'q1(i,j,'+str(nv)+') = 0.0_wp'+'\n')
-			output.write( 'q2(i,j,'+str(nv)+') = 0.0_wp'+'\n')
-			output.write('rhs(i,j,'+str(nv)+') = 0.0_wp'+'\n')
+		elif dim == 2 :
+			for nv in range(1,nvar+1):
+				output.write(  'q(i,j,'+str(nv)+') = 0.0_wp'+'\n')
+				output.write( 'q1(i,j,'+str(nv)+') = 0.0_wp'+'\n')
+				output.write( 'q2(i,j,'+str(nv)+') = 0.0_wp'+'\n')
+				output.write('rhs(i,j,'+str(nv)+') = 0.0_wp'+'\n')
 
-	else:	
-		for nv in range(1,nvar+1):
-			output.write(  'q(i,'+str(nv)+') = 0.0_wp'+'\n')
-			output.write( 'q1(i,'+str(nv)+') = 0.0_wp'+'\n')
-			output.write( 'q2(i,'+str(nv)+') = 0.0_wp'+'\n')
-			output.write('rhs(i,'+str(nv)+') = 0.0_wp'+'\n')
+		else:
+			for nv in range(1,nvar+1):
+				output.write(  'q(i,'+str(nv)+') = 0.0_wp'+'\n')
+				output.write( 'q1(i,'+str(nv)+') = 0.0_wp'+'\n')
+				output.write( 'q2(i,'+str(nv)+') = 0.0_wp'+'\n')
+				output.write('rhs(i,'+str(nv)+') = 0.0_wp'+'\n')
+	else:
+		if dim == 3:
+			for nv in range(1,nvar+1):
+				output.write(  'q(i,j,k,'+str(nv)+') = 0.0_wp'+'\n')
+				output.write( 'q1(i,j,k,'+str(nv)+') = 0.0_wp'+'\n')
+				output.write('rhs(i,j,k,'+str(nv)+') = 0.0_wp'+'\n')
+
+		elif dim == 2 :
+			for nv in range(1,nvar+1):
+				output.write(  'q(i,j,'+str(nv)+') = 0.0_wp'+'\n')
+				output.write( 'q1(i,j,'+str(nv)+') = 0.0_wp'+'\n')
+				output.write('rhs(i,j,'+str(nv)+') = 0.0_wp'+'\n')
+
+		else:
+			for nv in range(1,nvar+1):
+				output.write(  'q(i,'+str(nv)+') = 0.0_wp'+'\n')
+				output.write( 'q1(i,'+str(nv)+') = 0.0_wp'+'\n')
+				output.write('rhs(i,'+str(nv)+') = 0.0_wp'+'\n')
 
 def genbcsrc(nvar,rhs=None):
 	

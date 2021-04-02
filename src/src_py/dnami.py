@@ -454,6 +454,7 @@ def allocate(tree):
 	# Floating point parameters to be passed to the Fortran layer (3 additional floats for the metrics, uniforme grid + 1 for dt  +1 for eps filter)
 	param_float = np.zeros(shape=ncoef+5, dtype=wp, order='F')   
 
+
 	param_float[0] = cst(1.0)/tree['grid']['geom']['dx']
 	if(dim>=2)   : param_float[1] = cst(1.0)/tree['grid']['geom']['dy']
 	if(dim == 3) : param_float[2] = cst(1.0)/tree['grid']['geom']['dz']
@@ -465,13 +466,21 @@ def allocate(tree):
 		param_float[i+5] = v[1]
 
 	# Floating point array (contiguous, aligned, actually NOT aligned yet...)
-	
 	nfieldbcs = sum([nfacei,nfacej,nfacek,nedgeij,nedgejk,nedgeik])
 
+	# Depending on the RK scheme the # of vectors changes
+	from rhsinfo import rk_type
+	if rk_type=='Williamson':
+		print("Williamson RK")
+		num_vectors=3
+	else:
+		print("Standard RK")
+		num_vectors=4
+
 	if nvarst != 0 :
-		data     = np.empty(shape=ndimtot*4 + ndimpt*nvarst + nfieldbcs, dtype=wp,order='F') # 4 -->  q,q1,q2 + rhs + nvarstored
+		data     = np.empty(shape=ndimtot*num_vectors + ndimpt*nvarst + nfieldbcs, dtype=wp,order='F') # 4 -->  q,q1,q2 + rhs + nvarstored
 	else:	
-		data     = np.empty(shape=ndimtot*4 + 1             + nfieldbcs, dtype=wp,order='F') # 4 -->  q,q1,q2, rhs, + 1 (address for qst in fortran layer)
+		data     = np.empty(shape=ndimtot*num_vectors + 1             + nfieldbcs, dtype=wp,order='F') # 4 -->  q,q1,q2, rhs, + 1 (address for qst in fortran layer)
 
 	# Explicit view of data (only references here, no copy) 
 	views = {}
@@ -479,10 +488,10 @@ def allocate(tree):
 	
 	# WARNING assume contiguous addresses of stored variables in data_float...
 	if nvarst != 0:
-		addrstored_beg = ndimtot*4 
+		addrstored_beg = ndimtot*num_vectors
 		addrstored_end = addrstored_beg + ndimpt*nvarst
 	else:
-		addrstored_beg = ndimtot*4	
+		addrstored_beg = ndimtot*num_vectors
 		addrstored_end = addrstored_beg + 1
 
 	addrbcfields_beg      = addrstored_end	
