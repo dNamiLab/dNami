@@ -2655,14 +2655,14 @@ def globvar(rhs):
 		
 	if dim == 3:
 		globalvarFlt.write('real(wp),intent(inout) :: q(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq),&'+'\n')
-		globalvarFlt.write('                         q2(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq)'+'\n')			
+		globalvarFlt.write('                         q1(1-hlo:nx+hlo,1-hlo:ny+hlo,1-hlo:nz+hlo,neq)'+'\n')			
 	elif dim == 2 :
 		globalvarFlt.write('real(wp),intent(inout) ::  q(1-hlo:nx+hlo,1-hlo:ny+hlo,neq),&'+'\n')			
-		globalvarFlt.write('                          q2(1-hlo:nx+hlo,1-hlo:ny+hlo,neq)'+'\n')
+		globalvarFlt.write('                          q1(1-hlo:nx+hlo,1-hlo:ny+hlo,neq)'+'\n')
 				
 	else:
 		globalvarFlt.write('real(wp),intent(inout) ::  q(1-hlo:nx+hlo,neq),&'+'\n')			
-		globalvarFlt.write('                          q2(1-hlo:nx+hlo,neq)'+'\n')
+		globalvarFlt.write('                          q1(1-hlo:nx+hlo,neq)'+'\n')
 			
 	# Global variables for the boundary conditions
 	if dim == 3:
@@ -3698,14 +3698,14 @@ def genFilter(stencil,order,nvar,dirBC='',indbc='',fltbeg=2,rhs=None):
 				flt0 = ''
 			
 				if   dim == 1 and (dir in ['x']):
-					updateflt.write('q(i,'+str(nv)+') = q(i,'+str(nv)+') - param_float(5)*q2(i,'+str(nv)+')\n\n')
-					flt0 = 'q2(i,'+str(nv)+') ='	
+					updateflt.write('q(i,'+str(nv)+') = q(i,'+str(nv)+') - param_float(5)*q1(i,'+str(nv)+')\n\n')
+					flt0 = 'q1(i,'+str(nv)+') ='	
 				elif dim == 2 and (dir in ['x','y']):	
-					updateflt.write('q(i,j,'+str(nv)+') = q(i,j,'+str(nv)+') - param_float(5)*q2(i,j,'+str(nv)+')\n\n')
-					flt0 = 'q2(i,j,'+str(nv)+') ='	
+					updateflt.write('q(i,j,'+str(nv)+') = q(i,j,'+str(nv)+') - param_float(5)*q1(i,j,'+str(nv)+')\n\n')
+					flt0 = 'q1(i,j,'+str(nv)+') ='	
 				elif dim == 3 and (dir in ['x','y','z']):
-					updateflt.write('q(i,j,k,'+str(nv)+') = q(i,j,k,'+str(nv)+') - param_float(5)*q2(i,j,k,'+str(nv)+')\n\n')
-					flt0 = 'q2(i,j,k,'+str(nv)+') ='	
+					updateflt.write('q(i,j,k,'+str(nv)+') = q(i,j,k,'+str(nv)+') - param_float(5)*q1(i,j,k,'+str(nv)+')\n\n')
+					flt0 = 'q1(i,j,k,'+str(nv)+') ='	
 	
 		
 				if dir == 'x':
@@ -3859,8 +3859,8 @@ def genFilter(stencil,order,nvar,dirBC='',indbc='',fltbeg=2,rhs=None):
 			indexqout = indexq.replace('nvtmp',str(nv))
 			indexout  = indexout.replace('layertmp','{:+d}'.format(indbc*dirscan))
 
-			up.write('q('+indexout+') = q('+indexout+') - param_float(5)*q2('+indexout+')\n')
-			flt0 =  'q2('+indexout+') ='		
+			up.write('q('+indexout+') = q('+indexout+') - param_float(5)*q1('+indexout+')\n')
+			flt0 =  'q1('+indexout+') ='		
 			for shift in range(0,len(fd)):
 				indexqoutout = indexqout.replace('shiftmp','{:+d}'.format(shift*dirscan))
 
