@@ -60,7 +60,8 @@ for exm in exm_list:
     # -- Run copy script
     cmd = 'cd ' + exm+ '; ./copy.sh >> ' + exm_log 
     try:
-        process = subprocess.run(cmd,shell=True,capture_output=True,text=True,check=True)
+        #process = subprocess.run(cmd,shell=True,capture_output=True,text=True,check=True)
+        process = subprocess.run(cmd,shell=True)
     except Exception as e:
         print('Error at copy: ', e)
         exm_stat[exm] = f'{bcolors.FAIL}COPY FAIL{bcolors.ENDC}'
@@ -71,7 +72,8 @@ for exm in exm_list:
     # -- Compile 
     cmd = 'cd ../src; ./install_clean.sh >> ' + exm_log
     try:
-        process = subprocess.run(cmd,shell=True,capture_output=True,text=True,check=True)
+        #process = subprocess.run(cmd,shell=True,capture_output=True,text=True,check=True)
+        process = subprocess.run(cmd,shell=True)
     except Exception as e:
         print('Error at compilation: ', e)
         exm_stat[exm] = f'{bcolors.FAIL}COMPILATION FAIL{bcolors.ENDC}'
