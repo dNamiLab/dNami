@@ -471,16 +471,14 @@ def allocate(tree):
 	# Depending on the RK scheme the # of vectors changes
 	from rhsinfo import rk_type
 	if rk_type=='Williamson':
-		print("Williamson RK")
 		num_vectors=3
 	else:
-		print("Standard RK")
 		num_vectors=4
 
 	if nvarst != 0 :
-		data     = np.empty(shape=ndimtot*num_vectors + ndimpt*nvarst + nfieldbcs, dtype=wp,order='F') # 4 -->  q,q1,q2 + rhs + nvarstored
+		data     = np.empty(shape=ndimtot*num_vectors + ndimpt*nvarst + nfieldbcs, dtype=wp,order='F') # 4 -->  q,q1,(q2) + rhs + nvarstored
 	else:	
-		data     = np.empty(shape=ndimtot*num_vectors + 1             + nfieldbcs, dtype=wp,order='F') # 4 -->  q,q1,q2, rhs, + 1 (address for qst in fortran layer)
+		data     = np.empty(shape=ndimtot*num_vectors + 1             + nfieldbcs, dtype=wp,order='F') # 4 -->  q,q1,(q2), rhs, + 1 (address for qst in fortran layer)
 
 	# Explicit view of data (only references here, no copy) 
 	views = {}
