@@ -5,5 +5,12 @@ export  INSTALLPATH=$PWD
 export  PYTHONPATH=$PYTHONPATH:$INSTALLPATH/src_py
 export  PYTHONPATH=$PYTHONPATH:$INSTALLPATH/pymod
 export  PYTHONPATH=$PYTHONPATH:$INSTALLPATH/generate/
+
+# The following variable seems to fix crashes on Deigo for large jobs with many MPI processes.
+# The error message after the crash is similar to the following:
+# File "<frozen importlib._bootstrap>", line 983, in _find_and_load
+# File "<frozen importlib._bootstrap>", line 963, in _find_and_load_unlocked
+export PYTHONDONTWRITEBYTECODE=1
+
 #export  KMP_AFFINITY='verbose,granularity=fine,compact,1,0'
-export  KMP_AFFINITY='verbose,granularity=fine,proclist=[10,11,12,13,14,15,16,17,18,19,20,0,1,2,3,4,5,6,7,8,9],explicit'
+#export  KMP_AFFINITY='verbose,granularity=fine,proclist=[10,11,12,13,14,15,16,17,18,19,20,0,1,2,3,4,5,6,7,8,9],explicit'
