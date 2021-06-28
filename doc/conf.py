@@ -18,8 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'dNami'
-copyright = '2020, S2T Unit'
-author = 'S2T Unit'
+copyright = '2020, Okinawa Institute of Science and Technology School Corporation, Conservatoire national des arts et métiers'
+author = 'Nicolas Alferez, S2T Unit'
 
 
 # -- General configuration ---------------------------------------------------
