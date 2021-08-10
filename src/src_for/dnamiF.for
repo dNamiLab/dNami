@@ -37,7 +37,7 @@
   nedgejk   = param_int(iadrVARS + param_int(iadrNVAR) + param_int(iadrNVARST) + 1 + nbc + 10 )
 
   if ( param_int(iadrNVARST) .gt. 0 ) then
-   shiftstore = param_int(iadrNVARST)*param_int(iadrNDIMTOT)
+   shiftstore = param_int(iadrNVARST)*param_int(iadrNDIMPT)
   else
    shiftstore = 1
   endif
@@ -114,7 +114,7 @@
   nedgejk   = param_int(iadrVARS + param_int(iadrNVAR) + param_int(iadrNVARST) + 1 + nbc + 10 )
 
   if ( param_int(iadrNVARST) .gt. 0 ) then
-   shiftstore = param_int(iadrNVARST)*param_int(iadrNDIMTOT)
+   shiftstore = param_int(iadrNVARST)*param_int(iadrNDIMPT)
   else
    shiftstore = 1
   endif
@@ -124,7 +124,6 @@
   shiftfacek  = shiftfacej  + nfacek
   shiftedgeij = shiftfacek  + nedgeij
   shiftedgejk = shiftedgeij + nedgejk
-
 
   call cmp_stored(param_float                                                          ,&
                   type_st                                                              ,&
@@ -198,7 +197,6 @@
 
   indvars   = ind(1:neq)
   indvarsst = ind(1+neq:neq+neqst) 
-
 
 !f2py intent(in)    :: nx,ny,nz,nrk,q,nvar_f,nvar_e,neq,nbc
 !f2py intent(inout) :: qst

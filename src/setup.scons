@@ -52,7 +52,7 @@ else:
 
 # debug:
 # f90Args   = '-fbounds-check -fbacktrace -fcheck=all -O0 -Wall -fno-range-check -g -ggdb -ffpe-trap=invalid,zero -fPIC -fopenmp -ffree-line-length-512'
-# f90Args = '-O0 -fPIC -check all -check bounds -check uninit -ftrapuv -debug all -traceback -fpe-all=0 -fp-stack-check -ftrapuv -g'
+# f90Args = '-O0 -fPIC -check all -check     bounds -check uninit -ftrapuv -debug all -traceback -fpe-all=0 -fp-stack-check -ftrapuv -g'
 # F2PYFLAGS = '\'-Wall -g -fPIC -funroll-loops -O3 -fopenmp -ffree-line-length-512\''
 F2PYFLAGS  = '\'' + f90Args 
 

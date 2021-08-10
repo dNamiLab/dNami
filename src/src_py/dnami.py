@@ -272,6 +272,7 @@ def allocate(tree):
 		variables_edge[dir] = []
 		for v in tree['eqns']['qvec']['bcs']['edge'][dir]:
 				variables_edge[dir].append(v[1])		
+	
 
 	nvar_face = {'i': len(variables_face['i']),
 				 'j': len(variables_face['j']),
@@ -280,7 +281,9 @@ def allocate(tree):
 	nvar_edge = {'ij': len(variables_edge['ij']),
 				 'jk': len(variables_edge['jk']),
 				 'ik': len(variables_edge['ik'])}			 
-				
+
+
+
 	coeff = []
 	if tree['eqns']['coeff']:
 		for v in tree['eqns']['coeff']:
@@ -324,11 +327,12 @@ def allocate(tree):
 	nfacei = max(1,nvar_face['i']*ndimptbcs['i'])
 	nfacej = max(1,nvar_face['j']*ndimptbcs['j'])
 	nfacek = max(1,nvar_face['k']*ndimptbcs['k'])
+	
+
 	# edges:
 	nedgeij = max(1,nvar_edge['ij']*ndimptbcs['ij'])
 	nedgejk = max(1,nvar_edge['jk']*ndimptbcs['jk'])
-	nedgeik = max(1,nvar_edge['ik']*ndimptbcs['ik'])
-
+	nedgeik = max(1,nvar_edge['ik']*ndimptbcs['ik'])	
 
 	# unpack bc info:
 	tree = unpack_bcs(tree)
@@ -437,13 +441,13 @@ def allocate(tree):
 		for v in tree['eqns']['qvec']['stored']:
 			views[v[0]] = data[(v[1]-1)*(ndimpt)+addrstored_beg:(v[1])*ndimpt+addrstored_beg].view().reshape(sizex,sizey, order='F')	
 
-		# bc faces:	
-		shift = addrbcfields_beg
-		for dir in ['i','j']:
-			for v in tree['eqns']['qvec']['bcs']['face'][dir]:	
-				views[v[0]] = data[shift:ndimptbcs[dir]+shift].view().reshape(sizebcs[dir], order='F')			
-				shift       = shift + ndimptbcs[dir]
 
+		# bc faces:	
+		shift = addrbcfields_beg	
+		for dir in ['i','j']:
+			for v in tree['eqns']['qvec']['bcs']['face'][dir]:					
+				views[v[0]] = data[shift:ndimptbcs[dir]+shift].view().reshape(sizebcs[dir], order='F')			
+				shift       = shift + ndimptbcs[dir]	
 						
 	else:
 		views['q'] =  data[0:ndimpt*nvsolved].view().reshape(sizex,nvsolved, order='F')

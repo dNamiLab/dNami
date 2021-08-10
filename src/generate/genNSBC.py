@@ -1,6 +1,7 @@
 #
 # With Sympy :
 #
+import re
 
 varname      = {'rho' : 1,
                   'u' : 2,  
@@ -49,6 +50,7 @@ def dNami_to_sympy(expr,varname):
 
 def sympy2dNami(expr):
 
+  fltcheck = re.compile(r'_wp\d')
 
   dervSympy = []
   dervdNami = []
@@ -98,30 +100,32 @@ def sympy2dNami(expr):
           crosscount = crosscount - 1
 
       # convert floats:    
-      if isinstance(i, sym.Float):
+      if isinstance(i, sym.Float):        
         floatSympy.append(i)
         floatdNami.append(str(i)+'_wp')                       
-
+      # print(floatdNami)  
   expStr = str(expr)
 
   for dsy,ddn in zip(dervSympy,dervdNami):
     expStr = expStr.replace(str(dsy),ddn)
-  
+
   fltsyDone = []
   for fltsy,fltdn in zip(floatSympy,floatdNami):
-
     # Very dirty brute force !!!!
     replaceTrue = True
     for d in range(1,16):                    
       if replaceTrue and fltsy not in fltsyDone:
         expStrOld = expStr   
-        expStr = expStr.replace(str(fltsy.n(d)),str(fltsy.n(d))+'_wp')
-        replaceTrue = expStrOld == expStr
+        expStrtest = expStr.replace(str(fltsy.n(d)),str(fltsy.n(d))+'_wp')
+        if fltcheck.search(expStrtest) == None:
+          expStr = expStrtest
+          replaceTrue = expStrOld == expStr
 
     fltsyDone.append(fltsy)    
 
   expStr = expStr.replace('(x, y, z, t)','')
-  
+  expStr = expStr.replace('(x, y, t)','')
+
   return expStr
 
 rho   = sym.Function('rho')(x,y,z,t)

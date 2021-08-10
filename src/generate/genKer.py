@@ -262,7 +262,8 @@ derDicBc = {};der2DicBc = {}; fltDicBc = {}
 der2DicBc[4] = {2: fddrs4o2}
 derDicBc[3]  = {2: fdrs3o2 }
 # ['layer'] 
-fltDicBc[4] = flt_10_4
+#fltDicBc[4] = flt_10_4
+fltDicBc[4] = flt_10_4 # Hack
 fltDicBc[3] = flt_10_3
 fltDicBc[2] = flt_10_2
 fltDicBc[1] = flt_7_1
@@ -308,7 +309,7 @@ def dNamiVar(var,rangei,rangej,rangek):
 			
 			from collections import Counter	
 			if 	not (Counter(Counter(knownbcs).values())[1] == len(knownbcs)):
-				exception('Several occurrences of identical indices for a given bc location (i.e. face or edge) in "varbc". This ambiguity is not managed yet — generation aborted.',message='error')
+				exception('Several occurrences of identical indices for a given bc location (i.e. face or edge) in "varbc" ('+dirloc+', '+dir+','+str(knownbcs)+'). This ambiguity is not managed yet — generation aborted.',message='error')
 
 	try:
 		from genRhs import varstored
@@ -353,7 +354,7 @@ def dNamiVar(var,rangei,rangej,rangek):
 							   1:'('}}} 
 
 	domainBorder = {'face':{'i1'  : 1-5,
-							'imax': 'nx+5',
+							  'imax': 'nx+5',
 						   	'j1'  : 1-5,
 						   	'jmax': 'ny+5',
 						   	'k1'  : 1-5,
@@ -449,17 +450,17 @@ def genNbg(expr, dir , stencil, i='i',j='j',k='k',vname='v',dirBc=None,indbc='',
 	#             vname   = input name for the result (local variable)
 	#
 	#     outputs :
-    #             exprnbg : list of 'expr' expressed for each points in the neighborhood
-    #             vnamebg : corresponding temprary variable name
-    # 
-    #  Exemple :  
-    #              genNbg('rho*u','x',3,vname='derhou_') 
-    #
-    #             --> exprnbg = ['q(i-1,j,k,nvrh)*q(i-1,j,k,nvux)', 
-    #                            'q(i+0,j,k,nvrh)*q(i+0,j,k,nvux)', 
-    #                            'q(i+1,j,k,nvrh)*q(i+1,j,k,nvux)']
-    #
-    #             --> vnamebg = ['derhou_im1jk', 'derhou_ip0jk', 'derhou_ip1jk']
+  #             exprnbg : list of 'expr' expressed for each points in the neighborhood
+  #             vnamebg : corresponding temprary variable name
+  # 
+  #  Exemple :  
+  #              genNbg('rho*u','x',3,vname='derhou_') 
+  #
+  #             --> exprnbg = ['q(i-1,j,k,nvrh)*q(i-1,j,k,nvux)', 
+  #                            'q(i+0,j,k,nvrh)*q(i+0,j,k,nvux)', 
+  #                            'q(i+1,j,k,nvrh)*q(i+1,j,k,nvux)']
+  #
+  #             --> vnamebg = ['derhou_im1jk', 'derhou_ip0jk', 'derhou_ip1jk']
 	#           
 	#                                                
 	#***********************************************************
@@ -1797,10 +1798,27 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 
 										# stored add calls static/dynamic
 										if stored:
+											addvarbc = False
+											for var in varbc:
+												if 'face' in varbc[var]:
+													if varbc[var]['face'] == dir1: addvarbc = True
+												else:
+													addvarbc = False
+							
+												if addvarbc:	
+													if varbc[var]['static']:
+														staticvarbc[var] = varbc[var]['symb']
+													else:
+														dynamicvarbc[var] = varbc[var]['symb']
+												addvarbc = False			
+
+											var2process['varbcstatic'] = staticvarbc
+											var2process['varbc']       = dynamicvarbc
 											for k in var2process:
 												if var2process[k] != {}:
 													create_bccalls(efname_stored[k],edgecallname_stored[k],bcall_stored[k])
 													efname_stored[k].close()
+													
 #       
 #       Generates physical BC edges
 #
@@ -2207,14 +2225,15 @@ def genBC_calls(rhs):
 							var2process['varbc']       = dynamicvarbc
 
 							for k in var2process:
-								if var2process[k] != {}:
+								if var2process[k] != {}:	
 
 									slcbc_stored[k] = open(incPATH+'select'+k+'bc.f90','a+')
 									slcbc_stored[k].write('CASE ('+str(bcnum)+')\n')
-									if k[0:5] == 'varbc': 										
-									   layerend = 1
-									else:
-									   layerend = hlo_rhs   
+									# if k[0:5] == 'varbc': 										
+									#    layerend = 1
+									# else:
+									   # layerend = hlo_rhs   
+									layerend = hlo_rhs   
 									for layer1 in range(0,layerend): #BC layers dir1
 										efname_stored[k] = open(incPATH+'bcsrc_'+k+'_edgescall_'+dir1+'_'+dir2+'_'+str(layer1)+'.for','r')
 										slcbc_stored[k].write('      call '+efname_stored[k].readlines()[8][10:])								
@@ -2269,8 +2288,8 @@ def genBC_calls(rhs):
 			slcbcflt.write('\n CASE ('+str(bcnum)+')\n\n')
 			slcbcfltup.write('\n CASE ('+str(bcnum)+')\n\n')
 	
-			for layer in range(2,hlo_rhs):
-				     genFilter(stencil_rhs,order_rhs,len(varsolved),dirBC=dir1,indbc=layer,fltbeg=2,rhs=rhs)
+			for layer in range(0,hlo_rhs):
+				     genFilter(stencil_rhs,order_rhs,len(varsolved),dirBC=dir1,indbc=layer,fltbeg=0,rhs=rhs)
 			
 			up    = open(incPATH+'update_filterbc_'+axes[dir1[0]]+'.f90','r') # set to empty
 			fltbc = open(incPATH+'filterbc_'+axes[dir1[0]]+'.f90'       ,'r') # set to empty	
@@ -3546,7 +3565,7 @@ def gendtype():
 		      '                  given value = '+str(wp)+' (set in genRhs.py)',message='error')
 
 
-def genFilter(stencil,order,nvar,dirBC='',indbc='',fltbeg=2,rhs=None):
+def genFilter(stencil,order,nvar,dirBC='',indbc='',fltbeg=0,rhs=None):
 
 	from genRhs import incPATH
 
