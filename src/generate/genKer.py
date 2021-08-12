@@ -61,7 +61,7 @@ class rhs_info:
 
 #################################################################################
 #
-# Finite differences coefficients database (could be automatically computed )
+# Finite differences coefficients database (could be automatically computed)
 #
 #################################################################################
 
@@ -263,7 +263,7 @@ der2DicBc[4] = {2: fddrs4o2}
 derDicBc[3]  = {2: fdrs3o2 }
 # ['layer'] 
 #fltDicBc[4] = flt_10_4
-fltDicBc[4] = flt_10_4 # Hack
+fltDicBc[4] = flt_10_4 
 fltDicBc[3] = flt_10_3
 fltDicBc[2] = flt_10_2
 fltDicBc[1] = flt_7_1
@@ -3565,7 +3565,7 @@ def gendtype():
 		      '                  given value = '+str(wp)+' (set in genRhs.py)',message='error')
 
 
-def genFilter(stencil,order,nvar,dirBC='',indbc='',fltbeg=0,rhs=None):
+def genFilter(stencil,order,nvar,dirBC='',indbc='',fltbeg=2,rhs=None):
 
 	from genRhs import incPATH
 
