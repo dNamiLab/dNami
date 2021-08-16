@@ -50,7 +50,7 @@ def dNami_to_sympy(expr,varname):
 
 def sympy2dNami(expr):
 
-  fltcheck = re.compile(r'_wp\d')
+  fltcheck = re.compile(r'_wp\d'+"|"+r'_wp_wp')
 
   dervSympy = []
   dervdNami = []
@@ -64,7 +64,7 @@ def sympy2dNami(expr):
   t      = sym.Symbol('t')
   u = sym.Function('u')(x,y,z,t)
 
-  tst = [(x,1),(y,1),(z,1)]
+  tst = [(x,1),(y,1),(z,1),(x,2),(y,2),(z,2)]
 
   dummyderv = sym.Derivative(u,z)
   
@@ -73,18 +73,27 @@ def sympy2dNami(expr):
 
   for i in sym.preorder_traversal(expr):
       #convert derivatives  
+
       if isinstance(i, type(dummyderv)):
         if not crossder:
           crossder   = True 
           dervSympy.append(i)
           if (len(i.args) == 3):
-            dervdNami.append('[ {'+str(i.args[0])+' }_1'+str(i.args[1][0])+']_1'+str(i.args[2][0])+' ')
+            dervdNami.append('[ {'+str(i.args[0])+' }_1'+str(i.args[1][0])+' ]_1'+str(i.args[2][0])+' ')
           elif (len(i.args) == 2):
-            dervdNami.append('[ '+str(i.args[0])+' ]_1'+str(i.args[1][0])+' ') 
+            varder = str(i.args[1][1])+str(i.args[1][0])
+            if i.args[1][1] == 2:
+              varder = varder+str(i.args[1][0])
+            elif i.args[1][1] > 2:  
+              print("Derivation Order > 2 NRY",i)
+              import sys
+              sys.exit()              
+
+            dervdNami.append('[ '+str(i.args[0])+' ]_'+varder+' ') 
         else:
           dervSympy.append(i)
           if (len(i.args) == 3) or crosscount > 2:
-            print("Derivation Order > 2 NRY")
+            print("Derivation Order > 2 NRY",i)
             import sys
             sys.exit()
             dervdNami.append('[ {'+str(i.args[0])+' }_1'+str(i.args[1][0])+']_1'+str(i.args[2][0])+' ')
@@ -126,7 +135,7 @@ def sympy2dNami(expr):
   expStr = expStr.replace('(x, y, z, t)','')
   expStr = expStr.replace('(x, y, t)','')
 
-  return expStr
+  return expStr  
 
 rho   = sym.Function('rho')(x,y,z,t)
 u     = sym.Function('u')(x,y,z,t)
