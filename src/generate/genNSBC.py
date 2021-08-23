@@ -58,23 +58,23 @@ def sympy2dNami(expr):
   floatSympy = []
   floatdNami = []
 
-  x      = sym.Symbol('x')
-  y      = sym.Symbol('y')
-  z      = sym.Symbol('z')
-  t      = sym.Symbol('t')
+  x      = sym.Symbol('x',real=True)
+  y      = sym.Symbol('y',real=True)
+  z      = sym.Symbol('z',real=True)
+  t      = sym.Symbol('t',real=True)
   u = sym.Function('u')(x,y,z,t)
 
-  tst = [(x,1),(y,1),(z,1),(x,2),(y,2),(z,2)]
-
   dummyderv = sym.Derivative(u,z)
-  
+  dummyderarg = dummyderv.args[1]
+
   crossder = False
   crosscount= 0
 
   for i in sym.preorder_traversal(expr):
       #convert derivatives  
-
+      # print(i,crosscount,i==x,isinstance(i,type(dummyderarg)))
       if isinstance(i, type(dummyderv)):
+        # print(i,crosscount)
         if not crossder:
           crossder   = True 
           dervSympy.append(i)
@@ -85,7 +85,7 @@ def sympy2dNami(expr):
             if i.args[1][1] == 2:
               varder = varder+str(i.args[1][0])
             elif i.args[1][1] > 2:  
-              print("Derivation Order > 2 NRY",i)
+              print("Derivation Order > 2 NRY i.args",i,i.args[1][1])
               import sys
               sys.exit()              
 
@@ -93,7 +93,7 @@ def sympy2dNami(expr):
         else:
           dervSympy.append(i)
           if (len(i.args) == 3) or crosscount > 2:
-            print("Derivation Order > 2 NRY",i)
+            print("Derivation Order > 2 NRY i.args crosscount",i, len(i.args), crosscount)
             import sys
             sys.exit()
             dervdNami.append('[ {'+str(i.args[0])+' }_1'+str(i.args[1][0])+']_1'+str(i.args[2][0])+' ')
@@ -101,10 +101,10 @@ def sympy2dNami(expr):
             dervdNami.append('{ '+str(i.args[0])+' }_1'+str(i.args[1][0])+' ')
         crosscount = crosscount + len(i.args) - 1
         if crosscount > 2:
-          print("Derivation Order > 2 NRY",i)
+          print("Derivation Order > 2 NRY crosscount",i,crosscount)
           import sys
           sys.exit()
-      if i in tst:
+      if isinstance(i,type(dummyderarg)):
           crossder   = False
           crosscount = crosscount - 1
 
