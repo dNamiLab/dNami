@@ -446,7 +446,6 @@ enddo ! END cache blocking k
 
 #include "include_bcq.f90"
 
-! print*,'rk3_stepk',q(:,ny+hlo,1)
 
 
 !$OMP END PARALLEL
@@ -571,6 +570,7 @@ idarray(6) = nz+hlo
 size_bk = sizeblck(3)
 size_bj = sizeblck(2)
 size_bi = sizeblck(1)
+
 
 #include "include_bcfilterx.f90"
 

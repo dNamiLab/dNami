@@ -266,8 +266,8 @@ derDicBc[3]  = {2: fdrs3o2 }
 fltDicBc[4] = flt_10_4 
 fltDicBc[3] = flt_10_3
 fltDicBc[2] = flt_10_2
-fltDicBc[1] = flt_7_1
-fltDicBc[0] = flt_4_0
+fltDicBc[1] = [i*0.1 for i in flt_7_1]
+fltDicBc[0] = [i*0.1 for i in flt_4_0]
 
 operators = ('\+', '\*','\-','\/','\^','\(','\)','\,') 
 
@@ -353,12 +353,18 @@ def dNamiVar(var,rangei,rangej,rangek):
 							   2:'(',
 							   1:'('}}} 
 
-	domainBorder = {'face':{'i1'  : 1-5,
-							  'imax': 'nx+5',
-						   	'j1'  : 1-5,
-						   	'jmax': 'ny+5',
-						   	'k1'  : 1-5,
-						   	'kmax': 'nz+5'}}					   
+	try:
+		from genRhs import hlo_glob
+	except:
+		exception('The number of hlo cells, hlo_glob, needs to be defined in genRhs. It is not automatically computed yet.',message='error')								   
+
+	domainBorder = {'face':{'i1'  : 1-hlo_glob,
+							  'imax': 'nx +'+str(hlo_glob),
+						   	'j1'  : 1-hlo_glob,
+						   	'jmax': 'ny +'+str(hlo_glob),
+						   	'k1'  : 1-hlo_glob,
+						   	'kmax': 'nz +'+str(hlo_glob)}}
+	
 
 	dvar  = var
 
@@ -1330,183 +1336,196 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 #
 #  recover bc info for generation and update bc_info with new data...
 #  ... then start generating bc
-	
+
+		if dim == 3:	
+				dir2gen2 = ['i1','imax','j1','jmax','k1','kmax']
+		elif dim == 2:
+				dir2gen2 = ['i1','imax','j1','jmax']
+		elif dim == 1:
+				dir2gen2 = ['i1','imax']
+		
+		edgeBCs = []
+		for d1 in dir2gen2:
+			for d2 in dir2gen2:
+				if d1 != d2:
+					edgeBCs.append(d1+d2)
+
 		
 		for dirBC in dir2gen:
-
-			DirDic = {'i':{'dir':None,'indbc':None},
-			          'j':{'dir':None,'indbc':None},
-			          'k':{'dir':None,'indbc':None}}
-
-
-			DirDic[dirBC[0]] = {'dir': dirBC , 'indbc' : None}
-
-			bcnum = bcnum + 1
-
-			indrangei = 'indbc(1)=1\nindbc(2)=1\n'
-			indrangej = 'indbc(3)=1\nindbc(4)=1\n'
-			indrangek = 'indbc(5)=1\nindbc(6)=1\n'
-
-			if dim == 2:
-				if dirBC[0] == 'i':
-					indrangej = 'indbc(3)=1\nindbc(4)=ny\n'
-				elif dirBC[0] == 'j':	
-					indrangei = 'indbc(1)=1\nindbc(2)=nx\n'
-			elif dim == 3:
-				if   dirBC[0] == 'i':
-					indrangej = 'indbc(3)=1\nindbc(4)=ny\n'
-					indrangek = 'indbc(5)=1\nindbc(6)=nz\n'
-				elif dirBC[0] == 'j':	
-					indrangei = 'indbc(1)=1\nindbc(2)=nx\n'	
-					indrangek = 'indbc(5)=1\nindbc(6)=nz\n'
-				elif dirBC[0] == 'k':	
-					indrangei = 'indbc(1)=1\nindbc(2)=nx\n'	
-					indrangej = 'indbc(3)=1\nindbc(4)=ny\n'
-
-			indrange = {'i':indrangei,
-						'j':indrangej,
-						'k':indrangek}			
-
-			idrhs = {}		
-			idflt = {}	
-
-			idrhs['i1']   = 'idrhs(1)=idarray(1)\n'
-			idrhs['imax'] = 'idrhs(2)=idarray(2)\n'
-			idrhs['j1']   = 'idrhs(3)=idarray(3)\n'
-			idrhs['jmax'] = 'idrhs(4)=idarray(4)\n'
-			idrhs['k1']   = 'idrhs(5)=idarray(5)\n'
-			idrhs['kmax'] = 'idrhs(6)=idarray(6)\n'
-
-			idflt['i1']   = 'idflt(1)=idarray(1)\n'
-			idflt['imax'] = 'idflt(2)=idarray(2)\n'
-			idflt['j1']   = 'idflt(3)=idarray(3)\n'	
-			idflt['jmax'] = 'idflt(4)=idarray(4)\n'						
-			idflt['k1']   = 'idflt(5)=idarray(5)\n'	
-			idflt['kmax'] = 'idflt(6)=idarray(6)\n'	
-			
-			if update == False:
-				# bcnum = bcnum + 1
-				if setbc[0]: 
-
-					if dirBC in rhs.bc_info[1]:
-						rhs.bc_info[1][dirBC].append(bcnum)
+			if dirBC not in edgeBCs:
+				DirDic = {'i':{'dir':None,'indbc':None},
+				          'j':{'dir':None,'indbc':None},
+				          'k':{'dir':None,'indbc':None}}
+	
+	
+				DirDic[dirBC[0]] = {'dir': dirBC , 'indbc' : None}
+	
+				bcnum = bcnum + 1
+	
+				indrangei = 'indbc(1)=1\nindbc(2)=1\n'
+				indrangej = 'indbc(3)=1\nindbc(4)=1\n'
+				indrangek = 'indbc(5)=1\nindbc(6)=1\n'
+	
+				if dim == 2:
+					if dirBC[0] == 'i':
+						indrangej = 'indbc(3)=1\nindbc(4)=ny\n'
+					elif dirBC[0] == 'j':	
+						indrangei = 'indbc(1)=1\nindbc(2)=nx\n'
+				elif dim == 3:
+					if   dirBC[0] == 'i':
+						indrangej = 'indbc(3)=1\nindbc(4)=ny\n'
+						indrangek = 'indbc(5)=1\nindbc(6)=nz\n'
+					elif dirBC[0] == 'j':	
+						indrangei = 'indbc(1)=1\nindbc(2)=nx\n'	
+						indrangek = 'indbc(5)=1\nindbc(6)=nz\n'
+					elif dirBC[0] == 'k':	
+						indrangei = 'indbc(1)=1\nindbc(2)=nx\n'	
+						indrangej = 'indbc(3)=1\nindbc(4)=ny\n'
+	
+				indrange = {'i':indrangei,
+							'j':indrangej,
+							'k':indrangek}			
+	
+				idrhs = {}		
+				idflt = {}	
+	
+				idrhs['i1']   = 'idrhs(1)=idarray(1)\n'
+				idrhs['imax'] = 'idrhs(2)=idarray(2)\n'
+				idrhs['j1']   = 'idrhs(3)=idarray(3)\n'
+				idrhs['jmax'] = 'idrhs(4)=idarray(4)\n'
+				idrhs['k1']   = 'idrhs(5)=idarray(5)\n'
+				idrhs['kmax'] = 'idrhs(6)=idarray(6)\n'
+	
+				idflt['i1']   = 'idflt(1)=idarray(1)\n'
+				idflt['imax'] = 'idflt(2)=idarray(2)\n'
+				idflt['j1']   = 'idflt(3)=idarray(3)\n'	
+				idflt['jmax'] = 'idflt(4)=idarray(4)\n'						
+				idflt['k1']   = 'idflt(5)=idarray(5)\n'	
+				idflt['kmax'] = 'idflt(6)=idarray(6)\n'	
+				
+				if update == False:
+					# bcnum = bcnum + 1
+					if setbc[0]: 
+	
+						if dirBC in rhs.bc_info[1]:
+							rhs.bc_info[1][dirBC].append(bcnum)
+						else:
+							rhs.bc_info[1][dirBC] = []
+							rhs.bc_info[1][dirBC].append(bcnum)	
+						
+						localvar = open(incPATH+'include_PhyBClocVar_'+bcname+'_'+dirBC+'_'+bctype+'.f90','w')
+						output   = open(incPATH+'include_PhyBCLoops_'+bcname+'_'+dirBC+'_'+bctype+'.f90' ,'w')
+						rhs_for  = open(incPATH+'PhyBC'+bcname+'_'+dirBC+'_'+bctype+'.for','a+')	
+	
+						create_bcsubroutine(rhs_for,bcname+'bc'+'_faces_'+str(dirBC)+'_'+str(bcnum),
+										 'include_PhyBClocVar_'+bcname+'_'+dirBC+'_'+bctype+'.f90',
+										 'include_PhyBCLoops_'+bcname+'_'+dirBC+'_'+bctype+'.f90' ,indrange, phy=bctype)
+	
 					else:
-						rhs.bc_info[1][dirBC] = []
-						rhs.bc_info[1][dirBC].append(bcnum)	
+						
+						outlayer   = []
+						locallayer = []
+	
+						for layer in range(0,hlo_rhs): #BC layers  
+	
+							localvar = open(incPATH+'include_BClocVar_'+dirBC+'_'+str(layer)+'.f90','w')
+							output   = open(incPATH+'include_BCLoops_'+dirBC+'_'+str(layer)+'.f90' ,'w')	
+							rhs_for  = open(incPATH+'bcsrc'+dirBC+'_'+str(layer)+'.for','a+')
+	
+							outlayer.append(output)
+							locallayer.append(localvar)
+	
+							create_bcsubroutine(rhs_for,'_faces_'+str(dirBC)+'_'+str(layer),
+										 'include_BClocVar_'+dirBC+'_'+str(layer)+'.f90',
+										 'include_BCLoops_'+dirBC+'_'+str(layer)+'.f90',indrange)
+	
+	
+				else:	
+	
+					if setbc[0]:
+						exception('Update not supported for physical BCs',message='error')
+		
 					
-					localvar = open(incPATH+'include_PhyBClocVar_'+bcname+'_'+dirBC+'_'+bctype+'.f90','w')
-					output   = open(incPATH+'include_PhyBCLoops_'+bcname+'_'+dirBC+'_'+bctype+'.f90' ,'w')
-					rhs_for  = open(incPATH+'PhyBC'+bcname+'_'+dirBC+'_'+bctype+'.for','a+')	
-
-					create_bcsubroutine(rhs_for,bcname+'bc'+'_faces_'+str(dirBC)+'_'+str(bcnum),
-									 'include_PhyBClocVar_'+bcname+'_'+dirBC+'_'+bctype+'.f90',
-									 'include_PhyBCLoops_'+bcname+'_'+dirBC+'_'+bctype+'.f90' ,indrange, phy=bctype)
-
-				else:
-					
-					outlayer   = []
-					locallayer = []
-
-					for layer in range(0,hlo_rhs): #BC layers  
-
-						localvar = open(incPATH+'include_BClocVar_'+dirBC+'_'+str(layer)+'.f90','w')
-						output   = open(incPATH+'include_BCLoops_'+dirBC+'_'+str(layer)+'.f90' ,'w')	
-						rhs_for  = open(incPATH+'bcsrc'+dirBC+'_'+str(layer)+'.for','a+')
-
-						outlayer.append(output)
-						locallayer.append(localvar)
-
-						create_bcsubroutine(rhs_for,'_faces_'+str(dirBC)+'_'+str(layer),
-									 'include_BClocVar_'+dirBC+'_'+str(layer)+'.f90',
-									 'include_BCLoops_'+dirBC+'_'+str(layer)+'.f90',indrange)
-
-
-			else:	
-
+					else:
+	
+						outlayer   = []
+						locallayer = []
+	
+						for layer in range(0,hlo_rhs): #BC layers  
+	
+							localvar       = open(incPATH+'include_BClocVar_'+dirBC+'_'+str(layer)+'.f90','a+')
+							output         = open(incPATH+'include_BCLoops_'+dirBC+'_'+str(layer)+'.f90' ,'a+')	
+	
+							outlayer.append(output)
+							locallayer.append(localvar)
+	
+				
+				history={'x':{'var':[],'symb':[]},'y':{'var':[],'symb':[]},'z':{'var':[],'symb':[]}}
+				history2={'x':[[],[]],'y':[[],[]],'z':[[],[]]}
+				dhistory={'x':[[],[],[],[]],'y':[[],[],[],[]],'z':[[],[],[],[]]}
+		
+				indi = 'i'
+				indj = 'j'
+				indk = 'k'
+		
+				indiri = indi
+				indirj = indj
+				indirk = indk
+		
+				if dirBC == 'i1': 
+					indi = '1-'+str(hlo_rhs)
+				if dirBC == 'imax': 
+					indi = 'nx+'+str(hlo_rhs)
+		
+				if dirBC == 'j1': 
+					indj = '1-'+str(hlo_rhs)
+				if dirBC == 'jmax': 
+					indj = 'ny+'+str(hlo_rhs)
+		
+		
+				if dirBC == 'k1': 
+					indk = '1-'+str(hlo_rhs)
+				if dirBC == 'kmax': 
+					indk = 'nz+'+str(hlo_rhs)
+		
+			    # generate sources from equations:
+	
 				if setbc[0]:
-					exception('Update not supported for physical BCs',message='error')
+		
+					locvar = []
+					
+					layer = 0
 	
-				
-				else:
-
-					outlayer   = []
-					locallayer = []
-
-					for layer in range(0,hlo_rhs): #BC layers  
-
-						localvar       = open(incPATH+'include_BClocVar_'+dirBC+'_'+str(layer)+'.f90','a+')
-						output         = open(incPATH+'include_BCLoops_'+dirBC+'_'+str(layer)+'.f90' ,'a+')	
-
-						outlayer.append(output)
-						locallayer.append(localvar)
-
-			
-			history={'x':{'var':[],'symb':[]},'y':{'var':[],'symb':[]},'z':{'var':[],'symb':[]}}
-			history2={'x':[[],[]],'y':[[],[]],'z':[[],[]]}
-			dhistory={'x':[[],[],[],[]],'y':[[],[],[],[]],'z':[[],[],[],[]]}
-	
-			indi = 'i'
-			indj = 'j'
-			indk = 'k'
-	
-			indiri = indi
-			indirj = indj
-			indirk = indk
-	
-			if dirBC == 'i1': 
-				indi = '1-'+str(hlo_rhs)
-			if dirBC == 'imax': 
-				indi = 'nx+'+str(hlo_rhs)
-	
-			if dirBC == 'j1': 
-				indj = '1-'+str(hlo_rhs)
-			if dirBC == 'jmax': 
-				indj = 'ny+'+str(hlo_rhs)
-	
-	
-			if dirBC == 'k1': 
-				indk = '1-'+str(hlo_rhs)
-			if dirBC == 'kmax': 
-				indk = 'nz+'+str(hlo_rhs)
-	
-		    # generate sources from equations:
-
-			if setbc[0]:
-	
-				locvar = []
-				
-				layer = 0
-
-				DirDic[dirBC[0]]['indbc'] = layer
-
-				if bctype == 'q':
-					updateq = True
-				else:
-					updateq = False
-
-				gen_eqns_bc(Eqns,output,localvar,
-				            rhsname,Order=Order,Stencil=Stencil,
-				            indi    =indi,indj =indj,indk =indk,
-				            DirDic  = DirDic,
-				            vname   = vname,
-				            update  = update,
-				            updateq = updateq)				
-				
-			else:	
-
-				for layer in range(0,hlo_rhs): #BC layers 
-
 					DirDic[dirBC[0]]['indbc'] = layer
-
-					localvar = locallayer[layer]
-					output   = outlayer[layer]
+	
+					if bctype == 'q':
+						updateq = True
+					else:
+						updateq = False
 	
 					gen_eqns_bc(Eqns,output,localvar,
 					            rhsname,Order=Order,Stencil=Stencil,
 					            indi    =indi,indj =indj,indk =indk,
 					            DirDic  = DirDic,
 					            vname   = vname,
-					            update  = update)
+					            update  = update,
+					            updateq = updateq)				
+					
+				else:	
+	
+					for layer in range(0,hlo_rhs): #BC layers 
+	
+						DirDic[dirBC[0]]['indbc'] = layer
+	
+						localvar = locallayer[layer]
+						output   = outlayer[layer]
+		
+						gen_eqns_bc(Eqns,output,localvar,
+						            rhsname,Order=Order,Stencil=Stencil,
+						            indi    =indi,indj =indj,indk =indk,
+						            DirDic  = DirDic,
+						            vname   = vname,
+						            update  = update)
 #
 #		Generate edges	
 #
@@ -1824,12 +1843,12 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 #
 		else: # setbc[0] True (Physical BC)
 
-			if dim == 3:	
-				dir2gen2 = ['i1','imax','j1','jmax','k1','kmax']
-			elif dim == 2:
-				dir2gen2 = ['i1','imax','j1','jmax']
-			elif dim == 1:
-				dir2gen2 = ['i1','imax']
+			# if dim == 3:	
+			# 	dir2gen2 = ['i1','imax','j1','jmax','k1','kmax']
+			# elif dim == 2:
+			# 	dir2gen2 = ['i1','imax','j1','jmax']
+			# elif dim == 1:
+			# 	dir2gen2 = ['i1','imax']
 
 			DirDic = {'i':{'dir':None,'indbc':None},
 			          'j':{'dir':None,'indbc':None},
@@ -1844,13 +1863,13 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 		
 			edone = []
 
-			test ='i1j1'
+			# test ='i1j1'
 
-			edgeBCs = []
-			for d1 in dir2gen2:
-				for d2 in dir2gen2:
-					if d1 != d2:
-						edgeBCs.append(d1+d2)
+			# edgeBCs = []
+			# for d1 in dir2gen2:
+			# 	for d2 in dir2gen2:
+			# 		if d1 != d2:
+			# 			edgeBCs.append(d1+d2)
 
 #
 #           Generate faces BCs (i1,j1,k1,imax,...) and subsequent edges combinations (i1j1,...). 
@@ -1931,7 +1950,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 												elif edir == 'k':
 													indrangek = 'indbc(1)=1\nindbc(2)=nz\n'	
 													
-					 
+					 						
 											indrange = {'i':indrangei,
 														'j':indrangej,
 														'k':indrangek}
@@ -2004,13 +2023,13 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 					edir = 'ijk'
 					edir = edir.replace(d1[0],'').replace(d2[0],'')
 
-					if dim == 3:
-						if   edir == 'i':
-							indrangei = 'indbc(1)=1\nindbc(2)=nx\n'
-						elif edir == 'j':
-							indrangej = 'indbc(1)=1\nindbc(2)=ny\n'
-						elif edir == 'k':
-							indrangek = 'indbc(1)=1\nindbc(2)=nz\n'	
+					# if dim == 3:
+					# 	if   edir == 'i':
+					# 		indrangei = 'indbc(1)=1\nindbc(2)=nx\n'
+					# 	elif edir == 'j':
+					# 		indrangej = 'indbc(1)=1\nindbc(2)=ny\n'
+					# 	elif edir == 'k':
+					# 		indrangek = 'indbc(1)=1\nindbc(2)=nz\n'	
 							
 
 					indrange = {'i':indrangei,
