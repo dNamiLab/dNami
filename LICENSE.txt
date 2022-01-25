@@ -1,4 +1,4 @@
-Copyright (c) 2020, Okinawa Institute of Science and Technology School Corporation, Conservatoire national des arts et métiers
+Copyright (c) 2020, Conservatoire National des Arts et Métiers and Okinawa Institute of Science and Technology School Corporation
 
 All rights reserved.
 

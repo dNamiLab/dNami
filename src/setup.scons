@@ -31,7 +31,11 @@ ifortPath = which('ifort')
 if ifortPath: 
   f90compiler = 'ifort'
   # f90Args   = '-O3 -fPIC -qopenmp -fno-alias -fno-fnalias -ip -qopt-zmm-usage:high -xSKYLAKE-AVX512 -unroll0 -g -fp-model source -qoverride-limits '
+
   f90Args   = '-O3 -fPIC -qopenmp -fno-alias -fno-fnalias -ip -unroll0  -xSKYLAKE-AVX512  -g -fp-model precise -fp-model source  -fp-model consistent -qoverride-limits '
+
+  f90Args   = '-O3 -fPIC -qopenmp -fno-alias -fno-fnalias -ip -unroll0  -xSKYLAKE-AVX512  -g -fp-model precise -fp-model source   -qoverride-limits '
+  
   # f90Args   = '-O3 -fPIC -xCORE-AVX2 -g -fp-model strict -fp-model source -fp-model consistent -qoverride-limits '
   
   # f90Args   = '-O3 -fPIC -qopenmp -fno-alias -fno-fnalias -ip -finline -inline-forceinline -parallel -xHost  -g -fp-model strict -fp-model source  -prec-div -prec-sqrt -qoverride-limits '
