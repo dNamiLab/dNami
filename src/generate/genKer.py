@@ -3876,39 +3876,48 @@ def genP2C(output,conserv,rhs=None,bc=[False,[]]):
 	varsolved = rhs.varsolved
 	varname = rhs.varname
 
-	modvar = consvar
+	modvar = range(1,len(varsolved)+1)
+
 	if bc[0]:
 		modvar = bc[1]
 
 	if conserv == 'conservative':
 		if dim == 3:			
-			output.write('q1(i,j,k,'+str(varname['rho'])+') = q(i,j,k,'+str(varname['rho'])+')'+'\n')
+			output.write('q1(i,j,k,' +str(varname['rho'])+') = q(i,j,k,'+str(varname['rho'])+')'+'\n')
 			for nv in modvar:
-				output.write('q1(i,j,k,'+str(nv)+') = q(i,j,k,'+str(nv)+')*q(i,j,k,'+str(varname['rho'])+')'+'\n')			
-	
+				if nv in consvar:
+					output.write('q1(i,j,k,' +str(nv)+') = q(i,j,k,'+str(nv)+')*q(i,j,k,'+str(varname['rho'])+')'+'\n')
+				elif nv!=varname['rho'] :
+					output.write('q1(i,j,k,' +str(nv)+') = q(i,j,k,'+str(nv)+')'+'\n')
 		elif dim == 2:
-			output.write('q1(i,j,'+str(varname['rho'])+') = q(i,j,'+str(varname['rho'])+')'+'\n')
+			output.write('q1(i,j,' +str(varname['rho'])+') = q(i,j,'+str(varname['rho'])+')'+'\n')
 			for nv in modvar:
-				output.write('q1(i,j,'+str(nv)+') = q(i,j,'+str(nv)+')*q(i,j,'+str(varname['rho'])+')'+'\n')
+				if nv in consvar:
+					output.write('q1(i,j,' +str(nv)+') = q(i,j,'+str(nv)+')*q(i,j,'+str(varname['rho'])+')'+'\n')
+				elif nv!=varname['rho'] :
+					output.write('q1(i,j,' +str(nv)+') = q(i,j,'+str(nv)+')'+'\n')
 
 		elif dim == 1:	
-			output.write('q1(i,'+str(varname['rho'])+') = q(i,'+str(varname['rho'])+')'+'\n')
+			output.write('q1(i,' +str(varname['rho'])+') = q(i,'+str(varname['rho'])+')'+'\n')
 			for nv in modvar:
-				output.write('q1(i,'+str(nv)+') = q(i,'+str(nv)+')*q(i,'+str(varname['rho'])+')'+'\n')
+				if nv in consvar:
+					output.write('q1(i,' +str(nv)+') = q(i,'+str(nv)+')*q(i,'+str(varname['rho'])+')'+'\n')
+				elif nv!=varname['rho'] :
+					output.write('q1(i,' +str(nv)+') = q(i,'+str(nv)+')'+'\n')
 	
 	elif conserv == 'primitive':
 		if dim == 3:
 			output.write('one_over_rho = 1.0_wp/q(i,j,k,'+str(varname['rho'])+')\n')
 			for nv in modvar:
-				output.write('q(i,j,k,'+str(nv)+') = q(i,j,k,'+str(nv)+')*one_over_rho'+'\n')	
+				if nv in consvar: output.write('q(i,j,k,'+str(nv)+') = q(i,j,k,'+str(nv)+')*one_over_rho'+'\n')	
 		elif dim == 2:
 			output.write('one_over_rho = 1.0_wp/q(i,j,'+str(varname['rho'])+')\n')
 			for nv in modvar:
-				output.write('q(i,j,'+str(nv)+') = q(i,j,'+str(nv)+')*one_over_rho'+'\n')
+				if nv in consvar: output.write('q(i,j,'+str(nv)+') = q(i,j,'+str(nv)+')*one_over_rho'+'\n')
 		elif dim == 1:
 			output.write('one_over_rho = 1.0_wp/q(i,'+str(varname['rho'])+')\n')	
 			for nv in modvar:
-				output.write('q(i,'+str(nv)+') = q(i,'+str(nv)+')*one_over_rho'+'\n')
+				if nv in consvar: output.write('q(i,'+str(nv)+') = q(i,'+str(nv)+')*one_over_rho'+'\n')
 
 	elif conserv == 'standard':
 		if dim == 3:			
