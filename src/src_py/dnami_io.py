@@ -878,11 +878,11 @@ def read_custom(fname, tree, var2read):
 # Output
 # =============================================================================
 
-def write_data(field,path,n,t,tree):
-        # file name switch (for live views)
+def write_data(field,n,t,tree,fpath='./out/',fname='output'):
+        # File name switch (for live views)
         ndim = tree['eqns']['ndim']     
         bcs  = tree['bc']
-        fname      = path + 'output_' + str(n).zfill(8)
+        fname      = fpath + '%s_' % fname + str(n).zfill(8)
         fnameshell = {} 
         if  len(bcs['allbc']) != 0:     
                 dirBC = ['i1','imax']
