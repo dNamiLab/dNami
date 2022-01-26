@@ -1,6 +1,6 @@
 """
-    description of the dNami functions.  
-    A high level description
+The dnami module contains functions to setup
+a simulation run.
 """
 
 import numpy as np
@@ -34,6 +34,12 @@ def cst(x):
 # =============================================================================
 
 def create_tree():
+	"""
+        Creates the dnami tree data structure.
+        This data structure contains all the parameters of the simulation.
+        Returns:
+            A dictionary containing all the parameters needed for the simulation.
+        """
 	dtree = {}
 
 	dtree['stats'] = None
@@ -127,11 +133,27 @@ def create_tree():
 	return dtree
 
 def start_mpi(tree):
+	"""
+        Initializes the MPI class of dnami.
+
+        Args: 
+          tree: The dnami tree data structure
+        Returns:
+            A dictionary containing all the parameters needed for the simulation.
+        """
 	dMpi = type_mpi(tree)
 	tree['mpi']['dMpi'] = dMpi
 	return tree
 
 def unpack_bcs(tree):
+	"""
+        Please enter description.
+
+        Args: 
+          tree: The dnami tree data structure
+        Returns:
+            A dictionary containing all the parameters needed for the simulation.
+        """
 	dMpi  = tree['mpi']['dMpi'] 
 	iSwap = dMpi.iSwap
 	bcs   = tree['bc']
@@ -252,6 +274,14 @@ def unpack_bcs(tree):
 
 
 def allocate(tree):	
+	"""
+        Allocates memory. This function should not be called by the user.
+
+        Args: 
+          tree: The dnami tree data structure
+        Returns:
+            A dictionary containing all the parameters needed for the simulation.
+        """
 
 	wp     = tree['misc']['working precision']	
 	dim    = tree['eqns']['ndim']
@@ -486,6 +516,14 @@ def allocate(tree):
 # =============================================================================
 
 def create_grid(tree):
+	"""
+        Creates the grid as specified by the user.
+
+        Args: 
+          tree: The dnami tree data structure
+        Returns:
+            A dictionary containing all the parameters needed for the simulation.
+        """
 	
 	wp   = tree['misc']['working precision'] 
 	ndim = tree['eqns']['ndim']

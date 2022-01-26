@@ -1,3 +1,8 @@
+"""
+This module contains functions for generating 
+the FORTRAN code
+"""
+
 import re
 import os
 import numpy as np

@@ -7,4 +7,6 @@ This is a detailed reference manual for functions, modules, and objects in dNami
 
    dnami
    dnami_io
+   dnami_mpi
+   genKer
 
