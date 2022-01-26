@@ -1,10 +1,10 @@
 Tools
-*************************
+*****
 
 A certain number of tools are provided alongside the core of dNami. They are briefly presented in this section.
 
 I/O Tools
----------------------
+---------
 
 In the **pst/utils** folder, a **post_io.py** script is provided which contains three I/O functions:
 
