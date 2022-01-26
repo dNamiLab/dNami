@@ -9,11 +9,13 @@ The repository contains a documentation inside the **doc** directory.
 In order to generate the html documentation the following Python packages are needed:
 1. Sphinx
 2. sphinx-rtd-theme
+3. pydata-sphinx-theme
 
 They can be installed using the following command:
 ```bash
 pip3 install -U Sphinx
 pip3 install -U sphinx-rtd-theme
+pip3 install -U pydata-sphinx-theme
 ```
 
 Build the documentation by changing into the doc directory and executing the following command:
