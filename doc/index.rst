@@ -17,10 +17,9 @@ dNami is an open-source multi-language (Python, Fortran, C) framework for solvin
    usage/quickstart
    usage/installation
    usage/testcases
-   usage/examples
+   usage/api
    usage/tools
    usage/syntax
-..
    usage/clusters
 
 Indices and tables

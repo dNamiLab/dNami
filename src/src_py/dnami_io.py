@@ -1,3 +1,7 @@
+"""
+The dnami_io file provides a set 
+of functions to write and read the grid.
+"""
 from dnami import np, sys
 
 # =============================================================================
@@ -5,6 +9,15 @@ from dnami import np, sys
 # =============================================================================
 
 def write_grid(tree):
+        """
+        This functions writes the grid
+        
+        Args:
+          tree: the dnami tree
+        Returns:
+          This function returns nothing
+        """
+
         wp   = tree['misc']['working precision']
         grid = tree['grid']
         nxgb, nygb, nzgb = grid['size']['nxgb'], grid['size']['nygb'], grid['size']['nzgb']
@@ -59,6 +72,16 @@ def hello_world(tree):
 # =============================================================================
 
 def write_restart(n,t,flag,tree,fpath='./restarts/'):
+        """
+        Writes the whole grid to a binary file in order
+        to restart the simulation at a later.
+        
+        Args:
+          n: The number of iterations the simulation was running
+          t: The timestep
+          flag: If this parameter is 0 all boundary shells will be written (if any) in addition to the core, otherwiese only the core
+          fpath: The output directory of the restart file, the default is restarts
+        """
         # file name switch (for live views)
         ndim = tree['eqns']['ndim']     
         bcs   = tree['bc']
@@ -233,6 +256,13 @@ def write_restart(n,t,flag,tree,fpath='./restarts/'):
                 
 
 def read_restart(tree,fname='restart.bin'):
+        """
+        Reads the restart file in order to restart the simulation.
+        
+        Args:
+          tree: The dnami tree data structure 
+          fname: The filename of the restart file
+        """
         # unpack useful tree data
         wp   = tree['misc']['working precision']
         dmpi = tree['mpi']['dMpi']
@@ -430,6 +460,13 @@ def read_restart(tree,fname='restart.bin'):
 # -- READ 1D BASEFLOW INTO 2D FIELD
 
 def read_restart_1d_to_2d(tree,path=''):
+        """
+        Please insert the description here.
+        
+        Args:
+          tree: The dnami tree data structure 
+          fname: Some path
+        """
         # unpack useful tree data
         wp   = tree['misc']['working precision']
         dmpi = tree['mpi']['dMpi']
@@ -507,6 +544,13 @@ def read_restart_1d_to_2d(tree,path=''):
 # -- READ CUSTOM FILES 
 
 def read_custom_baseflow(tree, path=None):
+        """
+        Please insert the description here.
+        
+        Args:
+          tree: The dnami tree data structure 
+          fname: Some path
+        """
         # unpack useful tree data
         wp   = tree['misc']['working precision']
         dmpi = tree['mpi']['dMpi']
@@ -701,6 +745,14 @@ def read_custom_baseflow(tree, path=None):
 
 # -- WRITE CUSTOM ARRAY
 def write_custom(fname,tree,var2write):
+        """
+        Please insert the description here.
+        
+        Args:
+          fname: Some filename
+          tree: The dnami tree data structure
+          var2write: The variables which should be written
+        """
 
         # unpack useful tree data
         ndim = tree['eqns']['ndim']     
@@ -753,6 +805,14 @@ def write_custom(fname,tree,var2write):
                 fh.closed
 
 def write_custom_val(fname,tree,q):
+        """
+        Please insert the description here.
+        
+        Args:
+          fname: Some filename
+          tree: The dnami tree data structure
+          q: The variables which should be written
+        """
 
         # unpack useful tree data
         ndim = tree['eqns']['ndim']     
@@ -804,6 +864,14 @@ def write_custom_val(fname,tree,q):
                 fh.closed
 
 def read_custom(fname, tree, var2read):
+        """
+        Please insert the description here.
+        
+        Args:
+          fname: Some filename
+          tree: The dnami tree data structure
+          var2read: The variables which should be read
+        """
 
         # unpack useful tree data
         wp   = tree['misc']['working precision']
@@ -879,6 +947,17 @@ def read_custom(fname, tree, var2read):
 # =============================================================================
 
 def write_data(field,n,t,tree,fpath='./out/',fname='output'):
+        """
+        Please insert the description here.
+        
+        Args:
+          field: Some Vy
+          n: The number of iterations
+          t: The timestep
+          tree: The dnami tree data structure
+          fpath: The output directory
+          fname: The output filename
+        """
         # File name switch (for live views)
         ndim = tree['eqns']['ndim']     
         bcs  = tree['bc']
@@ -1069,6 +1148,15 @@ def write_data(field,n,t,tree,fpath='./out/',fname='output'):
 # =============================================================================
 
 def globalMinMax(tree,a,s):
+        """
+        Finds the global min and max of the passed array among
+        all MPI processes.
+        
+        Args:
+          tree: The dnami tree data structure
+          a: The array from which the min and max should be obtained
+          s: A character string which will be printed together with the min and max
+        """
         # get the global min/max value of array 'a' with string tag 's'
         
         minval = a.min()
@@ -1100,6 +1188,15 @@ def globalMinMax(tree,a,s):
         return
 
 def globalMax(tree,a,s):
+        """
+        Finds the global max of the passed array among
+        all MPI processes.
+        
+        Args:
+          tree: The dnami tree data structure
+          a: The array from which the max should be obtained
+          s: A character string which will be printed together with the max value
+        """
         # get the global max value of array 'a' with string tag 's'
         
         maxval = a.max()
@@ -1122,8 +1219,14 @@ def globalMax(tree,a,s):
 # FOR CONSTANT CFL RUNS
 
 def dtMax(tree,a):
-        # get the global min value of all dt's obtained at target CFL
-        # this would be the dt to not exceed, i.e. dtMax
+        """
+        Get the global min value of all dt's obtained at target CFL
+        this would be the dt to not exceed, i.e. dtMax
+        
+        Args:
+          tree: The dnami tree data structure
+          a: The array from which the min should be obtained
+        """
         
         minval = a.min()
 
@@ -1143,7 +1246,14 @@ def dtMax(tree,a):
         return max_dt
 
 def set_dt(tree,dt):
-        # broadcast dt value from global min search and assign it
+        """
+        Broadcast dt value from global min search and assign it.
+        
+        Args:
+          tree: The dnami tree data structure
+          dt: The dt value
+        """
+        
 
         numerics = tree['num']
         

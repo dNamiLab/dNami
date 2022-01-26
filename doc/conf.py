@@ -10,9 +10,10 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+sys.path.insert(0, os.path.abspath('..'))
+#sys.path.insert(0, os.path.abspath('.'))
 
 
 # -- Project information -----------------------------------------------------
@@ -28,7 +29,10 @@ author = 'Nicolas Alferez, S2T Unit'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-  "sphinx_rtd_theme"
+  "sphinx_rtd_theme",
+  "sphinx.ext.autodoc",
+  "sphinx.ext.coverage", 
+  "sphinx.ext.napoleon"
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -37,9 +41,11 @@ templates_path = ['_templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store','./usage/clusters.rst',
-        './usage/deigo.rst','./usage/fugaku.rst','./usage/fugaku_shared_storage.rst',
-        './usage/ko_fugaku.rst']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store','./usage/examples.rst']
+
+#exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store','./usage/clusters.rst',
+#        './usage/deigo.rst','./usage/fugaku.rst','./usage/fugaku_shared_storage.rst',
+#       './usage/ko_fugaku.rst']
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -56,3 +62,5 @@ html_static_path = []
 
 # -- Make sure figures are numbered in references
 numfig = True
+
+autodoc_mock_imports = ["dnami","dnamiF","dnami_io","dnami_mpi"]

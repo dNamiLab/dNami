@@ -1,3 +1,8 @@
+"""
+    description of the dNami functions.  
+    A high level description
+"""
+
 import numpy as np
 import dnamiF
 import sys
@@ -11,6 +16,14 @@ from dnami_mpi import type_mpi
 # =============================================================================
 
 def cst(x):
+	"""
+        This is a doc string for the cst function
+        Args:
+            x: some parameter for something
+        Returns:
+            A numpy object of something
+            which could be double or float.
+        """
 	from rhsinfo import wp
 	if wp == 'float32': x = np.float32(x)
 	if wp == 'float64': x = np.float64(x)

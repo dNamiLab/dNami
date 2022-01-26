@@ -1,7 +1,5 @@
-:orphan:
-
-How-To run dNami on different clusters
-**************************************
+HPC guide
+*********
 
 This sections shows how-to run dNami on different cluster systems.
 
