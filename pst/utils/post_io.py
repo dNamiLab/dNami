@@ -4,6 +4,15 @@ import numpy as np
 
 # === Axis loader 
 def load_ax(path,wp='float64'):
+    """
+    Enter the description here.
+    Args:
+        path: The path to the restart file
+    Returns:
+        If its 1D problem x,nxgb is returned
+        If its 2D problem x,y,nxgb,nygb is returned
+        If its 3D problem x,y,z,nxgb,nygb,nzgb is returned
+    """
     with open(path,"rb") as fh:
         head = np.fromfile(fh,dtype=wp,count=6)
         nxgb, nygb, nzgb = int(head[0]), int(head[1]), int(head[2])
@@ -24,6 +33,7 @@ def load_ax(path,wp='float64'):
 
 # === Restart loader -- core only 
 def read_restart(fname,wp='float64'):
+    ''' Input a restart_XXXXX file and the function will return the full core of q '''
     with open(fname,"rb") as fh:
         headsize = int(np.fromfile(fh,dtype=wp,count=1))
         head = np.fromfile(fh,dtype=wp,count=headsize-1)
