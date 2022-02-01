@@ -4,7 +4,7 @@ Test cases and validation
 One-dimensional cases
 ---------------------
 
-1) Periodic entropy wave advection
+**1) Periodic entropy wave advection**
 
 This case solves the one-dimensional gas dynamics equations on a periodic domain:
 
@@ -12,7 +12,7 @@ This case solves the one-dimensional gas dynamics equations on a periodic domain
 
    \dfrac{\partial }{\partial t} \begin{pmatrix} \rho  \\ \rho u  \\ \rho e_t \end{pmatrix}  + \dfrac{\partial }{\partial x} \begin{pmatrix} \rho u   \\ \rho u^2 + p   \\ u ( \rho e_t + p) \end{pmatrix}   = 0
 
-The files for this case are located in the ``exm/1d_entropywave`` folder. The initial non-dimensional density, pressure and velocity are set to :math:`(\rho/\rho_0, p/p_0, u/c_0) = (1,1,0.5)`. A sinusoidal perturbation of the density field is imposed. The case is run for 10 times the characterstic flow time. This test case compliments the quick-start guide in the sense that this case is periodic. No specification of a boundary condition in a given direction in the ``genRhs.py`` defaults to the domain being periodic in that direction. Periodicity is enforced via the ``swap`` operations. The resulting x-t diagram for the density field is shown in :numref:`xt_1d_per` for the 10 characteristic flow times.  
+The files for this case are located in the ``exm/1d_entropywave`` folder. The initial non-dimensional density, pressure and velocity are set to :math:`(\rho/\rho_0, p/p_0, u/c_0) = (1,1,0.5)`. A sinusoidal perturbation of the density field is imposed. The amplitude of the perturbation :math:`\epsilon` is kept small in this example i.e. :math:`\epsilon=10^{-3}` to minimise non-linear effects. The case is run for 10 times the characteristic flow time. This test case compliments the quick-start guide in the sense that this case is periodic. No specification of a boundary condition in a given direction in the ``genRhs.py`` defaults to the domain being periodic in that direction. Periodicity is enforced via the ``swap`` operations. The resulting x-t diagram for the density field is shown in :numref:`xt_1d_per` for the 10 characteristic flow times.  
 
 
 
@@ -26,7 +26,7 @@ The files for this case are located in the ``exm/1d_entropywave`` folder. The in
 Two-dimensional cases
 ---------------------
 
-1) Periodic vortex advection on a wavy mesh
+**2) Periodic vortex advection on a wavy mesh**
 
 This case solves the two-dimensional gasdynamics equations in curvilinear coordinates on a doubly-periodic domain using a wavy mesh for a weakly conservative formulation:
 
@@ -99,9 +99,9 @@ The baseflow and vortex speed are specified via the Mach numbers :math:`M_i=0.5`
 
    Comparison of results for various finite-difference stencils and orders after :math:`t = 10 u_0/L_x` (i.e 10 vortex-travel times) for mesh size :math:`(n_x,n_y)=(160,80)`.      
 
-2) Non-reflective vortex advection throught the boundaries
+**2) Non-reflective vortex advection throught the boundaries**
 
-This case solves the two-dimensional advection of a vortex through the boundaries of the domain using a non-reflective characteristic-based boundary condition implementation. The two-dimensional Euler equations are:  
+This case solves the two-dimensional advection of a vortex through the boundaries of the domain using a non-reflective characteristic-based boundary condition implementation. The files for this test case can be found in the ``exm/2d_vortex_exit`` folder. The two-dimensional Euler equations in cartesian coordinates are:  
 
 .. math::
 
@@ -154,15 +154,16 @@ where the derivatives of the potential :math:`\psi` and the pressure fluctuation
 
    \left\{
    \begin{matrix}
-   & p'(x,y) = -\dfrac{\rho_0 \Gamma ^2}{2 R^2} e^{-r^2/R^2} , \\ 
-   & \dfrac{\partial \psi}{\partial y }(x,y) = - \dfrac{y-y_0}{R^2} \Gamma e^{-r^2/(2R^2)},  \\
-   & \dfrac{\partial \psi}{\partial x }(x,y) = - \dfrac{x-x_0}{R^2} \Gamma e^{-r^2/(2R^2)},  \\
+    p'(x,y) = -\dfrac{\rho_0 \Gamma ^2}{2 R^2} e^{-r^2/R^2} , \\ 
+    \dfrac{\partial \psi}{\partial y }(x,y) = - \dfrac{y-y_0}{R^2} \Gamma e^{-r^2/(2R^2)},  \\
+    \dfrac{\partial \psi}{\partial x }(x,y) = - \dfrac{x-x_0}{R^2} \Gamma e^{-r^2/(2R^2)},  \\
    \end{matrix}
    \right.
 
-The vortex is initially centered in the domain i.e. :math:`(x_0,y_0)=(0.5L_x, 0.5L_y)`
+The vortex is initially centered in the domain i.e. :math:`(x_0,y_0)=(0.5L_x, 0.5L_y)`. The vortex strength :math:`\Gamma` is set using :math:`\Gamma = U_{v}R \sqrt{e}` where :math:`U_{v} = 0.25`. :numref:`2d_vortex_exit` shows the density fluctuations as the vortex is advected out of the domain via the upper boundary. The governing equations are discretised using a 9 point, 8 :sup:`th` order centered finite difference scheme and the conservative variables are filtered using a standard 11 point, 10 :sup:`th` order filter. The aim of this test case is to show the ability of the boundary conditions to evacuate the vortex while generating the least amount of spurious noise. With the quasi-one dimensional approach shown here, the density fluctuation do not exceed 3.5\%.    
 
 
+.. _2d_vortex_exit:
 .. figure:: img/2d_vortexexit_drho.png
    :width: 100%
 
