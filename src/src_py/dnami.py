@@ -18,6 +18,7 @@ from dnami_mpi import type_mpi
 def cst(x):
 	"""
         This is a doc string for the cst function
+
         Args:
             x: some parameter for something
         Returns:
@@ -37,6 +38,7 @@ def create_tree():
 	"""
         Creates the dnami tree data structure.
         This data structure contains all the parameters of the simulation.
+            
         Returns:
             A dictionary containing all the parameters needed for the simulation.
         """

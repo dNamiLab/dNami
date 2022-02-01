@@ -463,10 +463,10 @@ def read_restart(tree,fname='restart.bin'):
 
 def write_data(field,n,t,tree,fpath='./out/',fname='output'):
         """
-        Please insert the description here.
+        Write out a custom field that is not included in the restart file.
         
         Args:
-          field: Some Vy
+          field: list of fields to write out e.g. ['divV', 'p'] where the strings are the named of stored variables 
           n: The number of iterations
           t: The timestep
           tree: The dnami tree data structure

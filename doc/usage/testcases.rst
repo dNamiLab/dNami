@@ -174,4 +174,3 @@ The vortex is initially centered in the domain i.e. :math:`(x_0,y_0)=(0.5L_x, 0.
 Three-dimensional cases
 -----------------------
 
-1) Ideal gas Couette flow

@@ -1,5 +1,5 @@
-The dNami syntax
-****************
+dNami syntax
+************
 
 This section introduces the dNami syntax. By using the dNami syntax the 
 user can easily translate differential equations into finite difference code.
