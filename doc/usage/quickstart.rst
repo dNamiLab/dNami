@@ -217,9 +217,11 @@ then copy the ``compute.py`` file into the ``wrk`` folder and execute the run:
 The example should run for 4000 timesteps and then exit. Optionally, the user can choose to visualise the output using the provided python script ``plot.py``. The script gathers the output density fields and construct an x-t diagram showing the entropy perturbation moving from the center to the right of the domain at the flow speed. The result is displayed below: 
 
 .. _xt_quickstart: 
-.. figure:: img/xt.png
+.. figure:: img/xt_quickstart.png
    :width: 70%
    :align: center
 
    x-t diagram of the entropy perturbation leaving the computation domain. The field shown is that of density fluctuations (i.e. :math:`(\rho -  \rho_0)` ).  The dashed blue lines indicate the flow speed. 
 
+Platform specific options
+-------------------------

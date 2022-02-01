@@ -12,24 +12,16 @@ This case solves the one-dimensional gas dynamics equations on a periodic domain
 
    \dfrac{\partial }{\partial t} \begin{pmatrix} \rho  \\ \rho u  \\ \rho e_t \end{pmatrix}  + \dfrac{\partial }{\partial x} \begin{pmatrix} \rho u   \\ \rho u^2 + p   \\ u ( \rho e_t + p) \end{pmatrix}   = 0
 
-The initial non-dimensional density, pressure and velocity are set to :math:`(\rho_0, p_0, u_0) = (X,X,X)`. A small-amplitude half-sinwave perturbation of the density field is imposed in the center of the domain. The case is run for 10 times the characterstic flow time until the perturbation is once again located in the center of the domain. 
+The files for this case are located in the ``exm/1d_entropywave`` folder. The initial non-dimensional density, pressure and velocity are set to :math:`(\rho/\rho_0, p/p_0, u/c_0) = (1,1,0.5)`. A sinusoidal perturbation of the density field is imposed. The case is run for 10 times the characterstic flow time. This test case compliments the quick-start guide in the sense that this case is periodic. No specification of a boundary condition in a given direction in the ``genRhs.py`` defaults to the domain being periodic in that direction. Periodicity is enforced via the ``swap`` operations. The resulting x-t diagram for the density field is shown in :numref:`xt_1d_per` for the 10 characteristic flow times.  
 
-|1d_per_init|   |1d_per_grid|
 
-Left: initial density condition. Right: error plot versus number of grid points.      
 
-.. |1d_per_grid| image:: img/1d_periodic_grid.png
-   :width: 45%
+.. _xt_1d_per: 
+.. figure:: img/xt_1d_periodic.png
+   :width: 70%
+   :align: center
 
-.. |1d_per_init| image:: img/1d_periodic_init.png
-   :width: 45%
-
-2) Non-reflective entropy wave leaving the domain
-
-The previous case is replicated with non-reflective boundary conditions imposed at either end of the domain. 
-
-3) Supersonic nozzle with shock with comparison to linear solution
-
+   x-t diagram of the density perturbation for the one-dimensional Euler equations on a periodic domain. The blue lines indicate the flow speed. 
 
 Two-dimensional cases
 ---------------------
@@ -175,56 +167,6 @@ The vortex is initially centered in the domain i.e. :math:`(x_0,y_0)=(0.5L_x, 0.
    :width: 100%
 
    Density fluctuations at various times during the interaction of the vortex with the non-reflective boundary. Vertical velocity contours are shown (with values in the range only at the start of the simulation).
-
-3) Noh problem (explosion) in cylindrical coordinates 
-
-This case solves the Noh problem in cylindrical coordinates:
-
-
-.. math::
-
-   \dfrac{\partial }{\partial t} Q + \dfrac{1}{r} \left ( \dfrac{\partial }{\partial r} (r F_r)  + \dfrac{\partial }{\partial \theta} F_{\theta} \right) + S   = 0
-
-where:
-
-.. math::
-   Q          = \begin{pmatrix} \rho  \\ \rho u_r \\ \rho u_{\theta}  \\ \rho e_t \end{pmatrix}, \ 
-   F_r        = \begin{pmatrix} \rho u_r \\ \rho u_r^2 + p \\ \rho u_r u_{\theta} \\ u_r ( \rho e_t + p) \end{pmatrix}, \
-   F_{\theta} = \begin{pmatrix} \rho u_{\theta}  \\ \rho u_r u_{\theta}  \\ \rho u_{\theta}^2 +p    \\ u_{\theta} ( \rho e_t + p) \end{pmatrix}, \
-   S          = \begin{pmatrix}  0   \\ u_{\theta}^2/r \\ u_r u_{\theta}/r    \\       0            \end{pmatrix}     
-
-Artificial bulk viscosity is added to the governing equations to capture discontinuities in the flow field.
-
-4) Unmixing / Reverse mixing of passive scalars
-
-This case simulates the reverse mixing of :math:`N` passive scalars in a Taylor-Couette flow of an ideal fluid. The cylindrical Navier-Stokes (with uniform shear viscosity and thermal conductivity) are supplemented with advection equations for passive scalars:
-
-.. math::
-
-   \dfrac{\partial \rho \alpha_i }{ \partial t} + \dfrac{1}{r} \left[ \dfrac{ \partial r \rho u_r \alpha_i}{\partial r} + \dfrac{ \partial \rho u_{\theta} \alpha_i}{\partial \theta}  \right] = 0 \text{ for } i \in [1,N]
-
-where :math:`\alpha_i` is the concentration of passive scalar :math:`i`. At each of the radial boundary conditions, isothermal wall conditions are imposed with a fixed velocity and temperature. The orthoradial direction is made periodic. The case is run with a Reynolds number based on the diameter difference and the inner wall rotation speed equal to :math:`Re = 1`. The number of passive scalar is set to :math:`N=3`. Two Gaussian spots for each scalar are distributed in a staggered manner around the annulus.  The initial fields of the passive scalars are shown in :numref:`2d_rev_mix_init`.
-
-
-.. _2d_rev_mix_init:
-.. figure:: img/2d_rev_mix_init.png
-   :width: 90%
-   :align: center
-
-   Left: Distribution of the three passive scalars (red, green and blue) around the annulus for :math:`(n_r, n_{\theta}) = (48,192)`. Right: radial cut of the concentration of each of the passive scalar.
-
-.. _2d_rev_mix_turn:
-.. figure:: img/2d_rev_mix_turn.png
-   :width: 90%
-   :align: center
-
-   See :numref:`2d_rev_mix_init`.  
-
-
-
-
-
-
 
 Three-dimensional cases
 -----------------------
