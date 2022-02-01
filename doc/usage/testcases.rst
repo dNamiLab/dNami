@@ -1,6 +1,8 @@
 Test cases and validation
 *************************
 
+This section provides information about the test cases located in the ``exm`` folder. The necessary files to run each of the cases are provided so that users may use them as a starting point for similar cases or to test additional development. Plotting tools are provided for some of the cases.  
+
 One-dimensional cases
 ---------------------
 

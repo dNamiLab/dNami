@@ -5,9 +5,10 @@ import numpy as np
 # === Axis loader 
 def load_ax(path,wp='float64'):
     """
-    Enter the description here.
+    Load the axes (x in 1d, (x,y) in 2d, (x,y,z) in 3d) which are the coordinates in physical space as well as the number of points in each direction. 
+
     Args:
-        path: The path to the restart file
+        path: The path to the axis file. Usually written out in the work directory in /path/to/wrk/out/axes.bin 
     Returns:
         If its 1D problem x,nxgb is returned
         If its 2D problem x,y,nxgb,nygb is returned
@@ -33,7 +34,14 @@ def load_ax(path,wp='float64'):
 
 # === Restart loader -- core only 
 def read_restart(fname,wp='float64'):
-    ''' Input a restart_XXXXX file and the function will return the full core of q '''
+    """
+    Input a restart_XXXXX file and the function will return the full core of q 
+
+    Args:
+        fname: The path to the restart file. Usually written out in the work directory in /path/to/wrk/restarts/restart_XXXXXX
+    Returns:
+        The timestep number n, the time t and the variables in the core of the domain q are returned
+    """
     with open(fname,"rb") as fh:
         headsize = int(np.fromfile(fh,dtype=wp,count=1))
         head = np.fromfile(fh,dtype=wp,count=headsize-1)
@@ -55,7 +63,15 @@ def read_restart(fname,wp='float64'):
 
 # === Restart loader -- core and shells 
 def read_restart_wshell(fname,verbose=False,wp='float64'):
-    ''' Input a restart_XXXXX file and the function will return the full q including shell values if they exist '''
+    """
+    Input a restart_XXXXX file and the function will return the full q including the shell information. 
+
+    Args:
+        fname: The path to the restart file. Usually written out in the work directory in /path/to/wrk/restarts/restart_XXXXXX. The shell file name will be automatically detected. 
+        verbose: print additional information
+    Returns:
+        The timestep number n, the time t and the variables in the full domain, including the shells, q are returned
+    """
 
     if verbose:
         print('Input path:', fname)
