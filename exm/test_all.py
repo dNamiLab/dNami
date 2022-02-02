@@ -84,7 +84,6 @@ for test in test_list:
     cmd = 'cd ../src; ./install_clean.sh >> ' + test_log
     try:
         process = subprocess.run(cmd,shell=True,capture_output=True,text=True,check=True)
-        #process = subprocess.run(cmd,shell=True)
     except Exception as e:
         print('Error at compilation: ', e)
         test_stat[test] = f'{bcolors.FAIL}COMPILATION FAIL{bcolors.ENDC}'
@@ -96,7 +95,6 @@ for test in test_list:
     # Copy compute:
     cmd = 'cd ' + test+ '; cp compute.py ../../'+tmp_dir+'/ >> ' + test_log 
     try:
-        #process = subprocess.run(cmd,shell=True,capture_output=True,text=True,check=True)
         process = subprocess.run(cmd,shell=True)
     except Exception as e:
         print('Error at copy: ', e)
@@ -130,7 +128,6 @@ for test in test_list:
         export  PYTHONPATH=$PYTHONPATH:$INSTALLPATH/generate/; \
         cd ../'+tmp_dir+'; mpirun -n ' + nnproc + ' python3 compute.py >> ' + test_log
     try:
-        #process = subprocess.run(cmd,shell=True,capture_output=True,text=True,check=True)
         process = subprocess.run(cmd,shell=True)
     except subprocess.CalledProcessError as e:
         print('Error at runtime: ', e)
@@ -165,12 +162,17 @@ for test in test_list:
 
     # -- Clean wrk for next test
     cmd = 'rm -r ../'+tmp_dir+'/*'
-    #subprocess.run(cmd,shell=True,capture_output=True,text=True,check=True)
     subprocess.run(cmd,shell=True)
 
     print('')
 
 print('===================================================================')
+
+print('Cleaning up ...')
+
+cmd = 'rm -r ../'+tmp_dir
+subprocess.run(cmd,shell=True)
+
 print('All done. Synopsis:')
 
 for key in test_stat.keys():
