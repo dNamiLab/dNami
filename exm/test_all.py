@@ -37,7 +37,7 @@ class bcolors:
 # -- Get list of tests
 test_dir  = os.getcwd()
 test_log  = test_dir + '/test.log'
-test_list = glob.glob('./*')
+test_list = sorted(glob.glob('./*'))
 test_list.remove('./test_all.py')
 try:
     test_list.remove('./test.log')
@@ -156,7 +156,7 @@ for test in test_list:
 
     print(' Reference value: {}. Output data: {}'.format(ref_dat, out_dat))
 
-    if np.abs(ref_dat-out_dat)/ref_dat < 1e-10:
+    if np.abs(ref_dat-out_dat)/ref_dat < 1e-8:
         print(f'STATUS: {bcolors.OKGREEN}PASS{bcolors.ENDC}' )
         test_stat[test] = f'{bcolors.OKGREEN}PASS{bcolors.ENDC}'
     else:
