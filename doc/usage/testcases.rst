@@ -28,26 +28,63 @@ The files for this case are located in the ``exm/1d_entropywave`` folder. The in
 Two-dimensional cases
 ---------------------
 
-**2) Periodic vortex advection on a wavy mesh**
+**1) Periodic vortex advection on a wavy mesh**
 
-This case solves the two-dimensional gasdynamics equations in curvilinear coordinates on a doubly-periodic domain using a wavy mesh for a weakly conservative formulation:
-
-.. math::
-
-   \dfrac{\partial }{\partial t} Q + \dfrac{1}{J} \left( \dfrac{\partial \eta}{\partial y} \dfrac{\partial }{\partial x} F_x - \dfrac{\partial \xi}{\partial y} \dfrac{\partial }{\partial x} F_y - \dfrac{\partial \eta}{\partial x} \dfrac{\partial }{\partial y} F_x + \dfrac{\partial \xi}{\partial x} \dfrac{\partial }{\partial y} F_y \right) = 0
-
-where:
+This case solves the two-dimensional gasdynamics equations in curvilinear coordinates on a doubly-periodic domain using a wavy mesh for a weakly conservative formulation. The files for this case can be found in ``exm/2d_wavy_mesh``. The governing equations in curvilinear formulation are:
 
 .. math::
 
-   Q   = \begin{pmatrix} \rho  \\ \rho u \\ \rho v  \\ \rho e_t \end{pmatrix}, \ 
-   F_x = \begin{pmatrix} \rho u \\ \rho u^2 + p \\ \rho u v \\ u ( \rho e_t + p) \end{pmatrix}, \
-   F_y = \begin{pmatrix} \rho v  \\ \rho u v  \\ \rho v^2 +p    \\ v ( \rho e_t + p) \end{pmatrix}.
+        \begin{equation}
+       \dfrac{\partial }{\partial t} 
+       \begin{pmatrix}
+        \rho \\
+        \rho u \\
+        \rho v \\
+        \rho e_t \\
+       \end{pmatrix}
+       +
+       J^{-1}
+       \dfrac{\partial }{\partial x} 
+       \begin{pmatrix}
+        \rho J U  \\
+        \rho u J U + \dfrac{\partial \eta}{\partial y} p \\
+        \rho v J U - \dfrac{\partial \xi}{\partial y} p \\
+        (\rho e_t +p ) J U \\
+       \end{pmatrix}   
+       +
+       J^{-1}
+       \dfrac{\partial }{\partial y} 
+       \begin{pmatrix}
+        \rho J V  \\
+        \rho u J V + \dfrac{\partial \eta}{\partial x} p \\
+        \rho v J V - \dfrac{\partial \xi}{\partial x} p \\
+        (\rho e_t +p ) J V \\
+       \end{pmatrix}  = 0    
+       \end{equation}
 
-and :math:`J` is the Jacobian of the transformation between computational and physical space:
+.. math::
+
+where :math:`J` is the Jacobian of the transformation between computational and physical space:
 
 .. math::
    J \equiv \left( \dfrac{\partial \xi}{\partial x} \dfrac{\partial \eta}{\partial y} - \dfrac{\partial \eta}{\partial x}\dfrac{\partial \xi}{\partial y} \right)^{-1}
+
+where :math:`U` and :math:`V` are the contra-variant velocities (i.e. the project of the velocities onto the curvilinear coordinates):
+
+.. math::
+
+	\begin{equation}
+	    \begin{pmatrix}
+	    U \\
+	    V 
+	    \end{pmatrix}
+	    = J^{-1}
+	    \begin{pmatrix}
+	    \dfrac{\partial \eta}{\partial y} u - \dfrac{\partial \xi}{\partial y} v \\
+	    -\dfrac{\partial \eta}{\partial x} u + \dfrac{\partial \xi}{\partial x} v \\
+	    \end{pmatrix}    
+	    \label{eq:dNami_contravel}
+	\end{equation}
 
 The computational space :math:`(x,y)` is related to physical space :math:`(\xi, \eta)` with the mapping: 
 
