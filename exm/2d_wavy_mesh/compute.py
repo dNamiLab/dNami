@@ -54,11 +54,15 @@ with_grid   = [160,80]   # number of points in each direction
 
 # ... and time ...
 with_dt   = dn.cst(1.0e-3) # time step
-nitmax = int(720*0.5/0.5916/with_dt)
 filtr_amp = dn.cst(0.1)    # filter amplitude
 
+# - Number of computational timesteps for stencil comparison
+#nitmax    = int(720*0.5/0.5916/with_dt)
+# - Number of computational timesteps for test_all.py  
+nitmax    = int(720*0.5/0.5916/with_dt/100)
+
 # ... as fast as possible!
-with_proc     = [4,5] # mpi proc. topology
+with_proc     = [2,2] # mpi proc. topology
 
 # ===================================================================== PREPARE
 
@@ -324,4 +328,18 @@ for n in range(ni,nitmax+ni):
             dn.dnami_io.globalMinMax(dtree,v[hlo:nx+hlo,hlo:ny+hlo],'v')
             dn.dnami_io.globalMinMax(dtree,et[hlo:nx+hlo,hlo:ny+hlo],'et')
             sys.stdout.flush()
+
+# ----------------------------------------------------------------------------
+
+# -- Grab the max value of rho-rho0 at end of run
+
+if dMpi.iMpi:        
+    maxval = np.amax(rho[:]-rhoinf)
+    MPI    = dMpi.MPIlib
+    erra   = dMpi.comm_torus.reduce(maxval,op=MPI.MAX,root=0)
+    if dMpi.ioproc:
+        np.savetxt('out.dat',np.asarray([erra]))
+else:
+    erra = np.amax(rho[:]-rho0)
+    np.savetxt('out.dat',np.asarray([erra]))
 
