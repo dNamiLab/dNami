@@ -217,3 +217,17 @@ for n in range(ni,nitmax+ni):
         cfl = dt*(np.abs(u[hlo:nx+hlo])+c)/dx
         dn.dnami_io.globalMax(dtree,cfl,'cfl-x')
 
+# ----------------------------------------------------------------------------
+
+# -- Grab the max value of rho-rho0 at end of run
+
+if dMpi.iMpi:        
+    maxval = np.amax(rho[:]-rho0)
+    MPI    = dMpi.MPIlib
+    erra   = dMpi.comm_torus.reduce(maxval,op=MPI.MAX,root=0)
+    if dMpi.ioproc:
+        np.savetxt('out.dat',np.asarray([erra]))
+else:
+    erra = np.amax(rho[:]-rho0)
+    np.savetxt('out.dat',np.asarray([erra]))
+
