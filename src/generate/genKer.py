@@ -20,6 +20,10 @@ class rhs_info:
 		from genRhs	import dim, wp
 
 		try:
+			from genRhs import consvar
+		except:
+			consvar = []
+		try:
 			from genRhs import varbc
 		except:
 			varbc = {}
@@ -48,7 +52,8 @@ class rhs_info:
 		self.wp     	  = wp     	 
 		self.dim     	  = dim     	 
 		self.stencil 	  = 1 	 
-		self.order        = 1       
+		self.order        = 1      
+		self.consvar      = consvar 
 		self.coefficients = coefficients
 		self.varname      = varname  
 		self.varstored    = varstored  
@@ -266,8 +271,8 @@ derDicBc[3]  = {2: fdrs3o2 }
 fltDicBc[4] = flt_10_4 
 fltDicBc[3] = flt_10_3
 fltDicBc[2] = flt_10_2
-fltDicBc[1] = [i*0.1 for i in flt_7_1]
-fltDicBc[0] = [i*0.1 for i in flt_4_0]
+fltDicBc[1] = [i*0.5 for i in flt_7_1]
+fltDicBc[0] = [i*0.5 for i in flt_4_0]
 
 operators = ('\+', '\*','\-','\/','\^','\(','\)','\,') 
 
@@ -336,22 +341,22 @@ def dNamiVar(var,rangei,rangej,rangek):
 
 	sizebc   = {'face':{'i'  :{3:'('+rangej+','+rangek,
 							   2:'('+rangej,
-							   1:'('},
+							   1:'(1'},
 						'j'  :{3:'('+rangei+','+rangek,
 							   2:'('+rangei,
-							   1:'('},
+							   1:'(1'},
 						'k'  :{3:'('+rangei+','+rangek,
 							   2:'('+rangei,
-							   1:'('}},
+							   1:'(1'}},
 		        'edge':{'ij' :{3:'('+rangek,
-							   2:'(',
-							   1:'('},
+							   2:'(1',
+							   1:'(1'},
 						'jk' :{3:'('+rangei,
-							   2:'(',
-							   1:'('},
+							   2:'(1',
+							   1:'(1'},
 						'ik' :{3:'('+rangej,
-							   2:'(',
-							   1:'('}}} 
+							   2:'(1',
+							   1:'(1'}}} 
 
 	try:
 		from genRhs import hlo_glob
@@ -897,7 +902,7 @@ def compute_storedbc(StoredVar,Stencil,Order,output,localvar,dirBC,update=False,
 
 def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=False):		
 
-		from genRhs import consvar, incPATH
+		from genRhs import incPATH
 
 		dim = rhs.dim
 		wp  = rhs.wp
@@ -906,6 +911,7 @@ def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fals
 		varstored    = rhs.varstored
 		varbc        = rhs.varbc
 		varsolved    = rhs.varsolved
+		consvar      = rhs.consvar
 
 
 
@@ -2215,9 +2221,7 @@ def genBC_calls(rhs):
 											slcbc[bctype].write('      call '+fephy[bctype].readlines()[8][10:])
 	
 								edone.append(dir1+dir2)
-	
-							
-
+								
 
 # # Stored OPEN select and static/dyn extraction	
 							var2process['varbcstatic'] = {}
@@ -2418,7 +2422,7 @@ def genBC_calls(rhs):
 								rhshlo.append(open(incPATH+'bcsrc'+dir1+'_'+str(layer)+'.for','r'))	
 							for layer in range(0,hlo_rhs):
 									slcbc['rhs'].write('      call '+rhshlo[layer].readlines()[8][10:])
-							slcbc[bctype].write('      '+idrhs[dir1])							
+							slcbc['rhs'].write('      '+idrhs[dir1])							
 	
 	rhs.bc_info[1] = bcdone					
 
@@ -2490,42 +2494,42 @@ def globvar():
 
 	sizebcrk   = {'face':{'i'  :{3:'(1-hlo:ny+hlo,1-hlo:nz+hlo',
 							   2:'(1-hlo:ny+hlo',
-							   1:'('},
+							   1:'(1'},
 						'j'  :{3:'(1-hlo:nx+hlo,1-hlo:nz+hlo',
 							   2:'(1-hlo:nx+hlo',
-							   1:'('},
+							   1:'(1'},
 						'k'  :{3:'(1-hlo:nx+hlo,1-hlo:ny+hlo',
 							   2:'(1-hlo:nx+hlo',
-							   1:'('}},
+							   1:'(1'}},
 				'edge':{'ij' :{3:'(1-hlo:nz+hlo',
-							   2:'(',
-							   1:'('},
+							   2:'(1',
+							   1:'(1'},
 						'jk' :{3:'(1-hlo:nx+hlo',
-							   2:'(',
-							   1:'('},
+							   2:'(1',
+							   1:'(1'},
 						'ik' :{3:'(1-hlo:ny+hlo',
-							   2:'(',
-							   1:'('}}}        
+							   2:'(1',
+							   1:'(1'}}}        
 
 
 	sizebc   = {'face':{'i'  :{3:'(idarray(3):idarray(4),idarray(5):idarray(6)',
 							   2:'(idarray(3):idarray(4)',
-							   1:'('},
+							   1:'(1'},
 						'j'  :{3:'(idarray(1):idarray(2),idarray(5):idarray(6)',
 							   2:'(idarray(1):idarray(2)',
-							   1:'('},
+							   1:'(1'},
 						'k'  :{3:'(idarray(1):idarray(2),idarray(3):idarray(4)',
 							   2:'(idarray(1):idarray(2)',
-							   1:'('}},
+							   1:'(1'}},
 		        'edge':{'ij' :{3:'(idarray(5):idarray(6)',
-							   2:'(',
-							   1:'('},
+							   2:'(1',
+							   1:'(1'},
 						'jk' :{3:'(idarray(1):idarray(2)',
-							   2:'(',
-							   1:'('},
+							   2:'(1',
+							   1:'(1'},
 						'ik' :{3:'(idarray(3):idarray(4)',
-							   2:'(',
-							   1:'('}}}        
+							   2:'(1',
+							   1:'(1'}}}        
 
 
 	for v in varbc:
@@ -3841,8 +3845,11 @@ def genrk3(nvar,rhs=None,bc=[False,[]],rk3=None):
 
 def genrk3update(nvar,rhs=None,bc=[False,[]], updaterk3=None):
 
-	from genRhs import incPATH,consvar
-	dim = rhs.dim
+	from genRhs import incPATH
+	
+	dim     = rhs.dim
+	consvar = rhs.consvar
+
 	if not updaterk3:
 		updaterk3   = open(incPATH+'includeRK3update.f90','w')
 	
@@ -3870,11 +3877,10 @@ def genrk3update(nvar,rhs=None,bc=[False,[]], updaterk3=None):
 
 def genP2C(output,conserv,rhs=None,bc=[False,[]]):
 
-	from genRhs import consvar
-
-	dim = rhs.dim
+	dim       = rhs.dim
 	varsolved = rhs.varsolved
-	varname = rhs.varname
+	varname   = rhs.varname
+	consvar   = rhs.consvar
 
 	modvar = range(1,len(varsolved)+1)
 
