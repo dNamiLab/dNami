@@ -22,6 +22,10 @@ Optionally, to run the provided plotting scripts to visualise the code output, m
 
 Check out the documentation [HERE] to get a quickstart guide on running a case with dNami. 
 
+## Test suite 
+
+A Python script in the `exm/` folder called `test_all.py` will run through the list of available cases to test them. For each case, the script will copy the files to the appropriate location to generate the code, run the case and output values for a comparison with the reference values on the repository. Each case should output a `PASS` status once it is complete. If this is not the case, the `log.test` file generate during the testing process should clarify the reasons for the failure (e.g. missing dependence, lack of resources). The testing script currently assumes that the user is testing the code on a machine with at least 4 available cores.  
+
 ## How-To generate the documentation
 The repository contains a documentation inside the **doc** directory.
 In order to generate the html documentation the following Python packages are needed:
