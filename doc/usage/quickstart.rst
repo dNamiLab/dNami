@@ -33,7 +33,14 @@ Setting up a basic case like this is essentially a three-step process:
 2. Specify the desired numerics in the ``genRhs.py`` file then generate and compile the fortran  code
 3. Specify the problem parameter and integrate the equations in time in the ``compute.py`` file
 
-A minimal functional example for each of these files that allow the case to be run are given in the `/exm/1d_euler` directory. The core elements of each of these files are presented here. The user is referred to the API documentation for the settings and function arguments not detailed here.   
+A minimal functional example for each of these files that allow the case to be run are given in the `/exm/1d_euler_nonreflective` directory. The core elements of each of these files are presented here. The user is referred to the API documentation for the settings and function arguments not detailed here. :numref:`exworkflow` shows an overview of the file locations and steps detailed below.  
+
+.. _exworkflow: 
+.. figure:: img/dnami_example.png
+   :width: 75%
+   :align: center
+
+   Overview of file location and steps 
 
 **Specifying the governing equations**
 
@@ -115,7 +122,7 @@ The physical boundary conditions at the edge of the domain are enforced with the
 
     genBC(src_phybc_wave_i1,3,2,rhsname , vnamesrc_divF, setbc=[True,{'char':{'i1':['rhs']}}]  , update=False,rhs=rhs)
 
-The ``rhs.py`` and ``genRhs.py`` files must be placed in the ``src/generate/`` folder. Changing up to the ``src/`` folder and running the ``./install_clean.sh`` command will translate the symbolic expressions into fortran code with the aforementioned numerics and compile the code. Running the command ``source env_dNami.sh`` will add the necessary environment variables to the path.  
+The ``rhs.py`` and ``genRhs.py`` files **must be placed** in the ``src/generate/`` folder. Changing up to the ``src/`` folder and running the ``./install_clean.sh`` command will translate the symbolic expressions into fortran code with the aforementioned numerics and compile the code. Running the command ``source env_dNami.sh`` will add the necessary environment variables to the path.  
 
 **Specifying the parameters and running the computation**
 

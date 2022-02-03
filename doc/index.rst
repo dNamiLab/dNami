@@ -6,7 +6,7 @@
 Welcome to dNami's documentation!
 *********************************
 
-dNami is an open-source multi-language (Python, Fortran, C) framework for solving systems of balance laws using explicit numerical schemes. dNami uses MPI, OpenMP and cache blocking to speed up the calculation.
+**dNami** is an open-source multi-language (Python, Fortran, C) framework for solving systems of balance laws using explicit numerical schemes. dNami uses MPI, OpenMP and cache blocking to speed up the calculation.
 
 To get started with dNami, please check out the Quickstart guide to get set up with dependencies and run your first dNami case. 
 
@@ -17,6 +17,7 @@ To get started with dNami, please check out the Quickstart guide to get set up w
 
    usage/quickstart
    usage/testcases
+   usage/compute
    usage/api
    usage/syntax
    usage/clusters
