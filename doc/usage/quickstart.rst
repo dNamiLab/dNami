@@ -223,5 +223,3 @@ The example should run for 4000 timesteps and then exit. Optionally, the user ca
 
    x-t diagram of the entropy perturbation leaving the computation domain. The field shown is that of density fluctuations (i.e. :math:`(\rho -  \rho_0)` ).  The dashed blue lines indicate the flow speed. 
 
-Platform specific options
--------------------------
