@@ -277,7 +277,7 @@ def unpack_bcs(tree):
 
 def allocate(tree):	
 	"""
-        Allocates memory. This function should not be called by the user.
+        Allocates memory based on computational parameters in the tree. 
 
         Args: 
           tree: The dnami tree data structure

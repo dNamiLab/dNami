@@ -1,8 +1,8 @@
 # -----------------------------------------------------------------------------
 #
-# CASE: 1D entropy wave propagation
-#       -- with kernels: rhs_.py genKer_.py
-#                                                          -     sw 01-SEP-20
+# CASE: 1D euler equations - entropy wave propagation
+#       -- with kernels: rhs_.py genRhs_.py
+# 
 # -----------------------------------------------------------------------------
 
 # ======================================================================== LOAD
@@ -16,7 +16,7 @@ import os
 # dNami pre-processing tools?
 # dNami runtime tools?
 
-# =================================================================== Create WRK
+# ===================================================================  FOLDERS
 
 # -- restarts
 try:
@@ -92,7 +92,7 @@ dn.dnami_io.write_grid(dtree)
 dn.dnami_io.hello_world(dtree)
 
 # .. allocate tree
-large = 10000
+large = 10000 #no cache blocking in this example
 dtree['libs']['cache blocking'] = [large,large,large]
 dtree = dn.allocate(dtree)
 

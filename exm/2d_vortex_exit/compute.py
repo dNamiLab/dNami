@@ -1,6 +1,6 @@
 # -----------------------------------------------------------------------------
 #
-# CASE: 2D vortex test case 
+# CASE: 2D euler equations - vortex exit case with BCs
 #       -- with kernels: rhs.py genRhs.py
 # 
 # -----------------------------------------------------------------------------
@@ -12,7 +12,7 @@ import dnami as dn         # dNami kernel
 from dnami import np, sys  # call non-dNami libs already available in dNami
 import os
 
-# =================================================================== Create WRK
+# ===================================================================  FOLDERS
 
 # -- restarts
 try:

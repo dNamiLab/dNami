@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------
 #
-# CASE: 1D euler equations - entropy wave propagation 
-#       -- with kernels: rhs.py genKer.py
+# CASE: 1D euler equations - entropy wave propagation + non-reflective BCs 
+#       -- with kernels: rhs.py genRhs.py
 #
 # -----------------------------------------------------------------------------
 
@@ -13,7 +13,7 @@ from dnami import np, sys  # call non-dNami libs already available in dNami
 import math as m           # ... and some others
 import os
 
-# =================================================================== Create folders  
+# ===================================================================  FOLDERS  
 
 # -- restarts
 try:
@@ -86,7 +86,7 @@ dn.dnami_io.write_grid(dtree)
 dn.dnami_io.hello_world(dtree)
 
 # .. allocate tree
-large = 10000
+large = 10000 #no cache blocking in this example
 dtree['libs']['cache blocking'] = [large,large,large]
 dtree = dn.allocate(dtree)
 

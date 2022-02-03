@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------
 #
-# CASE: 2D wavy grid case 
-#       -- with kernels: rhs.py genKer.py
+# CASE: 2D euler equations - wavy grid case 
+#       -- with kernels: rhs.py genRhs.py
 #
 # -----------------------------------------------------------------------------
 
@@ -16,7 +16,7 @@ import os
 # dNami pre-processing tools?
 # dNami runtime tools?
 
-# ========================================================================= FOLDERS 
+# ===================================================================  FOLDERS
 
 # -- restarts 
 try :
@@ -107,7 +107,7 @@ dn.dnami_io.write_grid(dtree)
 dn.dnami_io.hello_world(dtree)
 
 # .. allocate tree
-large = 10000
+large = 10000 #no cache blocking in this example
 dtree['libs']['cache blocking'] = [large,large,large]
 dtree = dn.allocate(dtree)
 

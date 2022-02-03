@@ -1,4 +1,4 @@
-# -- Add dNami python related files to path
+# -- Add dNami Python related files to path
 export  INSTALLPATH=$PWD
 export  PYTHONPATH=$PYTHONPATH:$INSTALLPATH/src_py
 export  PYTHONPATH=$PYTHONPATH:$INSTALLPATH/pymod
