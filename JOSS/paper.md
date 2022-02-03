@@ -1,8 +1,8 @@
 ---
-title: '\texttt{dNami}: a framework for solving unsteady partial differential equations using explicit numerical schemes.'
+title: '\texttt{dNami}: a framework for solving systems of balance laws using explicit numerical schemes.'
 tags:
   - Python
-  - Tinite-difference 
+  - Finite-difference 
   - Time-integration
   - Computational Physics
   - High Performance Computing
@@ -33,16 +33,19 @@ bibliography: paper.bib
 
 # Summary
 
-Many physical systems obey or can be modelled by a system of unsteady partial differential equations. Over the years, many research codes have been developed to solve such sets of equations, each requiring consequential development time despite many of them obeying a similar structure. \texttt{dNami} aims to provides a framework to rapidly set up and solve equations of the form 
+Many physical systems obey or can be modelled by a system of balance laws taking the form of unsteady partial differential equations. Over the years, many research codes have been developed to solve such sets of equations, each requiring consequential development time despite many of them obeying a similar structure. \texttt{dNami} aims to provides a framework to rapidly set up and solve equations of the form 
 
 \begin{equation} \label{eq:gov_eq}
 	\frac{\partial}{\partial t} \textbf{q} = \textbf{RHS}(\textbf{q})
 \end{equation}
 
-where $\textbf{q} \in \mathbb{R}^N$ with associated (time-dependant) boundary conditions while minimising problem-specific code development.
+where $\textbf{q} \in \mathbb{R}^N$ with associated (time-dependant) boundary conditions while minimising problem-specific code development and still providing efficient and large-scale computing capabilities. 
 
-\texttt{dNami} is aimed at both researchers who wish to rapidly set up a computation without having to worry too much about the coding aspects and those who wish to work with a high-performance code that they can expand and/or tailor to specific applications. For the former group, a syntax to symbolically define the governing equations and boundary conditions, an automatic symbolic-to-Fortran translation, a set of pre-implemented numerical methods and a Python interface provide a way of setting up computations without having to delve into Fortran code. For the latter group, \texttt{dNami} provides control over many performance aspects and easy integration of custom Fortran routines into the code generation step. Both groups can run efficient computations that can be started on a workstation and scaled up to a cluster.  
+\texttt{dNami} is aimed at both researchers who wish to rapidly set up a computation without having to worry too much about the coding aspects and those who wish to work with a high-performance code that they can expand and/or tailor to specific applications. For the former group, a syntax to symbolically define the governing equations and boundary conditions, an automatic symbolic-to-Fortran translation, a set of pre-implemented numerical methods all resulting in a native Python pre-compiled module generated automatically provide a way of setting up computations and interacting conveniently with data at runtime without having to delve into Fortran code. For the latter group, \texttt{dNami} provides control over many performance aspects and easy integration of custom Fortran routines into the code generation step. Both groups can run efficient computations that can be started on a workstation and scaled up to a cluster.  
 
+# State of the field
+
+Code developments aiming at producing numerical solvers for problems given by equations \ref{eq:gov_eq} typically follow two different strategies, most of the time involving two different communities. For simple enough types of problems \ref{eq:gov_eq}, generic solutions provided by high-level languages may be used — notable examples are found in the vast offer provided by the scientific Python community. One of the reasons for the Python language success is its versatility to researchers' computational needs (e.g. diverse types of data structure, various interactions with data at runtime using the large offer from the community). A major drawback being its inability to tackle problems involving a large number of degrees of freedom, that typically requires highly efficient parallel capabilities. Note that solutions involving pre-compiled Python modules, see SciPy project @SciPy2020, or just-in-time compilation, see Numba project @lam2015numba exist but are most of the time restricted to workstation workflow and incompatible with large scale computing. The researcher targeting problems \ref{eq:gov_eq} requiring large scale computing capabilities typically has to tackle the tedious problem of High-Performance Computing (HPC) development on his own. This is time consuming for a non-specialist and often results in conservative technical solutions that do not comply with the rapid evolution of hardware architecture that comes with continuous change of parallelisation paradigms. Another possibility is to collaborate with HPC specialists for the HPC-layer of the solver. Several example of such fruitful joint effort are available in the literature (see for instance the recent )
 
 # Features 
 
