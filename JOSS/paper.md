@@ -1,9 +1,11 @@
 ---
-title: '\texttt{dNami}: a framework for solving systems of balance laws using explicit numerical schemes.'
+title: '\texttt{dNami}: a framework for solving unsteady partial differential equations using explicit numerical schemes.'
 tags:
   - Python
-  - finite-difference 
-  - time-integration
+  - Tinite-difference 
+  - Time-integration
+  - Computational Physics
+  - High Performance Computing
   - FORTRAN 
 authors:
   - name: Nicolas Alferez^[co-first author] # note this makes a footnote saying 'co-first author'
@@ -18,7 +20,7 @@ authors:
   - name: Yussuf Ali  
     affiliation: 2
 affiliations:
- - name: Laboratoire DynFluid, Arts et Métiers ParisTech, Paris, France  
+ - name: Laboratoire DynFluid, Conservatoire National des Arts et Métiers, Paris, France  
    index: 1
  - name: Okinawa Institute of Science and Technology, Okinawa, Japan 
    index: 2
@@ -31,7 +33,7 @@ bibliography: paper.bib
 
 # Summary
 
-Many physical systems obey or can be modelled by a system of balance laws. Over the years, many research codes have been developed to solve such sets of equations, each requiring consequential development time despite many of them obeying a similar structure. \texttt{dNami} aims to provides a framework to rapidly set up and solve equations of the form 
+Many physical systems obey or can be modelled by a system of unsteady partial differential equations. Over the years, many research codes have been developed to solve such sets of equations, each requiring consequential development time despite many of them obeying a similar structure. \texttt{dNami} aims to provides a framework to rapidly set up and solve equations of the form 
 
 \begin{equation} \label{eq:gov_eq}
 	\frac{\partial}{\partial t} \textbf{q} = \textbf{RHS}(\textbf{q})
