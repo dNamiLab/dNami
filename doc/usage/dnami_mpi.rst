@@ -5,7 +5,7 @@
 dnami_mpi
 ---------
 
-This section gives an overview over the different MPI
+This section gives an overview over the different MPI (Message Passing Interface)
 funtions of the dnami library.
 
 The dnami MPI functions
