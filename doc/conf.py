@@ -64,4 +64,4 @@ html_static_path = []
 # -- Make sure figures are numbered in references
 numfig = True
 
-autodoc_mock_imports = ["dnami","dnamiF","dnami_io","dnami_mpi"]
+autodoc_mock_imports = ["numpy","dnami","dnamiF","dnami_io","dnami_mpi"]
