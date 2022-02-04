@@ -85,11 +85,31 @@ Fz = {'rho' : 'rho*w         ',
       'w'   : 'rho*w*w  + p  ',
       'et'  : '(rho*et + p)*w '}
 
+# -- Conservative formulation
+
 Src_conv = {'rho' : '[ '+Fx['rho']+' ]_1x' + ' + ' + '[ '+Fy['rho']+' ]_1y' + ' + ' + '[ '+Fz['rho']+' ]_1z ',
             'u'   : '[ '+Fx['u']  +' ]_1x' + ' + ' + '[ '+Fy['u']  +' ]_1y' + ' + ' + '[ '+Fz['u']  +' ]_1z ',
             'v'   : '[ '+Fx['v']  +' ]_1x' + ' + ' + '[ '+Fy['v']  +' ]_1y' + ' + ' + '[ '+Fz['v']  +' ]_1z ',
             'w'   : '[ '+Fx['w']  +' ]_1x' + ' + ' + '[ '+Fy['w']  +' ]_1y' + ' + ' + '[ '+Fz['w']  +' ]_1z ',
             'et' : ' [ '+Fx['et'] +' ]_1x' + ' + ' + '[ '+Fy['et'] +' ]_1y' + ' + ' + '[ '+Fz['et'] +' ]_1z '}
+
+# -- Skew symmetric formulation
+
+Src_skew = {'rho' : '0.5_wp*( [rho*u]_1x + [rho*v]_1y + [rho*w]_1z '
+                   '+   u*[rho]_1x + v*[rho]_1y + w*[rho]_1z '
+                   '+ rho*( '+divops+' ) )',
+        'u'   : '0.5_wp*( [rho*u*u]_1x + [rho*u*v]_1y + [rho*u*w]_1z '
+                   '+   u*[rho*u]_1x + v*[rho*u]_1y + w*[rho*u]_1z '
+                   '+rho*u*( '+divops+' ) ) + [p]_1x ',
+        'v'   : '0.5_wp*( [rho*u*v]_1x + [rho*v*v]_1y + [rho*v*w]_1z '
+                   '+   u*[rho*v]_1x + v*[rho*v]_1y + w*[rho*v]_1z '
+                   '+rho*v*( '+divops+' ) ) + [p]_1y ',
+        'w'   : '0.5_wp*( [rho*w*u]_1x + [rho*w*v]_1y + [rho*w*w]_1z '
+                   '+   u*[rho*w]_1x + v*[rho*w]_1y + w*[rho*w]_1z '
+                   '+rho*w*( '+divops+' ) ) + [p]_1z ',
+        'et'  : '0.5_wp*( [rho*et*u]_1x + [rho*et*v]_1y + [rho*et*w]_1z '
+                   '+   u*[rho*et]_1x + v*[rho*et]_1y + w*[rho*et]_1z '
+                   '+rho*et*( '+divops+') ) + [p*u]_1x + [p*v]_1y + [p*w]_1z '}
 
 # Navier-Stokes Diffusive terms only 
 
@@ -118,8 +138,36 @@ Fz = {'u'   : ' - visc *( {u}_1z + {w}_1x )',
               ' - v*(visc *( {v}_1z + {w}_1y ))'
               ' - w*(visc *( 2.0_wp * {w}_1z - 2.0_wp/3.0_wp * ( '+ ddivops +'  )))'}
 
+# -- Divergence formulation
+
 Src_dif  = {'u'   : '[ '+Fx['u']  +' ]_1x' + ' + ' + '[ '+Fy['u']  +' ]_1y' + ' + ' + '[ '+Fz['u']  +' ]_1z ',
             'v'   : '[ '+Fx['v']  +' ]_1x' + ' + ' + '[ '+Fy['v']  +' ]_1y' + ' + ' + '[ '+Fz['v']  +' ]_1z ',
             'w'   : '[ '+Fx['w']  +' ]_1x' + ' + ' + '[ '+Fy['w']  +' ]_1y' + ' + ' + '[ '+Fz['w']  +' ]_1z ',
             'et' : ' [ '+Fx['et'] +' ]_1x' + ' + ' + '[ '+Fy['et'] +' ]_1y' + ' + ' + '[ '+Fz['et'] +' ]_1z '}
 
+# -- Laplacian formulation
+
+Src_Laplace = {'u'   : '- visc* ( [u]_2xx + [u]_2yy + [u]_2zz ) - visc*0.3333333333333333_wp*( [ '+ ddivops+' ]_1x )  ',
+     'v'   : '- visc* ( [v]_2xx + [v]_2yy + [v]_2zz ) - visc*0.3333333333333333_wp*( [ '+ ddivops+' ]_1y )  ',
+     'w'   : '- visc* ( [w]_2xx + [w]_2yy + [w]_2zz ) - visc*0.3333333333333333_wp*( [ '+ ddivops+' ]_1z )  ',
+     'et'  : '- visc* ( ( [u]_2xx + [u]_2yy + [u]_2zz )*u '
+             ' +        ( [v]_2xx + [v]_2yy + [v]_2zz )*v '
+             ' +        ( [w]_2xx + [w]_2yy + [w]_2zz )*w )'
+             '- visc*0.3333333333333333_wp*('
+             '  [ '+ ddivops+' ]_1x * u '
+             '+ [ '+ ddivops+' ]_1y * v '
+             '+ [ '+ ddivops+' ]_1z * w )'
+             '- visc* ('
+             ' ( 2.0_wp * [u]_1x * [u]_1x ) '
+             '+( [u]_1y + [v]_1x ) * [v]_1x '
+             '+( [u]_1z + [w]_1x ) * [w]_1x '
+             '+( 2.0_wp * [v]_1y * [v]_1y ) '
+             '+( [v]_1x + [u]_1y ) * [u]_1y '
+             '+( [v]_1z + [w]_1y ) * [w]_1y '
+             '+( 2.0_wp * [w]_1z * [w]_1z ) '
+             '+( [w]_1x + [u]_1z ) * [u]_1z '
+             '+( [w]_1y + [v]_1z ) * [v]_1z '
+             ')'
+             '+ 0.6666666666666666_wp*visc* ( ' + divops+' )*( ' + divops+' ) '} 
+
+Src_Laplace['et'] = Src_Laplace['et'] + '- kappa* ( [T]_2xx + [T]_2yy + [T]_2zz )'                          

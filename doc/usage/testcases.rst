@@ -298,3 +298,12 @@ The incompressible pressure solution is projected onto an isochore in thermodyna
 
       Animation of the x-direction velocity field at :math:`z=z_{max}/2`
 
+With dNami pseudo-code, different formulations of the governing equations can easily be implemented. The ``rhs.py`` file for the 3D TGV case contains two versions of the equations. :numref:`3d_tgv_formulation` shows a comparison between conservative and skew-symmetric formulations for various grid sizes and a comparison to a spectral method based reference of the enstrophy (i.e. the domain integral of the squared vorticity) over reduced time. All three finite-difference based computations presented in the graph use an 11 point, 10 :sup:`th` order scheme.  
+
+.. _3d_tgv_formulation:
+.. figure:: img/3d_tgv_enstrophy.png
+   :align: center
+   :width: 70%
+
+   Comparison of the enstrophy vs time profile for the conservative formulation using 600 :sup:`3`points (blue), conservative formulation using 260 :sup:`3` points (red), skew symmetric formulation using 260 :sup:`3` points (green) and the 512 degree of freedom spectral solution (dashed black).
+
