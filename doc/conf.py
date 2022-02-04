@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'dNami'
-copyright = '2020, Okinawa Institute of Science and Technology School Corporation, Conservatoire national des arts et métiers'
+copyright = '2019, Conservatoire National des Arts et Métiers and Okinawa Institute of Science and Technology School Corporation'
 author = 'Nicolas Alferez, S2T Unit'
 
 
