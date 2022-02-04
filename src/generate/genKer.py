@@ -79,7 +79,6 @@ class rhs_info:
 # sympy.finite_diff_weights(2,[-2,-1,0,1,2],0)[-1][-1]
 # where sympyp.finite_diff_weights(order of derivative, stencil,0)[-1][-1]
 
-
 fdd5o4 = [-0.08333333333333333,
 		   1.3333333333333333,
 		  -2.5,
@@ -289,7 +288,31 @@ Operations = lambda input: re.findall(oplist,input)
 
 
 def dNamiVar(var,rangei,rangej,rangek):
-	
+	"""
+			dNamiVar is a kernel internal function. It translates a symbolic word into a valid Fortran data access.
+			
+			Args:
+					var (string): The input symbolic word
+					rangei (int): The i position in the structured grid
+					rangej (int): The j position in the structured grid
+					rangek (int): The k position in the structured grid
+					dim (int): read from genRhs.py
+					varstored (dictionay): read from genRhs.py 
+					varloc (dictionay): read from genRhs.py
+					coefficients (dictionay): read from genRhs.py
+					varbc (dictionay): read from genRhs.py
+					varsolved (dictionay): read from genRhs.py
+					varname (dictionay): read from genRhs.py	    
+			Returns:
+				dvar (string): A valid Fortran data access
+			:Example:
+				>>> varname = {'u':1}
+				>>> dNamiVar('u',1,1,1) 
+				'q(1,1,1,1)'
+				>>> varstored = {'u' : {'symb': 'u','ind':10 ,'static': True}	
+				>>> dNamiVar('u',1,2,5)
+				'qst(1,2,3,10)'					
+			"""
 	from genRhs import dim
 
 	try:
@@ -719,7 +742,6 @@ def updateStored(vname,expr,i='i',j='j',k='k',update=False):
 		storedout = stored + ' = ' + stored + ' ' + expr	
 	
 	return storedout
-	
 
 def updateVarbc(vname,expr,i='i',j='j',k='k',update=False):
 	
@@ -755,7 +777,6 @@ def updateVarbc(vname,expr,i='i',j='j',k='k',update=False):
 		qbcout = qbc + ' = ' + qbc + ' ' + expr	
 	
 	return qbcout
-	
 
 def compute_stored(StoredVar,Stencil,Order,output,localvar,update=False,rhs=None):		
 
