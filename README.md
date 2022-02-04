@@ -20,7 +20,7 @@ Optionally, to run the provided plotting scripts to visualise the code output, m
 
 ## Quickstart guide
 
-Check out the documentation [HERE] to get a quickstart guide on running a case with dNami. 
+Check out the [documentation](https://dnami.readthedocs.io/en/latest/) to get a quickstart guide on running a case with dNami. 
 
 ## Test suite 
 

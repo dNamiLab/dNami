@@ -20,7 +20,6 @@ To get started with dNami, please check out the Quickstart guide to get set up w
    usage/compute
    usage/api
    usage/syntax
-   usage/clusters
 
 Indices and tables
 ==================

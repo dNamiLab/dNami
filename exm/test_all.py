@@ -45,9 +45,20 @@ except:
     pass
 test_stat = {} 
 
+# -- Check if all tests have a reference.dat file:
+for test in test_list:
+
+    # Get folder contents:
+    files = glob.glob(test + '/*')
+    ref = [i for i in files if 'reference.dat' in i]
+    if len(ref) == 0:
+        test_list.remove(test)
+
+
+
 # -- Print the list
 print(' ============================================' )
-print(' List of tests:')
+print(' List of tests with references:')
 for test in test_list:
     print('    o ', test)
 print(' ============================================' )

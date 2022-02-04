@@ -25,6 +25,62 @@ The files for this case are located in the ``exm/1d_entropywave`` folder. The in
 
    x-t diagram of the density perturbation for the one-dimensional Euler equations on a periodic domain. The blue lines indicate the flow speed. 
 
+**2) Korteweg-De Vries example** 
+
+To illustrate  higher-than-second-order derivatives, the one-dimensional Korteweg-De Vries equation is implemented in dNami and integrated in time. The general form of the equation is:
+
+.. math::
+	\begin{equation}
+	    \dfrac{\partial u}{\partial t } + \epsilon u \dfrac{\partial u}{\partial x } + \mu  \dfrac{\partial ^3 u}{\partial x^3 } = 0
+	\end{equation}
+ 
+For this test case, the scaling coefficients are set to :math:`\epsilon=6` and :math:`\mu=1`. To compute the third derivative of :math:`u` in dNami, first the second derivative is computed and stored and then a first derivative of this intermediate variable is taken when specifying the right-hand side as illustrated in the following code block:
+
+.. code-block:: python
+
+	varstored = { 'u_xx' : {'symb':' [u]_2xx ','ind':1, 'static': False } }
+	...
+	RHS = {'u' : ' epsilon * u * [ u ]_1x + mu * [ u_xx ]_1x ',}
+
+The case of two colliding solitons is simulated here for which there is an analytical solution on an infinite domain [CITATION]. The exact solution is given by:
+
+.. _1d_kdv_sol:
+.. math::
+	\begin{equation}
+	    u(x,t) = 2 \dfrac{\partial ^2 f  }{\partial x^2 }, \forall x \in \mathbb{R}, \forall t \in \mathbb{R},
+	\end{equation}
+
+where the function $f$ is defined by:
+
+.. math::
+	\begin{equation}
+	    f = 1 + e^{\eta_1} + e^{\eta_2} + \left( \dfrac{k_1 - k_2}{k_1 + k_2} \right)^2  e^{\eta_1  + \eta_2},
+	\end{equation}
+
+with: 
+
+.. math::
+	\begin{align}
+	    \eta_1 = k_1 x - k_1^3 t + \eta_1^{(0)}, \\
+	    \eta_2 = k_2 x - k_2^3 t + \eta_2^{(0)}. \\
+	\end{align}
+
+Following [CITATION], the coefficients in the previous equations are taken to be:
+
+.. math::
+	\begin{equation}
+	    k_1 = 1, \quad  k_2= \sqrt{2}, \quad \eta_1^{(0)} = 0 , \quad \eta_2^{(0)} = 2 \sqrt{2}
+	\end{equation}
+
+The domain is restricted to the segment :math:`x \in [-20,20]`, taken to be periodic and discretised with :math:`n_x=500` points. At the start of the simulation, the :math:`u` field is initialised using the analytical solution for :math:`t=0`. :numref:`1d_kdv` shows the solution after 6 time units. 
+
+.. _1d_kdv: 
+.. figure:: img/1d_kdv_final.png
+   :width: 70%
+   :align: center
+
+   Comparison of the numerical solution to the analytical solution after 6 time units
+
 Two-dimensional cases
 ---------------------
 
@@ -204,10 +260,41 @@ The vortex is initially centered in the domain i.e. :math:`(x_0,y_0)=(0.5L_x, 0.
 
 .. _2d_vortex_exit:
 .. figure:: img/2d_vortexexit_drho.png
+   :align: center
    :width: 100%
 
    Density fluctuations at various times during the interaction of the vortex with the non-reflective boundary. Vertical velocity contours are shown (with values in the range only at the start of the simulation).
 
+
 Three-dimensional cases
 -----------------------
+
+**1) Compressible Taylor-Green vortex case** 
+
+This case solves the compressible Navier-Stokes equations in 3D. The particular problem solved here is the Taylor-Green vortex flow. The files for this case can be found in ``exm/3d_tgv``. The initial conditions for this flow are: 
+
+
+.. math::
+
+   \left\{
+   \begin{matrix}
+   \rho(x,y,z,t=0) =  \rho_0, \\ 
+    u(x,y,z,t=0)   =  \sin(x) \cos(y) \cos(z), \\ 
+    v(x,y,z,t=0  ) = -\cos(x) \sin(y) \cos(z), \\ 
+    w(x,y,z,t=0  ) = 0, \\ 
+    p(x,y,z,t=0  ) = p_0 + \rho_0/16 \left[ \cos(2x) + \cos(2y) \right] \left( \cos(2z) + 2 \right) 
+   \end{matrix}
+   \right.
+
+
+The incompressible pressure solution is projected onto an isochore in thermodynamic space to set the initial internal energy. The case is setup to run with a reference Mach number of :math:`Ma = 0.45` and a Reynolds number of :math:`Re = 1600`. :numref:`3d_tgv` shows an animation of a cut of the x-direction velocity field at :math:`z=z_{max}/2` as the flow starts its transition from the smooth initial condition. The grid size is set to :math:`(n_x, n_y, n_z) = (128,128,128)`.  
+
+.. only:: html
+
+   .. _3d_tgv:
+   .. figure:: img/tgv.gif 
+      :width: 80%
+      :align: center
+
+      Animation of the x-direction velocity field at :math:`z=z_{max}/2`
 
