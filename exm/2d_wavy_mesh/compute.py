@@ -340,6 +340,6 @@ if dMpi.iMpi:
     if dMpi.ioproc:
         np.savetxt('out.dat',np.asarray([erra]))
 else:
-    erra = np.amax(rho[:]-rho0)
+    erra = np.amax(rho[:]-rhoinf)
     np.savetxt('out.dat',np.asarray([erra]))
 
