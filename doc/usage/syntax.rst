@@ -7,7 +7,11 @@ user can easily translate differential equations into finite difference code.
 Expressing differential equations in dNami
 ------------------------------------------
 
-The tables below show how to express derivatives in the dNami syntax in each of the three spatial directions. **NB:** when specifying derivatives, make sure to leave at least one white space after the ']_1x', ']_1y' or ']_1z' notation (this is so that the pseudo-code can be correctly understood and translated).
+The tables below show how to express derivatives in the dNami syntax in each of the three spatial directions. 
+
+.. warning::
+
+    When specifying derivatives, make sure to leave at least one white space after the ']_1x', ']_1y' or ']_1z' notation (this is so that the pseudo-code can be correctly understood and translated).
 
 .. table:: First derivative notation expressed in the dNami syntax
 

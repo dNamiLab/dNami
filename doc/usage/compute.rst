@@ -94,6 +94,15 @@ These memory references are then passed to the Fortran layer when calling the fu
 
 The integer parameters (which are organised in a set pre-defined order) are used to read and modify the correct portion of the memory corresponding to ``data``. 
 
+**Computing stored variables**
+
+[TO DO]
+ We need to comment on that (espacially the difference of the last arg 1/0 for static/dynamic)
+ 
+.. code-block:: python
+
+   if 'qstored' in dtree['eqns']['qvec']['views'].keys():
+        dn.dnamiF.stored(intparam,fltparam,data,1)      
 
 **Starting your own compute**
 
