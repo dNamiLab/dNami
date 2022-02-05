@@ -270,6 +270,11 @@ Three-dimensional cases
 -----------------------
 
 **1) Compressible Taylor-Green vortex case** 
+[CONSIDER PUTING THE EQUATIONS HERE]
+.. math::
+
+   \dfrac{\partial }{\partial t} \begin{pmatrix} \rho  \\ \rho u \\ \rho v  \\ \rho w \\ \rho e_t \end{pmatrix}  + \dfrac{\partial }{\partial x} \begin{pmatrix} \rho u   \\ \rho u^2 + p \\ \rho u v  \\ \rho u w  \\ u ( \rho e_t + p) \end{pmatrix}  + \dfrac{\partial }{\partial y} \begin{pmatrix} \rho v   \\ \rho u v \\ \rho v^2 + p   \\ \rho v w \\ v ( \rho e_t + p) \end{pmatrix}  + \dfrac{\partial }{\partial z} 
+   \begin{pmatrix} \rho w  \\ \rho u w \\ \rho vw + p   \\ \rho w^2 \\ w ( \rho e_t + p) \end{pmatrix}= 0
 
 This case solves the compressible Navier-Stokes equations in 3D. The particular problem solved here is the Taylor-Green vortex flow. The files for this case can be found in ``exm/3d_tgv``. The initial conditions for this flow are: 
 
@@ -297,7 +302,7 @@ The incompressible pressure solution is projected onto an isochore in thermodyna
       :align: center
 
       Animation of the x-direction velocity field at :math:`z=z_{max}/2`
-
+[TO BE COMPLETED : DETAIL MORE WHY IT IS DIFFICULT (JUST REF. TO HIGH ORDER WORKSHOP), HERE Ma=0.1, REFERENCE SOLUTION FROM SANDHAM]
 With dNami pseudo-code, different formulations of the governing equations can easily be implemented. The ``rhs.py`` file for the 3D TGV case contains two versions of the equations. :numref:`3d_tgv_formulation` shows a comparison between conservative and skew-symmetric formulations for various grid sizes and a comparison to a spectral method based reference of the enstrophy (i.e. the domain integral of the squared vorticity) over reduced time. All three finite-difference based computations presented in the graph use an 11 point, 10 :sup:`th` order scheme.  
 
 .. _3d_tgv_formulation:

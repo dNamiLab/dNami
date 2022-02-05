@@ -289,7 +289,7 @@ Operations = lambda input: re.findall(oplist,input)
 
 def dNamiVar(var,rangei,rangej,rangek):
 	"""
-			dNamiVar is a kernel internal function. It translates a symbolic word into a valid Fortran data access.
+			dNamiVar is a kernel-internal function. It translates a symbolic word into a valid Fortran data access.
 			
 			Args:
 					var (string): The input symbolic word
@@ -297,12 +297,12 @@ def dNamiVar(var,rangei,rangej,rangek):
 					rangej (int): The j position in the structured grid
 					rangek (int): The k position in the structured grid
 					dim (int): read from genRhs.py
-					varstored (dictionay): read from genRhs.py 
-					varloc (dictionay): read from genRhs.py
-					coefficients (dictionay): read from genRhs.py
-					varbc (dictionay): read from genRhs.py
-					varsolved (dictionay): read from genRhs.py
-					varname (dictionay): read from genRhs.py	    
+					varstored (dictionary): read from genRhs.py 
+					varloc (dictionary): read from genRhs.py
+					coefficients (dictionary): read from genRhs.py
+					varbc (dictionary): read from genRhs.py
+					varsolved (dictionary): read from genRhs.py
+					varname (dictionary): read from genRhs.py	    
 			Returns:
 				dvar (string): A valid Fortran data access
 			:Example:
@@ -447,6 +447,21 @@ def dNamiVar(var,rangei,rangej,rangek):
 	return dvar
 
 def op_to_dNami(source,i='i',j='j',k='k'):
+	"""
+			op_to_dNami is a kernel-internal function. It translates pseudo-code containing a mix of symbolic arithmetic expression and Fortran syntax into a valid Fortran syntax.
+			
+			Args:
+					source (string): The input symbolic sentence (not necessary unary)
+					i (string): The i position in the structured grid
+					j (string): The j position in the structured grid
+					k (string): The k position in the structured grid	    
+			Returns:
+				rhs_line (string): A valid arithmetic operation in Fortran syntax 
+			:Example:
+				>>> varname = {'u':1,'v':2}
+				>>> op_to_dNami('u*v + 1.0_wp ','1','4','9') 
+				'q(1,4,9,1)*q(1,4,9,2) + 1.0_wp '				
+			"""
 	rangei = i
 	rangej = j
 	rangek = k
@@ -466,6 +481,9 @@ def op_to_dNami(source,i='i',j='j',k='k'):
 	return rhs_line
 
 def comment(message):
+	"""
+		 Generate comments in the produced Fortran source code.
+			"""
 	msg = '\n\n'
 	msg = msg +'!'.ljust(60,'*')+'\n'
 	msg = msg +'! '.ljust(60,' ')+'\n'
@@ -476,33 +494,29 @@ def comment(message):
 	return msg
 
 def genNbg(expr, dir , stencil, i='i',j='j',k='k',vname='v',dirBc=None,indbc='',der='first'):
-
-	#***********************************************************
-	#                                                           
-	# prepare neighborhood for derivatives 
-	#
-	#     inputs :
-	#             expr    = arithmetical expression to be derived (user frindly synthax)
-	#             dir     = 'x','y','z' (direction used for the derivation)
-	#             stencil = stencil size (center included)
-	#             i,j,k   = location of the desired derivative 
-	#             vname   = input name for the result (local variable)
-	#
-	#     outputs :
-  #             exprnbg : list of 'expr' expressed for each points in the neighborhood
-  #             vnamebg : corresponding temprary variable name
-  # 
-  #  Exemple :  
-  #              genNbg('rho*u','x',3,vname='derhou_') 
-  #
-  #             --> exprnbg = ['q(i-1,j,k,nvrh)*q(i-1,j,k,nvux)', 
-  #                            'q(i+0,j,k,nvrh)*q(i+0,j,k,nvux)', 
-  #                            'q(i+1,j,k,nvrh)*q(i+1,j,k,nvux)']
-  #
-  #             --> vnamebg = ['derhou_im1jk', 'derhou_ip0jk', 'derhou_ip1jk']
-	#           
-	#                                                
-	#***********************************************************
+	"""
+			dNamiVar is a kernel-internal function. It prepares neighbourhood for spatial derivatives computation.
+			
+			Args:
+					expr (string): Arithmetical expression to be derived (pseudo-code)
+					dir  (string): 'x', 'y', 'z' (direction used for the derivation)
+					stencil (int): Stencil size 
+					i (string): The i position in the structured grid
+					j (string): The j position in the structured grid
+					k (string): The k position in the structured grid
+					vname (string): String used to generate the local variables names.
+					dirBc (string): 'None',i1','imax','j1','jmax','k1','kmax'
+					indbc (int): current distance to the boundary
+					der (string): 'first','second'     
+			Returns:
+				Fortran arithmetic expression in the neighbourhood and local variables names used in the Fortran source.
+			:Example:
+				>>> genNbg('rho*u','x',3,vname='derhou_') 
+				'[['q(i-1,j,k,1)*q(i-1,j,k,2)',
+				   'q(i+0,j,k,1)*q(i+0,j,k,2)',
+				   'q(i+1,j,k,1)*q(i+1,j,k,2)'],
+				  ['derhou_im1jk', 'derhou_ip0jk', 'derhou_ip1jk']]'		
+			"""	
 
 	exprnbg = []
 	vnamebg = []
@@ -554,7 +568,22 @@ def genNbg(expr, dir , stencil, i='i',j='j',k='k',vname='v',dirBc=None,indbc='',
 	return [exprnbg, vnamebg]
 
 def genVname(vname,i='i',j='j',k='k'):
-
+	"""
+			genVname is a kernel-internal function. It appends local position suffix to a variable name.
+			
+			Args:
+					vname (string): variable name
+					i (string): The i position in the structured grid
+					j (string): The j position in the structured grid
+					k (string): The k position in the structured grid    
+			Returns:
+				vname (string): vname complemented with local position suffix.
+			:Example:
+				>>> genVname('var1_','i','j','k') 
+				var1_ijk'
+				>>> genVname('var1_','i+2','j-4','k+2-2')
+				'var1_ip2jm4kp2m2'
+			"""	
 	indi = re.sub(r'\-','m',i)
 	indi = re.sub(r'\+','p',indi)
 
@@ -568,6 +597,27 @@ def genVname(vname,i='i',j='j',k='k'):
 	return vname.strip()
 
 def der(vnamebg,order,stencil,varname='derv',dirBC=None,indbc=None,bc=None):
+	"""
+			der is a kernel-internal function. Produces Fortran code corresponding to the first order derivative stencil operations.
+			
+			Args:
+					vnamebg (list): list of local variable names corresponding to neighbourhood operations.
+					order (int): order of the 1st derivative
+					stencil (int): stencil size of the 1st derivative
+					varname (string): local variable used to store the result in the Fortran code 
+					dirBc (string): 'None',i1','imax','j1','jmax','k1','kmax'
+					indbc (int): current distance to the boundary   
+					bc (logical): True/False derivative concerns a boundary condition
+			Returns:
+				der (string): Fortran source code corresponding to derivative computation.
+			:Example:
+				>>> vnamebg = [['q(i-1,j,k,1)*q(i-1,j,k,2)',
+				...           	'q(i+0,j,k,1)*q(i+0,j,k,2)',
+				...           	'q(i+1,j,k,1)*q(i+1,j,k,2)'],
+				...           	['derhou_im1jk', 'derhou_ip0jk', 'derhou_ip1jk']]
+				>>> der(vnamebg[1],2,3)
+				'derv = -&\\n          0.5_wp*derhou_im1jk+&\\n          0.5_wp*derhou_ip1jk\\n\\n'
+			"""
 	if stencil not in derDic:
 		exception('Wrong stencil length for centrered finite differences'+'\n        given value = '+str(stencil)+' (set in genRhs.py)',message='error')
 
@@ -623,7 +673,27 @@ def der(vnamebg,order,stencil,varname='derv',dirBC=None,indbc=None,bc=None):
 	return der+'\n\n'		
 
 def dder(vnamebg,order,stencil,varname='derv2',dirBC=None,indbc=None,bc=None):
-
+	"""
+			dder is a kernel-internal function. Produces Fortran code corresponding to the second order derivative stencil operations.
+			
+			Args:
+					vnamebg (list): list of local variable names corresponding to neighbourhood operations.
+					order (int): order of the second derivative
+					stencil (int): stencil size of the second derivative
+					varname (string): local variable used to store the result in the Fortran code 
+					dirBc (string): 'None',i1','imax','j1','jmax','k1','kmax'
+					indbc (int): current distance to the boundary   
+					bc (logical): True/False derivative concerns a boundary condition
+			Returns:
+				der (string): Fortran source code corresponding to derivative computation.
+			:Example:
+				>>> vnamebg = [['q(i-1,j,k,1)*q(i-1,j,k,2)',
+				...           	'q(i+0,j,k,1)*q(i+0,j,k,2)',
+				...           	'q(i+1,j,k,1)*q(i+1,j,k,2)'],
+				...           	['derhou_im1jk', 'derhou_ip0jk', 'derhou_ip1jk']]
+				>>> dder(vnamebg[1],2,3)
+				'derv2 = 1.0_wp*derhou_im1jk-&\\n          2.0_wp*derhou_ip0jk+&\\n          1.0_wp*derhou_ip1jk\\n\\n'
+			"""
 	if not(bc):
 		if(len(vnamebg)!= stencil):
 			raise ValueError('Wrong neighborhood ! ',len(vnamebg),stencil)
@@ -671,7 +741,32 @@ def dder(vnamebg,order,stencil,varname='derv2',dirBC=None,indbc=None,bc=None):
 	return der+'\n\n'		
 
 def createNbg(vnamebg,exprnbg,file,der='first',indbc=None,bc=False):
-
+	"""
+			createNbg is a kernel-internal function. Produces Fortran code corresponding to the neighbourhood stencil operations.
+			
+			Args:
+					vnamebg (list): list of local variable names corresponding to neighbourhood operations.
+					exprnbg (list): list of Fortran arithmetic expressions corresponding to neighbourhood operations.					
+					file (class '_io.TextIOWrapper'): open file in write mode which receive the source code.
+					stencil (int): stencil size of the second derivative
+					der (string): {'first','second'} 
+					indbc (int): current distance to the boundary   
+					bc (logical): True/False derivative concerns a boundary condition
+			:Example:
+				>>> vnamebg = [['q(i-1,j,k,1)*q(i-1,j,k,2)',
+				...           	'q(i+0,j,k,1)*q(i+0,j,k,2)',
+				...           	'q(i+1,j,k,1)*q(i+1,j,k,2)'],
+				...           	['derhou_im1jk', 'derhou_ip0jk', 'derhou_ip1jk']]
+				>>> out = open('./src.f90','a+')
+				>>> createNbg(vnamebg[1],vnamebg[0],out)
+				>>> out = open('./src.f90','r')
+				>>> print(out.read())
+				'derhou_im1jk = q(i-1,j,k,1)*q(i-1,j,k,2)'
+				'                                        '
+				'derhou_ip1jk = q(i+1,j,k,1)*q(i+1,j,k,2)'
+				'                                        '
+				'                                        '								
+			"""
 	stencil = len(vnamebg)
 	
 	hlo = int((stencil-1)/2)
@@ -695,7 +790,9 @@ def createNbg(vnamebg,exprnbg,file,der='first',indbc=None,bc=False):
 			file.write('\n\n')
 
 def updateRHS(vname,expr,i='i',j='j',k='k',update=False,updateq=False):
-	
+	"""
+			updateRHS is a kernel-internal function. Produces Fortran code with arithmetic expression corresponding to the RHS or an update of the RHS.
+			"""			
 	from genRhs import varname, dim
 
 	if dim == 3:
@@ -726,7 +823,9 @@ def updateRHS(vname,expr,i='i',j='j',k='k',update=False,updateq=False):
 	return out
 
 def updateStored(vname,expr,i='i',j='j',k='k',update=False):
-	
+	"""
+			updateStored is a kernel-internal function. Produces Fortran code with arithmetic expression corresponding to the stored variable.
+			"""		
 	from genRhs import varstored, dim
 
 	if dim == 3:
@@ -744,7 +843,9 @@ def updateStored(vname,expr,i='i',j='j',k='k',update=False):
 	return storedout
 
 def updateVarbc(vname,expr,i='i',j='j',k='k',update=False):
-	
+	"""
+			updateVarbc is a kernel-internal function. Produces Fortran code with arithmetic expression corresponding to an update of q vector at boundary.
+			"""		
 	from genRhs import varbc, dim
 
 	sizebc   = {'face':{'i'  :{3:'('+j+','+k,
@@ -779,82 +880,96 @@ def updateVarbc(vname,expr,i='i',j='j',k='k',update=False):
 	return qbcout
 
 def compute_stored(StoredVar,Stencil,Order,output,localvar,update=False,rhs=None):		
+	"""
+			compute_stored is a kernel-internal function. It produces the Fortran source code that loops over the domain to compute arithmetic expressions provided by the user for stored variables.  
 
-		if update and rhs != None:
-			hlo_rhs = rhs.hlo_rhs
-		else:	
-			hlo_rhs =int((Stencil-1)/2)
+			Args:
+					StoredVar (dictionary): Dictionary containing stored expressions needed for RHS computations.
+					Stencil (int): stencil size for the spatial derivatives (for both first or second derivatives).
+					Order (int): order of the spatial derivatives (for both first or second derivatives).				
+					output (class '_io.TextIOWrapper'): file opened in write mode to receive the source code.		
+					localvar (string): string containing declaration statement of intermediate variables.
+					update (logical): whether to update or erase stored memory content (update=True is NRY). 
+					rhs (class): contains all RHS relevant information at runtime.	
+
+			"""
+	if update and rhs != None:
+		hlo_rhs = rhs.hlo_rhs
+	else:	
+		hlo_rhs =int((Stencil-1)/2)
+
+	coefficients = rhs.coefficients
+	varname      = rhs.varname
+	wp           = rhs.wp
+	dim          = rhs.dim
+	locvar = []
+
+	output.write(comment('Start computing stored variables'))
 	
-		coefficients = rhs.coefficients
-		varname      = rhs.varname
-		wp           = rhs.wp
-		dim          = rhs.dim
-
-		locvar = []
+	history={'x':{'var':[],'symb':[]},'y':{'var':[],'symb':[]},'z':{'var':[],'symb':[]}}
+	history2={'x':[[],[]],'y':[[],[]],'z':[[],[]]}
+	dhistory={'x':[[],[],[],[]],'y':[[],[],[],[]],'z':[[],[],[],[]]}
+	loop_create('begin',output)
+	for vstored in  StoredVar.keys():
+		output.write(comment('building stored variable '+ vstored))
 	
-		output.write(comment('Start computing stored variables'))
+		op  = StoredVar[vstored]['symb'].replace(" ", "")+'\n'
 		
-		history={'x':{'var':[],'symb':[]},'y':{'var':[],'symb':[]},'z':{'var':[],'symb':[]}}
-		history2={'x':[[],[]],'y':[[],[]],'z':[[],[]]}
-		dhistory={'x':[[],[],[],[]],'y':[[],[],[],[]],'z':[[],[],[],[]]}
-
-		loop_create('begin',output)
-
-		for vstored in  StoredVar.keys():
-
-			output.write(comment('building stored variable '+ vstored))
+		output.write('!'.ljust(60,'~')+'\n')
+		output.write('!'+'\n')
+		output.write('! '+op)
+		output.write('!'+'\n')
+		output.write('!'.ljust(60,'~')+'\n\n')	
 		
-			op  = StoredVar[vstored]['symb'].replace(" ", "")+'\n'
-			
-			output.write('!'.ljust(60,'~')+'\n')
-			output.write('!'+'\n')
-			output.write('! '+op)
-			output.write('!'+'\n')
-			output.write('!'.ljust(60,'~')+'\n\n')	
-			
-			# for vn in dirrhs:				
-
-			[Out,locvar,history]  = genSymbDer1(StoredVar[vstored]['symb'],output,locvar,order=Order,stencil=Stencil,indi='i',indj='j',indk='k',vname=vstored,history=history,dhistory=dhistory)			
-			[Out,locvar,history2] = genSymbDer2(Out,output,locvar,order=Order,stencil=Stencil,indi='i',indj='j',indk='k',vname=vstored,history=history2)
-
-			for v in ['x','y','z']:
-				if len(history[v]['symb']) != 0:
-					for s in history[v]['symb']:	
-						if(re.findall('_d'+v+'d'+v+'_',s) != []):
-							hlo_rhs = max(hlo_rhs, 2*int((Stencil-1)/2))
-
-			if(history2 != {'x':[[],[]],'y':[[],[]],'z':[[],[]]} ): hlo_rhs = max(hlo_rhs, int((Stencil-1)/2))
-
-			output.write(comment('Update stored variables '+StoredVar[vstored]['symb']))
-			
-			exp_stored = op_to_dNami(Out) 
+		# for vn in dirrhs:				
+		[Out,locvar,history]  = genSymbDer1(StoredVar[vstored]['symb'],output,locvar,order=Order,stencil=Stencil,indi='i',indj='j',indk='k',vname=vstored,history=history,dhistory=dhistory)			
+		[Out,locvar,history2] = genSymbDer2(Out,output,locvar,order=Order,stencil=Stencil,indi='i',indj='j',indk='k',vname=vstored,history=history2)
+		for v in ['x','y','z']:
+			if len(history[v]['symb']) != 0:
+				for s in history[v]['symb']:	
+					if(re.findall('_d'+v+'d'+v+'_',s) != []):
+						hlo_rhs = max(hlo_rhs, 2*int((Stencil-1)/2))
+		if(history2 != {'x':[[],[]],'y':[[],[]],'z':[[],[]]} ): hlo_rhs = max(hlo_rhs, int((Stencil-1)/2))
+		output.write(comment('Update stored variables '+StoredVar[vstored]['symb']))
 		
-			output.write(updateStored(vstored,exp_stored,update=update)+'\n\n')
+		exp_stored = op_to_dNami(Out) 
+	
+		output.write(updateStored(vstored,exp_stored,update=update)+'\n\n')
+	
+	tmpvar = ''
+	for var1 in locvar: 
+		for var2 in var1:
+			if not tmpvar: 
+				tmpvar = tmpvar + ' ' +var2
+			else:
+				tmpvar = tmpvar + ',' + var2
+				
+		tmpvar = tmpvar + ' &\n            '
+	
+	tmpvar = tmpvar.rstrip()
 		
-		tmpvar = ''
-		for var1 in locvar: 
-			for var2 in var1:
-				if not tmpvar: 
-					tmpvar = tmpvar + ' ' +var2
-				else:
-					tmpvar = tmpvar + ',' + var2
-					
-			tmpvar = tmpvar + ' &\n            '
-		
-		tmpvar = tmpvar.rstrip()
-			
-		if(tmpvar !=''): 
-			localvar.write('\n\n real(wp) :: ')
-			localvar.write(tmpvar[:-1])
-
-		rhs.hlo_rhs = hlo_rhs	
-		rhs.stencil = max(rhs.stencil,Stencil)
-		rhs.order   = max(rhs.order,Order)
-
-		loop_create('end',output)
+	if(tmpvar !=''): 
+		localvar.write('\n\n real(wp) :: ')
+		localvar.write(tmpvar[:-1])
+	rhs.hlo_rhs = hlo_rhs	
+	rhs.stencil = max(rhs.stencil,Stencil)
+	rhs.order   = max(rhs.order,Order)
+	loop_create('end',output)
 
 def compute_storedbc(StoredVar,Stencil,Order,output,localvar,dirBC,update=False,updateqbc=False,rhs=None):		
+		"""
+			compute_storedbc is a kernel-internal function. It produces the Fortran source code that loops over the domain boundaries to compute arithmetic expressions provided by the user for stored variables.  
 
+			Args:
+					StoredVar (dictionary): Dictionary containing stored expressions needed for RHS computations.
+					Stencil (int): stencil size for the spatial derivatives (for both first or second derivatives).
+					Order (int): order of the spatial derivatives (for both first or second derivatives).				
+					output (class '_io.TextIOWrapper'): file opened in write mode to receive the source code.		
+					localvar (string): string containing declaration statement of intermediate variables.
+					update (logical): whether to update or erase stored memory content (update=True is NRY). 
+					rhs (class): contains all RHS relevant information at runtime.	
+
+			"""
 		# if update and rhs != None:
 		hlo_rhs      = rhs.hlo_rhs
 		dim          = rhs.dim
@@ -927,7 +1042,21 @@ def compute_storedbc(StoredVar,Stencil,Order,output,localvar,dirBC,update=False,
 			            updateqbc= updateqbc)
 
 def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=False):		
+		"""
+			append_Rhs is a user-level function. It instructs the kernel to generate the Fortran sources codes that loops over the domain to compute all arithmetic expressions needed to build the RHS.
+			Each call to append_Rhs creates a new loop that contains instructions needed to compute equations contained in Flx.
 
+			Args:
+					Flx (dictionary): Dictionary containing expressions needed for RHS computations.
+					Stencil (int): Stencil size for the spatial derivatives (for both first or second derivatives).
+					Order (int): Order of the spatial derivatives (for both first or second derivatives).	
+					rhsname (dictionary): A dictionary used to name equations in comments of the Fortran codes. 	
+					vname (dictionary): A dictionary used to name local variables generated for the produced loop in the Fortran code.
+					update (logical): whether to update or erase the content of the RHS. 
+					rhs (class): contains all RHS relevant information at runtime.
+					stored (logical): trigger the generation of stored variables with the current choice of (Stencil,Order).	
+
+			"""
 		from genRhs import incPATH
 
 		dim = rhs.dim
@@ -1108,6 +1237,22 @@ def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fals
 		loop_create('end',output)
 
 def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}}],update=False,rhs=None,stored=False):
+		"""
+			genBC is a user-level function. It instructs the kernel to generate the Fortran sources codes that loops over the domain boundaries to compute all arithmetic expressions needed to build the RHS.
+			Each call to genBC creates a new loop that contains instructions needed to compute equations for the RHS at the domain boundaries.
+
+			Args:
+					Eqns (dictionary): Dictionary containing expressions needed for the RHS computations at the boundaries.
+					Stencil (int): Stencil size for the spatial derivatives (for both first or second derivatives).
+					Order (int): Order of the spatial derivatives (for both first or second derivatives).	
+					rhsname (dictionary): A dictionary used to name equations in comments of the Fortran codes. 	
+					vname (dictionary): A dictionary used to name local variables generated for the produced loop in the Fortran code.
+					setbc (dictionary): if setbc[0]==False, Eqns are used to form the RHS near the domain boundaries, where central schemes are not fitting. If setbc[0]==True, Eqns are used to specify physical boundary conditions to either 'q' or 'RHS'.
+					update (logical): whether to update or erase the content of the RHS. 
+					rhs (class): contains all RHS relevant information at runtime.
+					stored (logical): trigger the generation of stored variables with the current choice of (Stencil,Order) at the domain boundaries.	
+
+			"""
 
 		from genRhs import incPATH
 
@@ -2078,7 +2223,9 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 
 
 def genBC_calls(rhs):
-
+	"""
+		 genBC_calls is a kernel-internal function. It generates the Fortran codes that calls for boundary treatments.	
+		 """
 	from genRhs import incPATH
 	
 	dim = rhs.dim
@@ -2453,11 +2600,16 @@ def genBC_calls(rhs):
 	rhs.bc_info[1] = bcdone					
 
 def loop(beg,end):
+	"""
+		 loop is a kernel-internal function. It trigger the creation of loop begin or ending in produced Fortran codes.
+		 """
 	loop_create("begin",beg)
 	loop_create("end"  ,end)
 
 def loop_create(type,input,bc='all',edge='all',corner='all'):
-
+	"""
+		 loop_create is a kernel-internal function. It gives developers the opportunity to tailor loop statements in all the Fortran codes. 
+		 """
 	from genRhs import dim
 
 	if dim == 3:		
@@ -2487,7 +2639,9 @@ def loop_create(type,input,bc='all',edge='all',corner='all'):
 			if((bc != 'i') and (edge != 'i') and (corner != 'i')):input.write('   enddo'+'\n')		
 
 def globvar():
-
+	"""
+		 globvar is a kernel-internal function. It creates Fortran static array declarations in all Fortran codes.
+		 """
 	from genRhs import dim, incPATH
 
 	try:
@@ -2753,6 +2907,9 @@ def genSymbDer1(exp,output,locvar,
 				vname='symb',
 				history={'x':{'var':[],'symb':[]},'y':{'var':[],'symb':[]},'z':{'var':[],'symb':[]}},
 				dhistory={'x':[[],[],[],[]],'y':[[],[],[],[]],'z':[[],[],[],[]]}):
+		"""
+			 genSymbDer1 is a kernel-internal function that scan the given exp pseudo-code for first order derivative computation. It then trigger kernel-internal procedure to generate the associated Fortran codes.	
+			 """
 
 		from genRhs import dim
 
@@ -2973,7 +3130,9 @@ def genSymbDer2(exp,output,locvar,
 				indi='i',indj='j',indk='k',
 				vname='symb',
 				history={'x':[[],[]],'y':[[],[]],'z':[[],[]]}):
-
+		"""
+			 genSymbDer2 is a kernel-internal function that scan the given exp pseudo-code for second order derivative computation. It then trigger kernel-internal procedure to generate the associated Fortran codes.	
+			 """
 		from genRhs import dim
 
 		vname = vname.strip()
@@ -3057,7 +3216,9 @@ def genSymbDer1_bc(bcdic,exp,output,locvar,
 				   vname='symb',
 				   history={'x':{'var':[],'symb':[]},'y':{'var':[],'symb':[]},'z':{'var':[],'symb':[]}},
 				   dhistory={'x':[[],[],[],[]],'y':[[],[],[],[]],'z':[[],[],[],[]]}):
-
+		"""
+			 genSymbDer1_bc is a kernel-internal function that scan the given exp pseudo-code for first order derivative computation. It then trigger kernel-internal procedure to generate the associated Fortran codes at the domain boundaries.	
+			 """
 		from genRhs import dim
 
 		dirBc_v   = '    '
@@ -3466,7 +3627,9 @@ def genSymbDer2_bc(bcdic,exp,output,locvar,
 				   indi='i',indj='j',indk='k',
 				   vname='symb',
 				   history={'x':[[],[]],'y':[[],[]],'z':[[],[]]}):
-
+		"""
+			 genSymbDer2_bc is a kernel-internal function that scan the given exp pseudo-code for second order derivative computation. It then trigger kernel-internal procedure to generate the associated Fortran codes at the domain boundaries.	
+			 """
 		from genRhs import dim
 
 		dirBc   = '    '
@@ -3567,7 +3730,9 @@ def genSymbDer2_bc(bcdic,exp,output,locvar,
 		return [exp,locvar,history]
 
 def rhsinfo(rhs):
-
+	"""
+			 rhsinfo is a user-level function that needs to be called at the end of genRhs.py in order to write necessary rhs information to be used at runtime.
+			 """
 	genBC_calls(rhs)
 
 	wp     	     = rhs.wp     	     
@@ -3599,6 +3764,9 @@ def rhsinfo(rhs):
 	rhsinf.write('varbc = '+str(varbc)+'\n')
 
 def gendtype():
+	"""
+		 gendtype is a kernel-internal function called by append_Rhs to specify floating point number precision in the Fortran sources (through the wp parameter specify in genRhs.py by the user).
+		 """
 
 	from genRhs import incPATH,wp
 
@@ -3615,7 +3783,19 @@ def gendtype():
 
 
 def genFilter(stencil,order,nvar,dirBC='',indbc='',fltbeg=2,rhs=None):
+	"""
+		 genFilter is a user-lever function. It generates centred spatial filtering to enforce numerical stability of central finite-differences computations.
 
+		 Args:
+		 		 stencil (int): stencil size (needs to match an entry in fltDic)
+		 		 order (int): order of the filter (needs to match an entry in fltDic)
+		 		 nvar (int): the number of variable to filter (typically the size of varsolved)
+		 		 dirBC (string): kernel-internal option to manage boundary treatments.
+		 		 indbc (string): kernel-internal option to manage boundary treatments.
+		 		 fltbeg (int): kernel-internal option to manage boundary treatments.
+		 		 rhs (class): contains all RHS informations necessary at runtime.
+
+		 """
 	from genRhs import incPATH
 
 	dim     = rhs.dim
@@ -3833,7 +4013,15 @@ def genFilter(stencil,order,nvar,dirBC='',indbc='',fltbeg=2,rhs=None):
 		fltbc.close()	
 
 def genrk3(nvar,rhs=None,bc=[False,[]],rk3=None):
+	"""
+		 genrk3 is a user-level function. It generates explicit discretisation of the left-hand side using Runge-Kutta schemes.
 
+		 Args:
+		 			nvar (int): number of variable to be marched in time (typically the size of varsolved).
+		 			rhs (class): contains all RHS information necessary at runtime.
+		 			bc (list): kernel-internal option for boundary treatments.
+		 			rk3 (class '_io.TextIOWrapper'): kernel-internal option to manage produced Fortran source file.		 			
+		 """
 	from genRhs import incPATH
 
 	dim = rhs.dim
@@ -3870,7 +4058,15 @@ def genrk3(nvar,rhs=None,bc=[False,[]],rk3=None):
 		# genP2C(output,'primitive')
 
 def genrk3update(nvar,rhs=None,bc=[False,[]], updaterk3=None):
+	"""
+		 genrk3update is a user-level function. It generates explicit discretisation of the left-hand side using Runge-Kutta schemes.
 
+		 Args:
+		 			nvar (int): number of variable to be marched in time (typically the size of varsolved).
+		 			rhs (class): contains all RHS information necessary at runtime.
+		 			bc (list): kernel-internal option for boundary treatments.
+		 			updaterk3 (class '_io.TextIOWrapper'): kernel-internal option to manage produced Fortran source file.		 			
+		 """
 	from genRhs import incPATH
 	
 	dim     = rhs.dim
@@ -3902,6 +4098,9 @@ def genrk3update(nvar,rhs=None,bc=[False,[]], updaterk3=None):
 		if consvar != []: genP2C(updaterk3,'primitive',rhs=rhs,bc=bc)
 
 def genP2C(output,conserv,rhs=None,bc=[False,[]]):
+	"""
+		 genP2C is a kernel-internal function. It creates necessary operation to march in time conservative variables depending on the value of consvar.	
+		 """
 
 	dim       = rhs.dim
 	varsolved = rhs.varsolved
@@ -3965,7 +4164,9 @@ def genP2C(output,conserv,rhs=None,bc=[False,[]]):
 				output.write('q1(i,'+str(varname[nv])+') = q(i,'+str(varname[nv])+')'+'\n')
 
 def geninit(output,nvar,rhs=None):
-
+	"""
+		 geninit is a kernel-internal function. It set static Fortran array initial content to zero and ensure first-touch policy for shared-memory parallelisation. 	
+		 """
 	dim = rhs.dim
 
 	if dim == 3:
@@ -3990,7 +4191,9 @@ def geninit(output,nvar,rhs=None):
 			output.write('rhs(i,'+str(nv)+') = 0.0_wp'+'\n')
 
 def genbcsrc(nvar,rhs=None):
-	
+	"""
+		 genbcsrc is a kernel-internal function to manage source code generation for boundary conditions.	
+		 """
 	from genRhs import incPATH
 
 	if rhs == None:
@@ -4047,7 +4250,9 @@ def genbcsrc(nvar,rhs=None):
 			fh[dir].write(bcexp_p[:-1]+'\n\n')
 
 def create_bcsubroutine(fname,fctname,locvname,loopname,indrange,phy=None):
-	
+	"""
+		 create_bcsubroutine is a kernel-internal function to manage source code generation for boundary conditions.	
+		 """	
 	from genRhs import incPATH
 	
 	if phy:
@@ -4099,7 +4304,9 @@ def create_bcsubroutine(fname,fctname,locvname,loopname,indrange,phy=None):
 		fname.write("\n\n")		
 
 def create_bccalls(fname,fctname,fctcall):
-	
+	"""
+		 create_bccalls is a kernel-internal function to manage source code generation for boundary conditions.	
+		 """	
 	from genRhs import incPATH
 	
 	bcScheme_template = open(incPATH[:-13]+'template_bccall.for','r')
@@ -4130,7 +4337,9 @@ def gen_eqns_bc(Eqns,output,localvar,
 	            updateq = False,
 	            updatest= False,
 	            updateqbc=False):
-					
+					"""
+		 					gen_eqns_bc is a kernel-internal function to manage source code generation for boundary conditions.	
+		 					"""					
 					from genRhs import dim
 					
 					indiri = indi
