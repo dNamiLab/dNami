@@ -41,17 +41,7 @@ A variety of physical and biological processes may be described by systems of ba
 
 in a flexible and efficient manner, where $\textbf{q} \in \mathbb{R}^n$ is a vector of $n$ real-valued unknowns, $t$ is time, and $\textbf{RHS}(\textbf{q})$ is a generic function of $\textbf{q}$ which may include differential and algebraic operators.
 
-The ability of \texttt{dNami} to clearly separate the problem statement from its numerical implementation (often a major time sink in research laboratories) is rooted in the flexibility of the Python language so as to let users define their own system of balance laws in the most natural way, which is then interpreted in Fortran to build a computationally-efficient library of \autoref{eq:gov_eq} callable from Python. Users can then easily interact with their own system of balance laws, including at runtime, thereby making it possible to easily integrate solutions to \autoref{eq:gov_eq} with other tools, such as optimisation tools, and augment the physical analysis seamlessly from small to large scale calculations.
-
-Many physical systems obey or can be modelled by a system of balance laws taking the form of unsteady partial differential equations. Over the years, many research codes have been developed to solve such sets of equations, each requiring consequential development time despite many of them obeying a similar structure. \texttt{dNami} aims to provide a framework to rapidly set up and solve equations of the form 
-
-\begin{equation} \label{eq:gov_eq}
-	\frac{\partial\mathbf{q}}{\partial t} \textbf{q} = \textbf{RHS}(\mathbf{q})
-\end{equation}
-
-where $\textbf{q} \in \mathbb{R}^N$ with associated (time-dependant) boundary conditions on structured meshes while minimising problem-specific code development and still providing efficient and large-scale computing capabilities. 
-
-\texttt{dNami} is aimed at both researchers who wish to rapidly set up a computation without having to worry too much about the coding aspects and those who wish to work with a high-performance code that they can expand and/or tailor to specific applications. For the former group, a syntax to symbolically define the governing equations and boundary conditions, an automatic symbolic-to-Fortran translation, a set of pre-implemented numerical methods all resulting in a native Python pre-compiled module generated automatically, provide a way of setting up computations and interacting conveniently with data at runtime without having to delve into Fortran code. For the latter group, \texttt{dNami} provides control over many performance aspects and easy integration of custom Fortran routines into the code generation step. Both groups can run efficient computations that can be started on a workstation and scaled up to a cluster.  
+The ability of \texttt{dNami} to clearly separate the problem statement from its numerical implementation (often a major time sink in research laboratories) is rooted in the flexibility of the Python language so as to let users define their own system of balance laws in the most natural way, which is then interpreted in Fortran to build a computationally-efficient library of \autoref{eq:gov_eq} callable from Python. Users can then easily interact with their own system of balance laws, including at runtime, thereby making it possible to integrate solutions to \autoref{eq:gov_eq} with other tools and libraries (e.g.\ optimisation and stability tools) to fully explore the properties of the system seamlessly from small to large scale calculations.
 
 # State of the field
 
