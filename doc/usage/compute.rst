@@ -1,7 +1,7 @@
 Writing your own compute.py
 ***************************
 
-The functions called in the `compute.py` are documented in the API reference section. However, this section aims to elucidate the order and reasoning behinds the various steps when setting up a case, allocating memory and passing information from the Python layer to the Fortran layer. 
+The functions called in the ``compute.py`` are documented in the API reference section. However, this section aims to elucidate the order and reasoning behinds the various steps when setting up a case, allocating memory and passing information from the Python layer to the Fortran layer. 
 
 Each of the following code blocks assume that the ``dnami`` Python library has been imported as ``dn``.
 
@@ -101,13 +101,14 @@ The integer parameters (which are organised in a set pre-defined order) are used
 Computing stored variables
 ##########################
 
-[TO DO]
- We need to comment on that (espacially the difference of the last arg 1/0 for static/dynamic)
- 
+If the user chooses to create stored variables in the ``rhs.py`` then these quantities can be computed by invoking the appropriate function in the ``compute.py``. When specifying the stored variable in the ``rhs.py``, the users can choose whether the variable is 'static' or not. This distinction can be used to differentiate between fields that need to calculated every time step (e.g. if the pressure is calculated and stored then used to update the RHS) or at regular intervals during the computation (e.g. an output of the vorticity field). To compute the value, the following code block is used:  
+
 .. code-block:: python
 
    if 'qstored' in dtree['eqns']['qvec']['views'].keys():
-        dn.dnamiF.stored(intparam,fltparam,data,1)      
+        dn.dnamiF.stored(intparam,fltparam,data,m)      
+
+where :math:`\texttt{m=0}` will compute the static variables and :math:`\texttt{m=1}` will compute the non-static variables. In the case that one of the variables is used to update the RHS, then this call should be made at every sub-RK step before the call to the ``time_march()`` funtion. 
 
 Starting your own compute
 #########################
