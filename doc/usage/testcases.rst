@@ -42,7 +42,7 @@ For this test case, the scaling coefficients are set to :math:`\epsilon=6` and :
 	...
 	RHS = {'u' : ' epsilon * u * [ u ]_1x + mu * [ u_xx ]_1x ',}
 
-The case of two colliding solitons is simulated here for which there is an analytical solution on an infinite domain [CITATION]. The exact solution is given by:
+The case of two colliding solitons is simulated here for which there is an analytical solution on an infinite domain :cite:`taha1984analytical`. The exact solution is given by:
 
 .. _1d_kdv_sol:
 .. math::
@@ -302,6 +302,7 @@ The incompressible pressure solution is projected onto an isochore in thermodyna
       :align: center
 
       Animation of the x-direction velocity field at :math:`z=z_{max}/2`
+
 [TO BE COMPLETED : DETAIL MORE WHY IT IS DIFFICULT (JUST REF. TO HIGH ORDER WORKSHOP), HERE Ma=0.1, REFERENCE SOLUTION FROM SANDHAM]
 With dNami pseudo-code, different formulations of the governing equations can easily be implemented. The ``rhs.py`` file for the 3D TGV case contains two versions of the equations. :numref:`3d_tgv_formulation` shows a comparison between conservative and skew-symmetric formulations for various grid sizes and a comparison to a spectral method based reference of the enstrophy (i.e. the domain integral of the squared vorticity) over reduced time. All three finite-difference based computations presented in the graph use an 11 point, 10 :sup:`th` order scheme.  
 
@@ -310,5 +311,5 @@ With dNami pseudo-code, different formulations of the governing equations can ea
    :align: center
    :width: 70%
 
-   Comparison of the enstrophy vs time profile for the conservative formulation using 600 :sup:`3`points (blue), conservative formulation using 260 :sup:`3` points (red), skew symmetric formulation using 260 :sup:`3` points (green) and the 512 degree of freedom spectral solution (dashed black).
+   Comparison of the enstrophy vs time profile for the conservative formulation using 600 :sup:`3` points (blue), conservative formulation using 260 :sup:`3` points (red), skew symmetric formulation using 260 :sup:`3` points (green) and the 512 degree of freedom spectral solution (dashed black).
 

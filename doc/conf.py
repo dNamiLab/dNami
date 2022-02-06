@@ -33,7 +33,11 @@ extensions = [
   "sphinx.ext.autodoc",
   "sphinx.ext.coverage", 
   "sphinx.ext.napoleon",
+  "sphinxcontrib.bibtex",
 ]
+
+# Citations file
+bibtex_bibfiles = ['refs.bib']
 
 #"pydata_sphinx_theme"
 
