@@ -33,13 +33,14 @@ bibliography: paper.bib
 
 # Summary
 
-A large variety of physical and biological processes may be described by systems of balance laws, which, if given appropriate initial and boundary conditions, dictates the future state of the system. In physics for example, systems of balance laws invoking mass, momentum and energy have been incredibly successful at providing meaningful insights to the future state of the systems. Yet, experimenting numerically with such systems still requires much implementation time. \texttt{dNami} was created so that most of the research time is spent deriving and exploring the set of balance laws, initial and boundary conditions applicable to a given research topic and not their numerical implementation across the computational spectrum, from small- to large-scale high-performance computations. Thus, \texttt{dNami} is a computational framework to study problems of the form:
+A large variety of physical and biological processes may be described by systems of balance laws, which, if given appropriate initial and boundary conditions, dictate the future states of the system. In physics for instance, systems of balance laws invoking mass, momentum and energy have been incredibly successful at providing meaningful insights to the future states of realistic systems. Yet, experimenting numerically with such systems still requires much implementation time. \texttt{dNami} was created so that more research time is spent deriving and exploring systems of balance laws and their initial and boundary conditions for any particular research topic, and less time is spent on numerical implementation across the whole computational spectrum, from the small-scale exploratory work on a workstation to the final large-scale computations on national clusters. \texttt{dNami} (di:nɑ:mi:) is a computational framework to study problems of the form:
 
 \begin{equation} \label{eq:gov_eq}
 \frac{\partial\textbf{q}}{\partial t} = \textbf{RHS}(\textbf{q}) \,\, + \,\, \mbox{initial/boundary conditions},
 \end{equation}
+in a flexible and efficient manner, where $\textbf{q} \in \mathbb{R}^n$ is a vector of $n$ real-valued unknowns, $t$ is time, and $\textbf{RHS}(\textbf{q})$ is a generic function of $\textbf{q}$ which may include differential and algebraic operators. 
 
-in a flexible and efficient manner, where $\textbf{q} \in \mathbb{R}^n$ is a vector of $n$ real-valued unknowns, $t$ is time, and $\textbf{RHS}(\textbf{q})$ is a generic function of $\textbf{q}$ which may include differential and algebraic operators.
+The ability of \texttt{dNami} to clearly separate the problem statement from its numerical implementation (a major time sink in research laboratories) is rooted in the flexibility of the Python language, the main user layer, whilst code-performance aspects are dealt in the Fortran layer, which is still easy to interact with from the Python layer.
 
 Many physical systems obey or can be modelled by a system of balance laws taking the form of unsteady partial differential equations. Over the years, many research codes have been developed to solve such sets of equations, each requiring consequential development time despite many of them obeying a similar structure. \texttt{dNami} aims to provide a framework to rapidly set up and solve equations of the form 
 
