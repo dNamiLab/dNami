@@ -39,7 +39,7 @@ A large variety of physical and biological processes may be described by systems
 \frac{\partial\textbf{q}}{\partial t} = \textbf{RHS}(\textbf{q}) \,\, + \,\, \mbox{initial/boundary conditions},
 \end{equation}
 
-in a flexible and efficient manner, where $\textbf{q} \in \mathbb{R}^N$ is a vector of unknowns, $t$ is time, and $\textbf{RHS}(\textbf{q})$ is a generic function of $\textbf{q}$ which may include differential and algebraic operators.
+in a flexible and efficient manner, where $\textbf{q} \in \mathbb{R}^n$ is a vector of $n$ real-valued unknowns, $t$ is time, and $\textbf{RHS}(\textbf{q})$ is a generic function of $\textbf{q}$ which may include differential and algebraic operators.
 
 Many physical systems obey or can be modelled by a system of balance laws taking the form of unsteady partial differential equations. Over the years, many research codes have been developed to solve such sets of equations, each requiring consequential development time despite many of them obeying a similar structure. \texttt{dNami} aims to provide a framework to rapidly set up and solve equations of the form 
 
