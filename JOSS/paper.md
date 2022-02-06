@@ -36,7 +36,7 @@ bibliography: paper.bib
 Many physical systems obey or can be modelled by a system of balance laws taking the form of unsteady partial differential equations. Over the years, many research codes have been developed to solve such sets of equations, each requiring consequential development time despite many of them obeying a similar structure. \texttt{dNami} aims to provide a framework to rapidly set up and solve equations of the form 
 
 \begin{equation} \label{eq:gov_eq}
-	\frac{\partial}{\partial t} \textbf{q} = \textbf{RHS}(\textbf{q})
+	\frac{\partial\mathbf{q}}{\partial t} \textbf{q} = \textbf{RHS}(\mathbf{q})
 \end{equation}
 
 where $\textbf{q} \in \mathbb{R}^N$ with associated (time-dependant) boundary conditions on structured meshes while minimising problem-specific code development and still providing efficient and large-scale computing capabilities. 
