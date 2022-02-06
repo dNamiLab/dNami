@@ -86,7 +86,7 @@ Two-dimensional cases
 
 **1) Periodic vortex advection on a wavy mesh**
 
-This case solves the two-dimensional gasdynamics equations in curvilinear coordinates on a doubly-periodic domain using a wavy mesh for a strong conservative formulation. The files for this case can be found in ``exm/2d_wavy_mesh``. The governing equations in curvilinear formulation are:
+This case solves the two-dimensional gasdynamics equations in curvilinear coordinates on a doubly-periodic domain using a wavy mesh for a strong conservative formulation. This case appears widely in the literature (see e.g. :cite:`visbal2002use`). The files for this case can be found in ``exm/2d_wavy_mesh``. The governing equations in curvilinear formulation are:
 
 .. math::
 
@@ -196,7 +196,7 @@ The baseflow and vortex speed are specified via the Mach numbers :math:`M_i=0.5`
 
 **2) Non-reflective vortex advection throught the boundaries**
 
-This case solves the two-dimensional advection of a vortex through the boundaries of the domain using a non-reflective characteristic-based boundary condition implementation. The files for this test case can be found in the ``exm/2d_vortex_exit`` folder. The two-dimensional Euler equations in cartesian coordinates are:  
+This case solves the two-dimensional advection of a vortex through the boundaries of the domain using a non-reflective characteristic-based boundary condition implementation. It is commonly used to validate non-reflective boundary condition implementations (see e.g. :cite:`lodato2008three`). The files for this test case can be found in the ``exm/2d_vortex_exit`` folder. The two-dimensional Euler equations in cartesian coordinates are:  
 
 .. math::
 
@@ -307,8 +307,7 @@ The incompressible pressure solution is projected onto an isochore in thermodyna
 
       Animation of the x-direction velocity field at :math:`z=z_{max}/2`
 
-[TO BE COMPLETED : DETAIL MORE WHY IT IS DIFFICULT (JUST REF. TO HIGH ORDER WORKSHOP), HERE Ma=0.1, REFERENCE SOLUTION FROM SANDHAM]
-With dNami pseudo-code, different formulations of the governing equations can easily be implemented. The ``rhs.py`` file for the 3D TGV case contains two versions of the equations. :numref:`3d_tgv_formulation` shows a comparison between conservative and skew-symmetric formulations for various grid sizes and a comparison to a spectral method based reference of the enstrophy (i.e. the domain integral of the squared vorticity) over reduced time. All three finite-difference based computations presented in the graph use an 11 point, 10 :sup:`th` order scheme.  
+For validation purposes, the more common validation case with :math:`Ma=0.1` is run. The complexity of the case arises as the flow transition to turbulence. A lack of spatial resolution quickly leads to a degradation of the solution due to dissipation and dispersion. A more detailed discussion can be found here :cite:`debonis2013solutions` A commonly used measure envolves tracking the enstrophy (i.e. the domain integral of the squared vorticity) over time. This is strongly affected by numerical methods (e.g. the amount of filtering or the numerical dissipation introduced by the discretisation). With dNami pseudo-code, different formulations of the governing equations can easily be implemented. The ``rhs.py`` file for the 3D TGV case contains two versions of the equations. :numref:`3d_tgv_formulation` shows a comparison between conservative and skew-symmetric formulations for various grid sizes and a comparison to a spectral method based reference of the enstrophy  over reduced time. All three finite-difference based computations presented in the graph use an 11 point, 10 :sup:`th` order scheme.  
 
 .. _3d_tgv_formulation:
 .. figure:: img/3d_tgv_enstrophy.png
