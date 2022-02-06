@@ -2,6 +2,14 @@
 **dNami** [di:nɑ:mi:] is an open-source multi-language (Python, Fortran, C) framework for solving systems of balance laws using explicit numerical schemes on structured meshes. 
 dNami uses MPI and cache blocking techniques to speed up stencil-based operations.
 
+<p align="center">
+  <img src="./doc/usage/img/earth.gif" alt="earth.gif" />
+</p>
+
+<p align="center">
+	<i> Animation of the atmospheric and water-height disturbance due to the Tonga volcano explosion in January 2022 computed with dNami. </i>
+</p>
+
 ## Dependencies
 
 The following Python packages are needed:
