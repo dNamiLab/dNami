@@ -36,7 +36,7 @@ bibliography: paper.bib
 A large variety of physical and biological processes may be described by systems of balance laws, which, if given appropriate initial and boundary conditions, dictates the future state of the system. In physics for example, systems of balance laws invoking mass, momentum and energy have been incredibly successful at providing meaningful insights to the future state of the systems. Yet, experimenting numerically with such systems still requires much implementation time. \texttt{dNami} was created so that most of the research time is spent deriving the set of balance laws, initial and boundary conditions applicable to any given research topic rather than waste significant time in their implementation across the computational spectrum, from small- to large-scale high-performance computations. Thus, \texttt{dNami} is a computational framework to study problems of the form:
 
 \begin{equation} \label{eq:gov_eq}
-\frac{\partial\textbf{q}}{\partial t} = \textbf{RHS}(\texthbf{q}) \,\, + \,\, \mbox{initial/boundary conditions},
+\frac{\partial\textbf{q}}{\partial t} = \textbf{RHS}(\textbf{q}) \,\, + \,\, \mbox{initial/boundary conditions},
 \end{equation}
 where $\textbf{q} \in \mathbb{R}^N$ is a vector of unknowns, and $\textbf{RHS}(\textbf{q})$ is a generic function of $\textbf{q}$ which may include differential and algebraic operators. 
 
