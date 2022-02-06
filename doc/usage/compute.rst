@@ -1,7 +1,7 @@
 Writing your own compute.py
 ***************************
 
-The functions called in the `compute.py` are documented in the API reference section. However, this section aims to elucidate the order and reasoning behinds the various steps when setting up a case, allocating memory and passing information from the Python layer to the Fortran layer. 
+The functions called in the ``compute.py`` are documented in the API reference section. However, this section aims to elucidate the order and reasoning behinds the various steps when setting up a case, allocating memory and passing information from the Python layer to the Fortran layer. 
 
 Each of the following code blocks assume that the ``dnami`` Python library has been imported as ``dn``.
 

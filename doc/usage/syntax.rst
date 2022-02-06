@@ -67,7 +67,7 @@ To specify second order derivatives, two ways are currently possible. The user c
 Higher order derivative syntax
 ------------------------------
 
-To generate higher-order derivatives, the current stategy involves storing an intermediate derivative and then taking the derivative of that stored variable. This is illustrated in the 1D KdV equations in :doc:`/usage/quickstart` where the third order derivative of the field :math:`u` is computed by computing and storing the second order derivative and them taking the first derivative of that stored field when specifying the RHS: 
+To generate higher-order derivatives, the current stategy involves storing an intermediate derivative and then taking the derivative of that stored variable. This is illustrated in the 1D KdV equations in :doc:`/usage/quickstart` where the third order derivative of the field :math:`u` is computed by computing and storing the second order derivative and then taking the first derivative of that stored field when specifying the RHS: 
 
 .. code-block:: python
 
