@@ -50,7 +50,7 @@ The case of two colliding solitons is simulated here for which there is an analy
 	    u(x,t) = 2 \dfrac{\partial ^2 f  }{\partial x^2 }, \forall x \in \mathbb{R}, \forall t \in \mathbb{R},
 	\end{equation}
 
-where the function $f$ is defined by:
+where the function :math:`f` is defined by:
 
 .. math::
 	\begin{equation}
@@ -65,7 +65,7 @@ with:
 	    \eta_2 = k_2 x - k_2^3 t + \eta_2^{(0)}. \\
 	\end{align}
 
-Following [CITATION], the coefficients in the previous equations are taken to be:
+Following :cite:`taha1984analytical`, the coefficients in the previous equations are taken to be:
 
 .. math::
 	\begin{equation}
@@ -86,7 +86,7 @@ Two-dimensional cases
 
 **1) Periodic vortex advection on a wavy mesh**
 
-This case solves the two-dimensional gasdynamics equations in curvilinear coordinates on a doubly-periodic domain using a wavy mesh for a weakly conservative formulation. The files for this case can be found in ``exm/2d_wavy_mesh``. The governing equations in curvilinear formulation are:
+This case solves the two-dimensional gasdynamics equations in curvilinear coordinates on a doubly-periodic domain using a wavy mesh for a strong conservative formulation. The files for this case can be found in ``exm/2d_wavy_mesh``. The governing equations in curvilinear formulation are:
 
 .. math::
 
@@ -270,13 +270,17 @@ Three-dimensional cases
 -----------------------
 
 **1) Compressible Taylor-Green vortex case** 
-[CONSIDER PUTING THE EQUATIONS HERE]
+
+This case solves the compressible Navier-Stokes equations in 3D which are:
+
 .. math::
 
    \dfrac{\partial }{\partial t} \begin{pmatrix} \rho  \\ \rho u \\ \rho v  \\ \rho w \\ \rho e_t \end{pmatrix}  + \dfrac{\partial }{\partial x} \begin{pmatrix} \rho u   \\ \rho u^2 + p \\ \rho u v  \\ \rho u w  \\ u ( \rho e_t + p) \end{pmatrix}  + \dfrac{\partial }{\partial y} \begin{pmatrix} \rho v   \\ \rho u v \\ \rho v^2 + p   \\ \rho v w \\ v ( \rho e_t + p) \end{pmatrix}  + \dfrac{\partial }{\partial z} 
-   \begin{pmatrix} \rho w  \\ \rho u w \\ \rho vw + p   \\ \rho w^2 \\ w ( \rho e_t + p) \end{pmatrix}= 0
+   \begin{pmatrix} \rho w  \\ \rho u w \\ \rho vw + p   \\ \rho w^2 \\ w ( \rho e_t + p) \end{pmatrix}= \mathbf{D}
 
-This case solves the compressible Navier-Stokes equations in 3D. The particular problem solved here is the Taylor-Green vortex flow. The files for this case can be found in ``exm/3d_tgv``. The initial conditions for this flow are: 
+where :math:`\textbf{D}` is the matrix of diffusive terms. 
+
+The particular problem solved here is the Taylor-Green vortex flow. The files for this case can be found in ``exm/3d_tgv``. The initial conditions for this flow are: 
 
 
 .. math::
