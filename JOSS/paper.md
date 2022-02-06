@@ -33,6 +33,8 @@ bibliography: paper.bib
 
 # Summary
 
+A large variety of physical and biological processes may be described by systems of balance laws, which, if given appropriate initial and boundary conditions, dictates the future state of the system. In physics for example, system of balance laws invoking mass, momentum and energy have been incredibly successful at providing meaningful insights to the future state of the system. Yet, experimenting numerically with such systems still requires much implementation time. \texttt{dNami} has been created so that research time is spent deriving the set of balance laws, initial and boundary conditions applicable to the research topic rather than their implementation across the computational spectrum, from small- to large-scale computations. Thus, \texttt{dNami} is a computational framework to study equations of the form:
+
 Many physical systems obey or can be modelled by a system of balance laws taking the form of unsteady partial differential equations. Over the years, many research codes have been developed to solve such sets of equations, each requiring consequential development time despite many of them obeying a similar structure. \texttt{dNami} aims to provide a framework to rapidly set up and solve equations of the form 
 
 \begin{equation} \label{eq:gov_eq}
