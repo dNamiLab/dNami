@@ -5,7 +5,8 @@ The functions called in the `compute.py` are documented in the API reference sec
 
 Each of the following code blocks assume that the ``dnami`` Python library has been imported as ``dn``.
 
-**Creating the tree** 
+Creating the tree
+#################
 
 The first ``dnami`` library function called in the `compute.py` is: 
 
@@ -33,7 +34,8 @@ Note that this is the global number of points, not the processor specific number
         dtree['mpi']['split']['nxpr'] = nxpr
 
 
-**Initialising the Message Passing Interface**
+Initialising the Message Passing Interface
+##########################################
 
 If the total number of processors is not one, then the next step involves setting up the Message Passing Interface via: 
 
@@ -50,7 +52,8 @@ With the information supplied in the previous section, the appropriate number of
 Note that ``dtree['mpi']['dMpi']`` is a class.
 
 
-**Allocating memory**
+Allocating memory
+#################
 
 In this step, the memory used by each subprocess for the run parameters and the data (i.e. the solved and stored variables) is allocated:  
 
@@ -75,7 +78,8 @@ The user can then set the initial velocity field to zero:
 To be clear, this operation does not create a new numpy array, it zeros the portion of the already-allocated memory that corresponds to the velocity variable. 
 
 
-**Passing information to the Fortran layer**
+Passing information to the Fortran layer
+########################################
 
 A set of aliases for the three aforementioned arrays are created:
 
@@ -94,7 +98,8 @@ These memory references are then passed to the Fortran layer when calling the fu
 
 The integer parameters (which are organised in a set pre-defined order) are used to read and modify the correct portion of the memory corresponding to ``data``. 
 
-**Computing stored variables**
+Computing stored variables
+##########################
 
 [TO DO]
  We need to comment on that (espacially the difference of the last arg 1/0 for static/dynamic)
@@ -104,7 +109,8 @@ The integer parameters (which are organised in a set pre-defined order) are used
    if 'qstored' in dtree['eqns']['qvec']['views'].keys():
         dn.dnamiF.stored(intparam,fltparam,data,1)      
 
-**Starting your own compute**
+Starting your own compute
+#########################
 
 To create your own compute, we suggest that you start from an existing example that is closest to your desired case and tailor it to your needs. 
 

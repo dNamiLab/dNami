@@ -42,7 +42,7 @@ For this test case, the scaling coefficients are set to :math:`\epsilon=6` and :
 	...
 	RHS = {'u' : ' epsilon * u * [ u ]_1x + mu * [ u_xx ]_1x ',}
 
-The case of two colliding solitons is simulated here for which there is an analytical solution on an infinite domain [CITATION]. The exact solution is given by:
+The case of two colliding solitons is simulated here for which there is an analytical solution on an infinite domain :cite:`taha1984analytical`. The exact solution is given by:
 
 .. _1d_kdv_sol:
 .. math::
@@ -50,7 +50,7 @@ The case of two colliding solitons is simulated here for which there is an analy
 	    u(x,t) = 2 \dfrac{\partial ^2 f  }{\partial x^2 }, \forall x \in \mathbb{R}, \forall t \in \mathbb{R},
 	\end{equation}
 
-where the function $f$ is defined by:
+where the function :math:`f` is defined by:
 
 .. math::
 	\begin{equation}
@@ -65,7 +65,7 @@ with:
 	    \eta_2 = k_2 x - k_2^3 t + \eta_2^{(0)}. \\
 	\end{align}
 
-Following [CITATION], the coefficients in the previous equations are taken to be:
+Following :cite:`taha1984analytical`, the coefficients in the previous equations are taken to be:
 
 .. math::
 	\begin{equation}
@@ -86,7 +86,7 @@ Two-dimensional cases
 
 **1) Periodic vortex advection on a wavy mesh**
 
-This case solves the two-dimensional gasdynamics equations in curvilinear coordinates on a doubly-periodic domain using a wavy mesh for a weakly conservative formulation. The files for this case can be found in ``exm/2d_wavy_mesh``. The governing equations in curvilinear formulation are:
+This case solves the two-dimensional gasdynamics equations in curvilinear coordinates on a doubly-periodic domain using a wavy mesh for a strong conservative formulation. The files for this case can be found in ``exm/2d_wavy_mesh``. The governing equations in curvilinear formulation are:
 
 .. math::
 
@@ -270,13 +270,17 @@ Three-dimensional cases
 -----------------------
 
 **1) Compressible Taylor-Green vortex case** 
-[CONSIDER PUTING THE EQUATIONS HERE]
+
+This case solves the compressible Navier-Stokes equations in 3D which are:
+
 .. math::
 
    \dfrac{\partial }{\partial t} \begin{pmatrix} \rho  \\ \rho u \\ \rho v  \\ \rho w \\ \rho e_t \end{pmatrix}  + \dfrac{\partial }{\partial x} \begin{pmatrix} \rho u   \\ \rho u^2 + p \\ \rho u v  \\ \rho u w  \\ u ( \rho e_t + p) \end{pmatrix}  + \dfrac{\partial }{\partial y} \begin{pmatrix} \rho v   \\ \rho u v \\ \rho v^2 + p   \\ \rho v w \\ v ( \rho e_t + p) \end{pmatrix}  + \dfrac{\partial }{\partial z} 
-   \begin{pmatrix} \rho w  \\ \rho u w \\ \rho vw + p   \\ \rho w^2 \\ w ( \rho e_t + p) \end{pmatrix}= 0
+   \begin{pmatrix} \rho w  \\ \rho u w \\ \rho vw + p   \\ \rho w^2 \\ w ( \rho e_t + p) \end{pmatrix}= \mathbf{D}
 
-This case solves the compressible Navier-Stokes equations in 3D. The particular problem solved here is the Taylor-Green vortex flow. The files for this case can be found in ``exm/3d_tgv``. The initial conditions for this flow are: 
+where :math:`\textbf{D}` is the matrix of diffusive terms. 
+
+The particular problem solved here is the Taylor-Green vortex flow. The files for this case can be found in ``exm/3d_tgv``. The initial conditions for this flow are: 
 
 
 .. math::
@@ -302,6 +306,7 @@ The incompressible pressure solution is projected onto an isochore in thermodyna
       :align: center
 
       Animation of the x-direction velocity field at :math:`z=z_{max}/2`
+
 [TO BE COMPLETED : DETAIL MORE WHY IT IS DIFFICULT (JUST REF. TO HIGH ORDER WORKSHOP), HERE Ma=0.1, REFERENCE SOLUTION FROM SANDHAM]
 With dNami pseudo-code, different formulations of the governing equations can easily be implemented. The ``rhs.py`` file for the 3D TGV case contains two versions of the equations. :numref:`3d_tgv_formulation` shows a comparison between conservative and skew-symmetric formulations for various grid sizes and a comparison to a spectral method based reference of the enstrophy (i.e. the domain integral of the squared vorticity) over reduced time. All three finite-difference based computations presented in the graph use an 11 point, 10 :sup:`th` order scheme.  
 
@@ -310,5 +315,5 @@ With dNami pseudo-code, different formulations of the governing equations can ea
    :align: center
    :width: 70%
 
-   Comparison of the enstrophy vs time profile for the conservative formulation using 600 :sup:`3`points (blue), conservative formulation using 260 :sup:`3` points (red), skew symmetric formulation using 260 :sup:`3` points (green) and the 512 degree of freedom spectral solution (dashed black).
+   Comparison of the enstrophy vs time profile for the conservative formulation using 600 :sup:`3` points (blue), conservative formulation using 260 :sup:`3` points (red), skew symmetric formulation using 260 :sup:`3` points (green) and the 512 degree of freedom spectral solution (dashed black).
 

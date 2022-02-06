@@ -230,3 +230,11 @@ The example should run for 4000 timesteps and then exit. Optionally, the user ca
 
    x-t diagram of the entropy perturbation leaving the computation domain. The field shown is that of density fluctuations (i.e. :math:`(\rho -  \rho_0)` ).  The dashed blue lines indicate the flow speed. 
 
+
+Advanced information
+--------------------
+
+To get more in-depth information about the ``genRhs.py`` and the ``compute.py``, check out for the corresponding sections:
+
+* :doc:`../usage/genRhs`
+* :doc:`../usage/compute`
