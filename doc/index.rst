@@ -15,7 +15,7 @@ Welcome to dNami's documentation!
       :width: 70%
       :align: center
 
-      Animation of the atmospheric and water-height disturbance due to the Tonga volcano explosion in January 2022 
+      Animation of the atmospheric and water-height disturbance due to the Tonga volcano explosion in January 2022 computed with dNami. 
 
 To get started with dNami, please check out the Quickstart guide to get set up with dependencies and run your first dNami case. 
 

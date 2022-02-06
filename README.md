@@ -6,6 +6,8 @@ dNami uses MPI and cache blocking techniques to speed up stencil-based operation
   <img src="./doc/usage/img/earth.gif" alt="earth.gif" />
 </p>
 
+*Animation of the atmospheric and water-height disturbance due to the Tonga volcano explosion in January 2022 computed with dNami.*
+
 
 ## Dependencies
 
