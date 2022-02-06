@@ -56,7 +56,7 @@ directory and also update *doc/index.rst* (if necessary).
 
 ### Contributing 
 
-We look forward to seeing dNami used to solve problems from many different domain. If you would like to contribute an example, please prepare an `exm/*`-like folder with the equations, numerics and a compute.py as well as a short write-up of the problem and dNami results in the `Test cases and validation` section of the documentation. Then submit a pull request so that we can review it for acceptance.   
+We look forward to seeing dNami used to solve problems from many different fields. If you would like to contribute an example, please prepare an `exm/*`-like folder with the equations, numerics and a compute.py as well as a short write-up of the problem and dNami results in the `Test cases and validation` section of the documentation. Then submit a pull request so that we can review it for acceptance. Thank you for helping us grow the example section.  
 
 ### Issues and support  
 
