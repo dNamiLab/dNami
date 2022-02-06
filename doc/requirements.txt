@@ -4,3 +4,4 @@ sphinx_copybutton
 git+https://github.com/pandas-dev/pydata-sphinx-theme
 sphinxext-rediraffe
 sphinx-autobuild
+sphinxcontrib-bibtex
