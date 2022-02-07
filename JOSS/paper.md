@@ -72,6 +72,6 @@ Python is used at runtime to set up the run parameters and initial conditions. M
 
 # Acknowledgements
 
-?
+We are grateful for the help and support provided by the Scientific Computing and Data Analysis section of Research Support Division at OIST.
 
 # References
