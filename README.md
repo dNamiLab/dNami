@@ -34,7 +34,8 @@ Check out the [documentation](https://dnami.readthedocs.io/en/latest/) to get a 
 
 A Python script in the `exm/` folder called `test_all.py` will run through the list of available cases to test them. For each case, the script will copy the files to the appropriate location to generate the code, run the case and output values for a comparison with the reference values on the repository. Each case should output a `PASS` status once it is complete. If this is not the case, the `log.test` file generated during the testing process should clarify the reasons for the failure (e.g. missing dependence, lack of resources, ...). The testing script currently assumes that the user is testing the code on a machine with at least 4 available cores.  
 
-## How-To generate the documentation
+## Generating the documentation locally  
+
 The repository contains a documentation inside the **doc** directory.
 In order to generate the html documentation the following Python packages are needed:
 1. Sphinx
@@ -54,17 +55,18 @@ make html
 ```
 After building the documentation the *_build/html* directory should contain the index.html startpage.
 
-### Extending the documentation
-
-If you want to add additional content to the documentation, add/edit *.rst* files in the *doc/usage*
-directory and also update *doc/index.rst* (if necessary). 
 
 ## Community guidelines 
 -----------------------
 
-### Contributing 
+### Contributing examples and test cases 
 
 We look forward to seeing dNami used to solve problems from many different fields. If you would like to contribute an example, please prepare an `exm/*`-like folder with the equations, numerics and a compute.py as well as a short write-up of the problem and dNami results in the `Test cases and validation` section of the documentation. Then submit a pull request so that we can review it for acceptance. Thank you for helping us grow the example section.  
+
+### Extending the documentation
+
+If you want to add additional content to the documentation, add/edit *.rst* files in the *doc/usage*
+directory and also update *doc/index.rst* (if necessary). 
 
 ### Issues and support  
 
