@@ -69,7 +69,7 @@ Python is used at runtime to set up the run parameters and initial conditions. M
 
 To illustrate the ability of \texttt{dNami} to solve new systems of balance laws on supercomputers in record times, we used the eruption of the Tonga volcano on 12 January 2022, which made tsunami warnings fail in Japan [@tonga]. A new system of balance laws to couple gravity-driven waves (shallow-water equations) in the ocean and the primary Lamb wave (compressible Euler equations) in the atmosphere following the eruption was created and computed on a global scale using available bathymetry data. The arrival times of the meteotsunami waves are found to be in good agreement with tide gages around the globe. A snapshot of the resulting animation is shown in \autoref{fig:tonga}. Starting from scratch the whole process was completed in a day owing to the flexibility with which \texttt{dNami} could handle the new set of equations, the choice of spherical coordinates, and importing geotiff files for the bathymetry data.
 
-![Example computation of a global simulation of the atmopsheric and water-height disturbance due to the January 2022 Tonga volcano explosion. Time is shown in UT starting on January 15th. \label{fig:tonga}](tonga.png){ width=80% }
+![Example computation of a global simulation of the atmopsheric and water-height disturbance due to the January 2022 Tonga volcano explosion. Time is shown in UT starting on January 15th. \label{fig:tonga}](tonga.png){ width=100% }
 
 # Acknowledgements
 
