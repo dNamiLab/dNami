@@ -97,23 +97,98 @@ In this example, an equation is provided to compute ``'e'`` from ``varname`` and
 [
 
 
-
-
 **Compulsory steps**
+
+The first lines in any ``genRhs.py`` will involve importing the necessary code-construction functions from the ``genKer.py``. Then, the working precision of the computation is specified via the ``wp`` variable.  
 
 .. code-block:: python
 
-			from genKer import rhsinfo, genrk3, genrk3update, genFilter, genBC, append_Rhs, genbcsrc
-			import os 
-			
-			wp = 'float64'
+        from genKer import rhsinfo, genrk3, genrk3update, genFilter, genBC, append_Rhs, genbcsrc
+        import os 
+        
+        wp = 'float64'
+
+dNami offer the flexibility of using a combination of different numerical schemes as well as a filter with each relying on a stencil size that need not be identical. :numref:`hlo_glob`. illustrates the stencils for a filter that uses 11 points and a finite-difference scheme that uses 5 points. 
+
+.. _hlo_glob: 
+.. figure:: img/halo_glob.png
+   :width: 70%
+   :align: center
+
+   Two different stencil sizes 
+
+To construct the loops over the domain, the ``genRhs.py`` requires the user to specify the overall largest number of halo points required to satisfy all the stencil sizes used in the run. In the example of :numref:`hlo_glob`, this would be 5. The ``hlo_glob`` variable is used to give this information to the code-generation process:
+
+.. code-block:: python
+
+        hlo_glob = 5
+
+Next, the user must initialise the ``rhs`` class which is used to store and transfer information from one step to the next: 
+
+.. code-block:: python
+
+    from genKer import rhs_info    
+    rhs = rhs_info()
+
+Then, the Runge-Kutta time-marching steps are generated with calls to the following functions:
+
+.. code-block:: python
+
+    genrk3(len(varsolved)      ,rhs=rhs) 
+    genrk3update(len(varsolved),rhs=rhs)
+
+Finally, at least one equation must be specified to set the RHS used to march the variables in time, for example:
+
+.. code-block:: python
+
+	append_Rhs(divF, 5, 4, rhsname,vnamesrc_divF,update=False,rhs=rhs)
+
+which generates the discretised version of ``divF`` using a 5 point, 4 :sup:`th` order centered finite difference scheme with ``rhsname`` being used to generate code comments and ``vnamesrc_divF`` being used to generate intermediate variable names. The ``update=False`` arguments guarantees that the components of ``divF`` are being used to set the RHS rather than be added to existing terms. 
+
+This ends the list of compulsory steps when creating a ``genRhs.py``. 
+
+.. warning::
+
+    When no boundary conditions are specified in a given direction, the default behaviour assumes that that direction is **periodic**. 
+        
 
 
 **Optional steps**
 
+The user has access to a number of additional automatic code-generation steps detailed here.  
+
 *Adding explicit filtering*
 
+To add explicit filtering to the computation, the user can call the ``genFilter`` function. Currently, the function relies on pre-specified coefficients for a given stencil/order (which can be found at the start of the ``genKer.py`` file). For example, the following code block generates code to apply a standard 11 point, 10 :sup:`th` order filter to each of the directions (between 1 and 3 depending on ``dim``): 
+
+.. code-block:: python
+
+        # Generate Filters (if required):      
+    genFilter(11,10, len(varsolved),rhs=rhs)
+
+The user can specify the filter amplitude in the ``compute.py``. 
+
 *Adding boundary conditions*
+
+When non-periodic boundary conditions are enforced, the user must do two things: choose what happens between the core and the boundaries and specify the boundary conditions. These two sets of points are illustrated in :numref:`non_core_and_edge`. 
+
+.. _non_core_and_edge: 
+.. figure:: img/bc.png
+   :width: 70%
+   :align: center
+
+   The two sets of points that must be managed seperately from the core of the domain: the physical boundary points (orange) and the points that do not have enough neighbours for the full stencil width (red)
+
+.. code-block:: python
+
+        # Progressive stencil/order adjustement from domain to boundary 
+            genBC(Save_eqns['divF']  ,3,2, rhsname , vnamesrc_divF, update=False,rhs=rhs)
+
+        # Boundary conditions on d(q)/dt 
+            #i1
+            genBC(src_phybc_wave_i1,3,2,rhsname , vnamesrc_divF, setbc=[True,{'char':{'i1':['rhs']}}]  , update=False,rhs=rhs)
+            #imax
+            genBC(src_phybc_wave_imax,3,2,rhsname ,vnamesrc_divF, setbc=[True,{'char':{'imax':['rhs']}}]  , update=False,rhs=rhs)
 
 Advanced use: control of the Fortran loop distribution
 ######################################################
@@ -151,7 +226,7 @@ In addition, the dictionaries containing the term nomenclature for the Fortran c
                          'u'    : 'FluMx',
                          'et'   : 'FluEx'}
 
-which are used to choose variable names and generate comments in the Fortran code blocks below. Simply passing the ``divF`` dictionary to the ``append_Rhs`` function: 
+which are used to set variable names and generate comments in the Fortran code blocks below. Simply passing the ``divF`` dictionary to the ``append_Rhs`` function: 
 
 .. code-block:: python
 
