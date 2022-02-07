@@ -15,7 +15,7 @@ GNU **gfortran** compiler).
 
    .. code-block:: bash
 
-    git@github.com:dNamiLab/dNami.git
+    git clone git@github.com:dNamiLab/dNami.git
 
 #. Install the dependencies
 
