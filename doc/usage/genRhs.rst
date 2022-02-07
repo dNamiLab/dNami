@@ -143,6 +143,8 @@ Finally, at least one equation must be specified to set the RHS used to march th
 
 	append_Rhs(divF, 3, 2, rhsname,vnamesrc_divF,update=False,rhs=rhs)
 
+which generates the discretised version of ``divF`` using a 3 point, 2 :sup:`nd` order centered finite difference scheme with ``rhsname`` being used to generate code comments and ``vnamesrc_divF`` being used to generate intermediate variable names. The ``update=False`` arguments guarantees that the components of ``divF`` are being used to set the RHS rather than be added to existing terms. 
+
 This ends the list of compulsory steps when creating a ``genRhs.py``. The user then has access to a number of additional steps detailed below.  
 
 .. warning::
