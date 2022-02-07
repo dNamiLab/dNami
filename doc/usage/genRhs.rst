@@ -118,99 +118,335 @@ In this example, an equation is provided to compute ``'e'`` from ``varname`` and
 Advanced use: control of the Fortran loop distribution
 ######################################################
 
+For optimisation purposes, the user can choose to split the 'do-loops' generated from the pseudo-code in a number of different ways. Here we present a simple way to split the 'do-loops' over the components of the RHS (other alternatives include splitting by derivative direction, splitting by groups of terms, etc) which can lead to more efficient memory access for certain configurations. 
 
-[TO DO Needs to comment on the following successive steps]
-
-.. code-block:: python
-
-	varloc       = {'e': '(et-0.5_wp*(u*u+v*v))'}
-	varstored    = {'p'  : {'symb' : 'gamma_m1*rho*(e)', 'ind' : 1, 'static' : False}}
-	SRC = {
-   			'rho' :  ' [ rho*u          ]_1x ',
-   			'u'   :  ' [ rho*u*u  + p   ]_1x ',
-   			'v'   :  ' [ rho*u*v        ]_1x ',
-   			'et'  :  ' [ (rho*et + p)*u ]_1x '
-   			}
-
-with 
+Let us assume that the user has created the following ``rhs.py`` for their one-dimensional case:
 
 .. code-block:: python
 
-	append_Rhs(SRC, 3, 2, rhsname,vnamesrc_divFconv,update=False,rhs=rhs)
+        # - Local variables
+        varloc = { 'e' : ' (et - 0.5_wp*u*u) ',  #internal energy
+                    'p' : 'delta*rho* ( e )',    #pressure equation of state
+                        }
 
-producing the following Fortran code (we could detail vnamesrc_divFconv and rhsname)
+        # - Divergence of the flux function 
+        divF    = {  
+                'rho' : ' [ rho*u          ]_1x ', 
+                'u'   : ' [ rho*u*u + p    ]_1x ', 
+                'et'  : ' [ u*(rho*et + p) ]_1x ', 
+                }
+
+In addition, the dictionaries containing the term nomenclature for the Fortran code are:
+
+.. code-block:: python
+
+        # .. for comments in the Fortran file
+        rhsname = {'rho'  : 'd(rho)/dt',
+                   'u'    : 'd(rho u)/dt',
+                   'et'   : 'd(rho et)/dt',
+                   }
+
+        # .. name tags to use for intermediate variables created by the constructor
+        vnamesrc_divF = {'rho'  : 'FluRx',
+                         'u'    : 'FluMx',
+                         'et'   : 'FluEx'}
+
+which are used to choose variable names and generate comments in the Fortran code blocks below. Simply passing the ``divF`` dictionary to the ``append_Rhs`` function: 
+
+.. code-block:: python
+
+	append_Rhs(divF, 3, 2, rhsname,vnamesrc_divF,update=False,rhs=rhs)
+
+will produce the following Fortran code:
 
 .. code-block:: fortran
 
 
-	!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	!
-	! [rho*u*u+p]_1x
-	!
-	!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	
-	d1_FluXconv_dx_0_im1jk = q(i-1,j,indvars(1))*q(i-1,j,indvars(2))*q(i-1,j,indvars(2))+qst(i-1,j,indvarsst(1))
-	
-	d1_FluXconv_dx_0_ip1jk = q(i+1,j,indvars(1))*q(i+1,j,indvars(2))*q(i+1,j,indvars(2))+qst(i+1,j,indvarsst(1))
-	
-	d1_FluXconv_dx_0_ijk = -&
-	          0.5_wp*d1_FluXconv_dx_0_im1jk+&
-	          0.5_wp*d1_FluXconv_dx_0_ip1jk
-	
-	d1_FluXconv_dx_0_ijk = d1_FluXconv_dx_0_ijk*param_float(1)
-	
-	
-	
-	!***********************************************************
-	!                                                           
-	! Update RHS terms for d(rho u)/dt *************************
-	!                                                           
-	!***********************************************************
-	
-	
-	rhs(i,j,indvars(2)) =   -  ( d1_FluXconv_dx_0_ijk ) 
+        !***********************************************************
+        !                                                           
+        ! Start building RHS with source terms (1D) ****************
+        !                                                           
+        !***********************************************************
 
-and 
+
+         
+              do i=idloop(1),idloop(2) 
+
+
+        !***********************************************************
+        !                                                           
+        ! building source terms in RHS for d(rho)/dt ***************
+        !                                                           
+        !***********************************************************
+
+
+        !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        !
+        ! [rho*u]_1x
+        !
+        !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        d1_FluRx_dx_0_im1jk = q(i-1,indvars(1))*q(i-1,indvars(2))
+
+        d1_FluRx_dx_0_ip1jk = q(i+1,indvars(1))*q(i+1,indvars(2))
+
+        d1_FluRx_dx_0_ijk = -&
+                  0.5_wp*d1_FluRx_dx_0_im1jk+&
+                  0.5_wp*d1_FluRx_dx_0_ip1jk
+
+        d1_FluRx_dx_0_ijk = d1_FluRx_dx_0_ijk*param_float(1)
+
+
+
+        !***********************************************************
+        !                                                           
+        ! Update RHS terms for d(rho)/dt ***************************
+        !                                                           
+        !***********************************************************
+
+
+        rhs(i,indvars(1)) =   -  ( d1_FluRx_dx_0_ijk ) 
+
+
+
+        !***********************************************************
+        !                                                           
+        ! building source terms in RHS for d(rho u)/dt *************
+        !                                                           
+        !***********************************************************
+
+
+        !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        !
+        ! [rho*u*u+p]_1x
+        !
+        !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        d1_FluMx_dx_0_im1jk = q(i-1,indvars(1))*q(i-1,indvars(2))*q(i-1,indvars(2))+param_float(1 + 5)*q(i-1,indvars(1))*((q(i-1,indvars(3))-&
+                            0.5_wp*q(i-1,indvars(2))*q(i-1,indvars(2))))
+
+        d1_FluMx_dx_0_ip1jk = q(i+1,indvars(1))*q(i+1,indvars(2))*q(i+1,indvars(2))+param_float(1 + 5)*q(i+1,indvars(1))*((q(i+1,indvars(3))-&
+                            0.5_wp*q(i+1,indvars(2))*q(i+1,indvars(2))))
+
+        d1_FluMx_dx_0_ijk = -&
+                  0.5_wp*d1_FluMx_dx_0_im1jk+&
+                  0.5_wp*d1_FluMx_dx_0_ip1jk
+
+        d1_FluMx_dx_0_ijk = d1_FluMx_dx_0_ijk*param_float(1)
+
+
+
+        !***********************************************************
+        !                                                           
+        ! Update RHS terms for d(rho u)/dt *************************
+        !                                                           
+        !***********************************************************
+
+
+        rhs(i,indvars(2)) =   -  ( d1_FluMx_dx_0_ijk ) 
+
+
+
+        !***********************************************************
+        !                                                           
+        ! building source terms in RHS for d(rho et)/dt ************
+        !                                                           
+        !***********************************************************
+
+
+        !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        !
+        ! [u*(rho*et+p)]_1x
+        !
+        !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        d1_FluEx_dx_0_im1jk = q(i-1,indvars(2))*(q(i-1,indvars(1))*q(i-1,indvars(3))+&
+                            param_float(1 + 5)*q(i-1,indvars(1))*((q(i-1,indvars(3))-&
+                            0.5_wp*q(i-1,indvars(2))*q(i-1,indvars(2)))))
+
+        d1_FluEx_dx_0_ip1jk = q(i+1,indvars(2))*(q(i+1,indvars(1))*q(i+1,indvars(3))+&
+                            param_float(1 + 5)*q(i+1,indvars(1))*((q(i+1,indvars(3))-&
+                            0.5_wp*q(i+1,indvars(2))*q(i+1,indvars(2)))))
+
+        d1_FluEx_dx_0_ijk = -&
+                  0.5_wp*d1_FluEx_dx_0_im1jk+&
+                  0.5_wp*d1_FluEx_dx_0_ip1jk
+
+        d1_FluEx_dx_0_ijk = d1_FluEx_dx_0_ijk*param_float(1)
+
+
+
+        !***********************************************************
+        !                                                           
+        ! Update RHS terms for d(rho et)/dt ************************
+        !                                                           
+        !***********************************************************
+
+
+        rhs(i,indvars(3)) =   -  ( d1_FluEx_dx_0_ijk ) 
+
+           enddo
+
+This is a single 'do-loop' over the points in the x-direction which updates all three components of the RHS. However, a simple modification of the call the ``append_Rhs()`` function allows the user to split the Fortran code into three seperate x-direction loops. Three calls are made to the ``append_Rhs()`` function with a dictionnary of a single components of the RHS being passed as the input each time: 
+
+.. code-block:: python
+
+    append_Rhs({'rho': divF['rho']}, 3,2, {'rho': rhsname['rho']}, {'rho':vnamesrc_divF['rho']}, update=False,rhs=rhs,stored=True)
+    append_Rhs({'u'  : divF['u']  }, 3,2, {'u'  : rhsname['u']  }, {'u'  :vnamesrc_divF['u']  }, update=False,rhs=rhs,stored=False)                           
+    append_Rhs({'et' : divF['et'] }, 3,2, {'et' : rhsname['et'] }, {'et' :vnamesrc_divF['et'] }, update=False,rhs=rhs,stored=False)                           
+
+This will procude the following three 'do-loops' in the Fortran code:
+
 
 .. code-block:: fortran
 
-	!***********************************************************
-	!                                                           
-	! Start computing stored variables *************************
-	!                                                           
-	!***********************************************************
-	
-	
-	     do j=idloop(3),idloop(4) 
-	 
-	      do i=idloop(1),idloop(2) 
-	
-	
-	!***********************************************************
-	!                                                           
-	! building stored variable p *******************************
-	!                                                           
-	!***********************************************************
-	
-	
-	!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	!
-	! gamma_m1*rho*(e)
-	!
-	!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	
-	
-	
-	!***********************************************************
-	!                                                           
-	! Update stored variables gamma_m1*rho*(e) *****************
-	!                                                           
-	!***********************************************************
-	
-	
-	qst(i,j,indvarsst(1)) =  param_float(3 + 5)*q(i,j,indvars(1))*((q(i,j,indvars(4))-&
-	                    0.5_wp*(q(i,j,indvars(2))*q(i,j,indvars(2))+&
-	                    q(i,j,indvars(3))*q(i,j,indvars(3)))))
-	
-	     enddo
-	   enddo
+        !***********************************************************
+        !                                                           
+        ! Start building RHS with source terms (1D) ****************
+        !                                                           
+        !***********************************************************
+
+
+         
+              do i=idloop(1),idloop(2) 
+
+
+        !***********************************************************
+        !                                                           
+        ! building source terms in RHS for d(rho)/dt ***************
+        !                                                           
+        !***********************************************************
+
+
+        !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        !
+        ! [rho*u]_1x
+        !
+        !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        d1_FluRx_dx_0_im1jk = q(i-1,indvars(1))*q(i-1,indvars(2))
+
+        d1_FluRx_dx_0_ip1jk = q(i+1,indvars(1))*q(i+1,indvars(2))
+
+        d1_FluRx_dx_0_ijk = -&
+                  0.5_wp*d1_FluRx_dx_0_im1jk+&
+                  0.5_wp*d1_FluRx_dx_0_ip1jk
+
+        d1_FluRx_dx_0_ijk = d1_FluRx_dx_0_ijk*param_float(1)
+
+
+
+        !***********************************************************
+        !                                                           
+        ! Update RHS terms for d(rho)/dt ***************************
+        !                                                           
+        !***********************************************************
+
+
+        rhs(i,indvars(1)) =   -  ( d1_FluRx_dx_0_ijk ) 
+
+           enddo
+
+
+        !***********************************************************
+        !                                                           
+        ! Start building RHS with source terms (1D) ****************
+        !                                                           
+        !***********************************************************
+
+
+         
+              do i=idloop(1),idloop(2) 
+
+
+        !***********************************************************
+        !                                                           
+        ! building source terms in RHS for d(rho u)/dt *************
+        !                                                           
+        !***********************************************************
+
+
+        !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        !
+        ! [rho*u*u+p]_1x
+        !
+        !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        d1_FluMx_dx_0_im1jk = q(i-1,indvars(1))*q(i-1,indvars(2))*q(i-1,indvars(2))+param_float(1 + 5)*q(i-1,indvars(1))*((q(i-1,indvars(3))-&
+                            0.5_wp*q(i-1,indvars(2))*q(i-1,indvars(2))))
+
+        d1_FluMx_dx_0_ip1jk = q(i+1,indvars(1))*q(i+1,indvars(2))*q(i+1,indvars(2))+param_float(1 + 5)*q(i+1,indvars(1))*((q(i+1,indvars(3))-&
+                            0.5_wp*q(i+1,indvars(2))*q(i+1,indvars(2))))
+
+        d1_FluMx_dx_0_ijk = -&
+                  0.5_wp*d1_FluMx_dx_0_im1jk+&
+                  0.5_wp*d1_FluMx_dx_0_ip1jk
+
+        d1_FluMx_dx_0_ijk = d1_FluMx_dx_0_ijk*param_float(1)
+
+
+
+        !***********************************************************
+        !                                                           
+        ! Update RHS terms for d(rho u)/dt *************************
+        !                                                           
+        !***********************************************************
+
+
+        rhs(i,indvars(2)) =   -  ( d1_FluMx_dx_0_ijk ) 
+
+           enddo
+
+
+        !***********************************************************
+        !                                                           
+        ! Start building RHS with source terms (1D) ****************
+        !                                                           
+        !***********************************************************
+
+
+         
+              do i=idloop(1),idloop(2) 
+
+
+        !***********************************************************
+        !                                                           
+        ! building source terms in RHS for d(rho et)/dt ************
+        !                                                           
+        !***********************************************************
+
+
+        !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        !
+        ! [u*(rho*et+p)]_1x
+        !
+        !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        d1_FluEx_dx_0_im1jk = q(i-1,indvars(2))*(q(i-1,indvars(1))*q(i-1,indvars(3))+&
+                            param_float(1 + 5)*q(i-1,indvars(1))*((q(i-1,indvars(3))-&
+                            0.5_wp*q(i-1,indvars(2))*q(i-1,indvars(2)))))
+
+        d1_FluEx_dx_0_ip1jk = q(i+1,indvars(2))*(q(i+1,indvars(1))*q(i+1,indvars(3))+&
+                            param_float(1 + 5)*q(i+1,indvars(1))*((q(i+1,indvars(3))-&
+                            0.5_wp*q(i+1,indvars(2))*q(i+1,indvars(2)))))
+
+        d1_FluEx_dx_0_ijk = -&
+                  0.5_wp*d1_FluEx_dx_0_im1jk+&
+                  0.5_wp*d1_FluEx_dx_0_ip1jk
+
+        d1_FluEx_dx_0_ijk = d1_FluEx_dx_0_ijk*param_float(1)
+
+
+
+        !***********************************************************
+        !                                                           
+        ! Update RHS terms for d(rho et)/dt ************************
+        !                                                           
+        !***********************************************************
+
+
+        rhs(i,indvars(3)) =   -  ( d1_FluEx_dx_0_ijk ) 
+
+           enddo
+
+The performance gains associated with this loop-splitting technique is illustrated for a more realistic case in the Performance section. 
