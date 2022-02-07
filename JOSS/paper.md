@@ -65,12 +65,7 @@ Python is used at runtime to set up the run parameters and initial conditions. M
 
 # Current \texttt{dNami} applications
 
-\texttt{dNami} is currently being used to solve a wide variety of different physics problems such as ideal and non-ideal gasdynamics, (magneto-)hydrodynamic flows, shallow-water equations and global coupled air-water meteotsunami simulations. 
-
-Navier--Stokes, Euler, shallow-water equations, dissipative solitons in reaction-diffusion equations, Bose--Einstein condensates, traffic flows, geophysical flows, space weather, oceanography, internal gravity waves, MHD, bow shocks, wall-bounded turbulence, planetary exploration
-
-shock and solitary waves, turbulence
-
+\texttt{dNami} is currently being used by researchers to study linear and nonlinear wave phenomena in various systems, from engineering to biology and space physics. For example, we solve the Navier Stokes equations to study shock waves and compressible turbulence, reacting-diffusion equations to study dissipative solitons in biological networks, the magneto-hydrodynamic equations to study shock-entropy interactions in plasmas, and the shallow-water equations to study geophysical flows (e.g.\ internal gravity waves, tsunamis, two-dimensional compressible turbulence).
 
 
 ![Example computation of a global simulation of the water height variation due to the January 2022 Tonga volcano explosion.](earth_water.png){ width=80% }
