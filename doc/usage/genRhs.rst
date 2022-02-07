@@ -163,14 +163,14 @@ To add explicit filtering to the computation, the user can call the ``genFilter`
 
 .. code-block:: python
 
-        # Generate Filters (if required):      
+    # Generate Filters (if required):      
     genFilter(11,10, len(varsolved),rhs=rhs)
 
 The user can specify the filter amplitude in the ``compute.py``. 
 
 *Adding boundary conditions*
 
-When non-periodic boundary conditions are enforced, the user must do two things: choose what happens between the core and the boundaries and specify the boundary conditions. These two sets of points are illustrated in :numref:`non_core_and_edge`. 
+When non-periodic boundary conditions are enforced, the user must do two things: choose what happens between the core and the boundaries (i.e. those who do not have enough neighbours for the full stencil width) and specify the boundary conditions. These two sets of points are illustrated in :numref:`non_core_and_edge`. 
 
 .. _non_core_and_edge: 
 .. figure:: img/bc.png
@@ -179,16 +179,31 @@ When non-periodic boundary conditions are enforced, the user must do two things:
 
    The two sets of points that must be managed seperately from the core of the domain: the physical boundary points (orange) and the points that do not have enough neighbours for the full stencil width (red)
 
+
+Both of these cases are dealt with via calls to the ``genBC()`` function.  
+
+.. warning:: 
+
+   Before making a call to the append_Rhs() function, make a copy of the equation dictionnaries to avoid unwanted intermediate modification
+
+The following code block details the two steps: after making a copy of the equations and calling the ``append_Rhs()`` function, a first call to ``genBC()`` is made. This performs an automatic stencil and order reduction of the finite-difference schemes and the filter (based on the set of coefficients currently included in dNami) as the boundary is approached. However this does nothing for the actual boundary point (shown in orange in :numref:`non_core_and_edge`). That point is handled by additional calls to ``genBC()`` for each boundary condition (points in 1D, corner and lines in 2D, corners, lines and faces in 3D). For each, the user can specify whether the boundary condition acts on a primitive variable or on the RHS via set ``setbc`` argument. In the dictionary in the list supplied to this argument, the ``'char'`` is a name variable used for code comments, ``'i1'`` refers to the location of the boundary (here face 'i1' which in 1D is a point) and ``rhs`` which means that the equations supplied in ``src_phybc_wave_i1`` are to act on the RHS.  
+
 .. code-block:: python
+
+        Save_eqns = {'divF':divF.copy()}
+
+        #... <- append_Rhs() calls made here 
 
         # Progressive stencil/order adjustement from domain to boundary 
             genBC(Save_eqns['divF']  ,3,2, rhsname , vnamesrc_divF, update=False,rhs=rhs)
 
         # Boundary conditions on d(q)/dt 
             #i1
-            genBC(src_phybc_wave_i1,3,2,rhsname , vnamesrc_divF, setbc=[True,{'char':{'i1':['rhs']}}]  , update=False,rhs=rhs)
+            genBC(src_phybc_wave_i1,3,2,rhsname , vnamesrc_divFbc, setbc=[True,{'char':{'i1':['rhs']}}]  , update=False,rhs=rhs)
             #imax
-            genBC(src_phybc_wave_imax,3,2,rhsname ,vnamesrc_divF, setbc=[True,{'char':{'imax':['rhs']}}]  , update=False,rhs=rhs)
+            genBC(src_phybc_wave_imax,3,2,rhsname ,vnamesrc_divFbc, setbc=[True,{'char':{'imax':['rhs']}}]  , update=False,rhs=rhs)
+
+In 3D, if non-periodic condition are desired then a boundary condition for each physical boundary must be supplied i.e. face ``i1``, line ``i1j1``, corner ``i1j1k1``, face ``imax``, line ``imaxj1`` and so on ...  
 
 Advanced use: control of the Fortran loop distribution
 ######################################################
