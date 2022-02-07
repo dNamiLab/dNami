@@ -1,22 +1,56 @@
 Quickstart guide
 ****************
 
-Dependencies
-------------
+Get the code and setup your environment in Linux
+------------------------------------------------
 
-Required software packages for running dNami. The following Python packages are needed:
+The following instructions will walk you through the installation
+process of dNami in Linux. You need to have a working **Python3**
+environment and a **FORTRAN** compiler (Intels **ifort** or the
+GNU **gfortran** compiler).
 
-* python3.x
-* mpi4py
-* numpy
-* scons
+#. Clone dNami from the github repository
 
-In addition the following software is needed:
+   In your home directory execute the following command
 
-* MPI (OpenMPI or Intel-MPI recommended)
-* A Fortran compiler gfortran or the Intel compiler ifort
+   .. code-block:: bash
 
-Optionally, to run the provided plotting scripts to visualise the code output, matplotlib is required. 
+    git@github.com:dNamiLab/dNami.git
+
+#. Install the dependencies
+
+   dNami depends on the following Python packages:
+
+   * numpy
+   * scons
+
+   These can be installed using Pythons package installer pip:
+
+   .. code-block:: bash
+
+    python3 -m pip install --user numpy scons
+
+#. Additional dependencies (strongly recommended)
+
+   If you want to run dNami in a distributed memory environment (cluster) or
+   on multiple cores you also need to install **MPI** and **mpi4py**.
+   If you already have a working MPI installation you can install mpi4py
+   using the Python package installter pip:
+
+   .. code-block:: bash
+
+    python3 -m pip install --user mpi4py
+
+   If you don't have a working MPI installation you can use your
+   Linux distributions package manager to install MPI. The following command
+   will install **OpenMPI** on Ubuntu:
+
+   .. code-block:: bash
+
+    sudo apt-get -y install openmpi-bin
+
+   If you are running a different Linux distribution check the documentation
+   on how to install MPI.
 
 Solving the 1D Euler equations
 ------------------------------
