@@ -68,7 +68,7 @@ For the x derivative of the RHS in the 2D Euler equations we would write:
     		 'u'   : ' [ rho*u*u + p     ]_1x ', 
     		 'v'   : ' [ rho*v*u         ]_1x ', 
     		 'et'  : ' [ (rho*et + p )*u ]_1x ', 
-    }
+                }
 
 In this expression the pressure is introduced through a new symbol, ``'p'``, not defined in ``varname``. Two possibilities are offered by dNami in such cases. The first one is to provide an equation that relates ``'p'`` with ``varname`` variables, this is done through the ``varloc`` dictionary:
 
@@ -86,18 +86,17 @@ Another option is to allocate static memory for ``'p'`` and compute ``'p'`` befo
 	varloc = { 'e' : ' (et - 0.5_wp*u*u) '}                      
 	varstored = {'p' : {'symb': 'rho*e', 'ind':1 , 'static': True}
 
-In this example, an equation is provided to compute ``'e'`` from ``varname`` and ``'p'`` is stored at the first location of the stored-data memory.
+In this example, an equation is provided to compute ``'e'`` from ``varname`` and ``'p'`` is stored at the first location of the stored-data memory. For what follows, we will assume that the ``x`` and ``y`` derivative of the flux function have been grouped in one dictionary ``divF`` as :
 
+.. code-block:: python
+	
+	divF = {'rho' : ' [ rho*u           ]_1x  + [ rho*v           ]_1y ', 
+    		'u'   : ' [ rho*u*u + p     ]_1x  + [ rho*u*v         ]_1y ', 
+    		'v'   : ' [ rho*v*u         ]_1x  + [ rho*v*v         ]_1y ', 
+    		'et'  : ' [ (rho*et + p )*u ]_1x  + [ (rho*et + p )*v ]_1y ', 
+                }
 
-
-*List of solver parameters*
-
-**The** ``append_Rhs`` **function**
-
-[
-
-
-**Compulsory steps**
+**Filling out the genRhs.py: Compulsory steps**
 
 The first lines in any ``genRhs.py`` will involve importing the necessary code-construction functions from the ``genKer.py``. Then, the working precision of the computation is specified via the ``wp`` variable.  
 
@@ -153,7 +152,7 @@ This ends the list of compulsory steps when creating a ``genRhs.py``.
         
 
 
-**Optional steps**
+**Filling out the genRhs.py: Optional steps**
 
 The user has access to a number of additional automatic code-generation steps detailed here.  
 
