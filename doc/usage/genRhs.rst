@@ -130,7 +130,7 @@ Next, the user must initialise the ``rhs`` class which is used to store and tran
     from genKer import rhs_info    
     rhs = rhs_info()
 
-Then, the Runge-Kutta time marching steps are generated with calls to the following functions:
+Then, the Runge-Kutta time-marching steps are generated with calls to the following functions:
 
 .. code-block:: python
 
@@ -141,11 +141,11 @@ Finally, at least one equation must be specified to set the RHS used to march th
 
 .. code-block:: python
 
-	append_Rhs(divF, 3, 2, rhsname,vnamesrc_divF,update=False,rhs=rhs)
+	append_Rhs(divF, 5, 4, rhsname,vnamesrc_divF,update=False,rhs=rhs)
 
-which generates the discretised version of ``divF`` using a 3 point, 2 :sup:`nd` order centered finite difference scheme with ``rhsname`` being used to generate code comments and ``vnamesrc_divF`` being used to generate intermediate variable names. The ``update=False`` arguments guarantees that the components of ``divF`` are being used to set the RHS rather than be added to existing terms. 
+which generates the discretised version of ``divF`` using a 5 point, 4 :sup:`th` order centered finite difference scheme with ``rhsname`` being used to generate code comments and ``vnamesrc_divF`` being used to generate intermediate variable names. The ``update=False`` arguments guarantees that the components of ``divF`` are being used to set the RHS rather than be added to existing terms. 
 
-This ends the list of compulsory steps when creating a ``genRhs.py``. The user then has access to a number of additional steps detailed below.  
+This ends the list of compulsory steps when creating a ``genRhs.py``. 
 
 .. warning::
 
@@ -155,20 +155,29 @@ This ends the list of compulsory steps when creating a ``genRhs.py``. The user t
 
 **Optional steps**
 
+The user has access to a number of additional automatic code-generation steps detailed here.  
+
 *Adding explicit filtering*
 
-Specify filter
+To add explicit filtering to the computation, the user can call the ``genFilter`` function. Currently, the function relies on pre-specified coefficients for a given stencil/order (which can be found at the start of the ``genKer.py`` file). For example, the following code block generates code to apply a standard 11 point, 10 :sup:`th` order filter to each of the directions (between 1 and 3 depending on ``dim``): 
 
 .. code-block:: python
 
         # Generate Filters (if required):      
     genFilter(11,10, len(varsolved),rhs=rhs)
 
-
+The user can specify the filter amplitude in the ``compute.py``. 
 
 *Adding boundary conditions*
 
-Order reduc and phys bc
+When non-periodic boundary conditions are enforced, the user must do two things: choose what happens between the core and the boundaries and specify the boundary conditions. These two sets of points are illustrated in :numref:`non_core_and_edge`. 
+
+.. _non_core_and_edge: 
+.. figure:: img/bc.png
+   :width: 70%
+   :align: center
+
+   The two sets of points that must be managed seperately from the core of the domain: the physical boundary points (orange) and the points that do not have enough neighbours for the full stencil width (red)
 
 .. code-block:: python
 
