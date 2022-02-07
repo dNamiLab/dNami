@@ -97,23 +97,87 @@ In this example, an equation is provided to compute ``'e'`` from ``varname`` and
 [
 
 
-
-
 **Compulsory steps**
+
+The first lines in any ``genRhs.py`` will involve importing the necessary code-construction functions from the ``genKer.py``. Then, the working precision of the computation is specified via the ``wp`` variable.  
 
 .. code-block:: python
 
-			from genKer import rhsinfo, genrk3, genrk3update, genFilter, genBC, append_Rhs, genbcsrc
-			import os 
-			
-			wp = 'float64'
+        from genKer import rhsinfo, genrk3, genrk3update, genFilter, genBC, append_Rhs, genbcsrc
+        import os 
+        
+        wp = 'float64'
+
+dNami offer the flexibility of using a combination of different numerical schemes as well as a filter with each relying on a stencil size that need not be identical. :numref:`hlo_glob`. illustrates the stencils for a filter that uses 11 points and a finite-difference scheme that uses 5 points. 
+
+.. _hlo_glob: 
+.. figure:: img/halo_glob.png
+   :width: 70%
+   :align: center
+
+   Two different stencil sizes 
+
+To construct the loops over the domain, the ``genRhs.py`` requires the user to specify the overall largest number of halo points required to satisfy all the stencil sizes used in the run. In the example of :numref:`hlo_glob`, this would be 5. The ``hlo_glob`` variable is used to give this information to the code-generation process:
+
+.. code-block:: python
+
+        hlo_glob = 5
+
+Next, the user must initialise the ``rhs`` class which is used to store and transfer information from one step to the next: 
+
+.. code-block:: python
+
+    from genKer import rhs_info    
+    rhs = rhs_info()
+
+Then, the Runge-Kutta time marching steps are generated with calls to the following functions:
+
+.. code-block:: python
+
+    genrk3(len(varsolved)      ,rhs=rhs) 
+    genrk3update(len(varsolved),rhs=rhs)
+
+Finally, at least one equation must be specified to set the RHS used to march the variables in time, for example:
+
+.. code-block:: python
+
+	append_Rhs(divF, 3, 2, rhsname,vnamesrc_divF,update=False,rhs=rhs)
+
+This ends the list of compulsory steps when creating a ``genRhs.py``. The user then has access to a number of additional steps detailed below.  
+
+.. warning::
+
+    When no boundary conditions are specified in a given direction, the default behaviour assumes that that direction is **periodic**. 
+        
 
 
 **Optional steps**
 
 *Adding explicit filtering*
 
+Specify filter
+
+.. code-block:: python
+
+        # Generate Filters (if required):      
+    genFilter(11,10, len(varsolved),rhs=rhs)
+
+
+
 *Adding boundary conditions*
+
+Order reduc and phys bc
+
+.. code-block:: python
+
+        # Progressive stencil/order adjustement from domain to boundary 
+            genBC(Save_eqns['divF']  ,3,2, rhsname , vnamesrc_divF, update=False,rhs=rhs)
+
+        # Boundary conditions on d(q)/dt 
+            #i1
+            genBC(src_phybc_wave_i1,3,2,rhsname , vnamesrc_divF, setbc=[True,{'char':{'i1':['rhs']}}]  , update=False,rhs=rhs)
+            #imax
+            genBC(src_phybc_wave_imax,3,2,rhsname ,vnamesrc_divF, setbc=[True,{'char':{'imax':['rhs']}}]  , update=False,rhs=rhs)
 
 Advanced use: control of the Fortran loop distribution
 ######################################################
@@ -151,7 +215,7 @@ In addition, the dictionaries containing the term nomenclature for the Fortran c
                          'u'    : 'FluMx',
                          'et'   : 'FluEx'}
 
-which are used to choose variable names and generate comments in the Fortran code blocks below. Simply passing the ``divF`` dictionary to the ``append_Rhs`` function: 
+which are used to set variable names and generate comments in the Fortran code blocks below. Simply passing the ``divF`` dictionary to the ``append_Rhs`` function: 
 
 .. code-block:: python
 
