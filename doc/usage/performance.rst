@@ -34,3 +34,29 @@ The metrics show that 82% of the overall elapsed time is spent on the compute ke
    | Communication|                   |                             | (18% of elapsed time)  |
    +--------------+-------------------+-----------------------------+------------------------+
 
+
+Internode performance characterization has been carried out on the Deigo cluster at the Okinawa Institute of Science and Technology (OIST), which is made of 456 nodes of double AMD EPYC 7702 sockets (128 cores per node).
+dNami weak scalability has been measured up to 200 nodes, using the TGV test case with
+pure MPI parallelization and the OpenMPI library version 4.0.3 :numref:`efficiency_AMD`.
+Each of the 200 nodes computes 5123 points (40GB/node) leading to an
+overall problem size of 26.8 billion points
+
+.. _efficiency_AMD:
+.. figure:: img/AMDEPYCOpenMPI_SK_FD11.png
+   :width: 70%
+   :align: center
+
+   Weak scalability of dNami as measured with the TGV test case (Skew-Symetric formulation, FD11 points) on the AMD partition of the Deigo cluster at OIST.
+
+The scalability is satisfactory up to 200 nodes,
+apart from some fluctuations observed between job
+submissions (unknown origin).
+Compared to the Intel Xeon Platinum 8280L, the AMD node reveals a
+larger sensitivity of the MPI communication kernel of dNami to
+a lower memory bandwidth (which is half the Intel one), but a limited
+impact on the compute-kernel (30% slower).
+This demonstrates the ability of the HPC layer to mitigate the
+negative impact of the lower memory bandwidth per core on AMD nodes.
+Note that the OpenMP layer, which is under development, was not included
+in the scalability test.
+
