@@ -28,6 +28,7 @@ To get started with dNami, please check out the Quickstart guide to get set up w
    usage/testcases
    usage/genRhs   
    usage/compute
+   usage/postpro
    usage/api
    usage/syntax
    usage/performance
