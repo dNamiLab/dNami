@@ -23,9 +23,7 @@
 import glob
 import os 
 import subprocess
-import numpy as np
-
-# ---------------------------------------------------
+import shutil
 
 # -- Color class 
 class bcolors:
@@ -33,6 +31,60 @@ class bcolors:
     OKGREEN = '\033[92m'
     WARNING = '\033[93m'
     ENDC    = '\033[0m'
+
+# --------------------------------------------------
+# -- Check if the dependencies are met:
+
+deps={ 'numpy'    : None,
+       'scons'    : None,
+       'mpi'      : None,
+       'fcompiler': None, 
+       'mpi4py'   : None
+       }
+
+# -- Numpy
+try:
+    import numpy as np
+    deps['numpy'] = f'{bcolors.OKGREEN}OK{bcolors.ENDC}'
+except:
+    deps['numpy'] = f'{bcolors.FAIL}MISSING{bcolors.ENDC}'
+
+# -- scons 
+if shutil.which('scons'):
+    deps['scons'] = f'{bcolors.OKGREEN}OK{bcolors.ENDC}'
+else:
+    deps['scons'] = f'{bcolors.FAIL}MISSING{bcolors.ENDC}'
+
+# -- mpirun or mpiexec 
+if shutil.which('mpirun') or shutil.which('mpiexec'):
+    deps['mpi'] = f'{bcolors.OKGREEN}OK{bcolors.ENDC}'
+else:
+    deps['mpi'] = f'{bcolors.FAIL}MISSING{bcolors.ENDC}'
+
+# -- mpirun or mpiexec 
+if shutil.which('gfortran') or shutil.which('ifort'):
+    deps['fcompiler'] = f'{bcolors.OKGREEN}OK{bcolors.ENDC}'
+else:
+    deps['fcompiler'] = f'{bcolors.FAIL}MISSING{bcolors.ENDC}'
+
+# -- MPI4PY
+try:
+    import mpi4py 
+    deps['mpi4py'] = f'{bcolors.OKGREEN}OK{bcolors.ENDC}'
+except:
+    deps['mpi4py'] = f'{bcolors.FAIL}MISSING{bcolors.ENDC}'
+
+
+print(' --- Dependencies --- ')
+for key in deps.keys():
+    print('Item: {:10s}'.format(key) +  '  Status: {:10s}'.format(deps[key]))
+
+print('')
+print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+print( f'{bcolors.WARNING}If all dependencies are not OK, the next steps will likely fail .... {bcolors.ENDC}') 
+print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+print('')
+# ---------------------------------------------------
 
 # -- Get list of tests
 test_dir  = os.getcwd()
