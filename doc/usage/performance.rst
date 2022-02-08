@@ -38,7 +38,7 @@ The metrics show that 82% of the overall elapsed time is spent on the compute ke
 Internode performance characterization has been carried out on the Deigo cluster at the Okinawa Institute of Science and Technology (OIST), which is made of 456 nodes of double AMD EPYC 7702 sockets (128 cores per node).
 dNami weak scalability has been measured up to 200 nodes, using the TGV test case with
 pure MPI parallelization and the OpenMPI library version 4.0.3 :numref:`efficiency_AMD`.
-Each of the 200 nodes computes 5123 points (40GB/node) leading to an
+Each of the 200 nodes computes :math:`512^3` points (40GB/node) leading to an
 overall problem size of 26.8 billion points
 
 .. _efficiency_AMD:
