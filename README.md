@@ -32,7 +32,7 @@ Check out the [documentation](https://dnami.readthedocs.io/en/latest/) to get a 
 
 ## Test suite 
 
-A Python script in the `exm/` folder called `test_all.py` will run through the list of available cases to test them. For each case, the script will copy the files to the appropriate location to generate the code, run the case and output values for a comparison with the reference values on the repository. Each case should output a `PASS` status once it is complete. If this is not the case, the `log.test` file generated during the testing process should clarify the reasons for the failure (e.g. missing dependence, lack of resources, ...). The testing script currently assumes that the user is testing the code on a machine with at least 4 available cores.  
+A Python script in the `exm/` folder called `test_all.py` will check the required dependencies (and will inform the user of any missing items) and then run through the list of available cases to test them. For each case, the script will copy the files to the appropriate location to generate the code, run the case and output values for a comparison with the reference values on the repository. Each case should output a `PASS` status once it is complete. If this is not the case, the `log.test` file generated during the testing process should clarify the reasons for the failure (e.g. missing dependence, lack of resources, ...). The testing script currently assumes that the user is testing the code on a machine with at least 4 available cores.  
 
 ## Generating the documentation locally  
 
