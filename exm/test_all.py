@@ -131,11 +131,10 @@ for test in test_list:
 
     print(f'{bcolors.WARNING}Running test ... {test}{bcolors.ENDC}')
 
-    # -- Run copy script
-    cmd = 'cd ' + test+ '; cp rhs.py genRhs.py ../../src/generate >> ' + test_log 
+    # -- Run copy step 
     try:
-        #process = subprocess.run(cmd,shell=True,capture_output=True,text=True,check=True)
-        process = subprocess.run(cmd,shell=True)
+        shutil.copyfile( test+'/rhs.py', '../src/generate/rhs.py' )
+        shutil.copyfile( test+'/genRhs.py', '../src/generate/genRhs.py' )
     except Exception as e:
         print('Error at copy: ', e)
         test_stat[test] = f'{bcolors.FAIL}COPY FAIL{bcolors.ENDC}'
@@ -144,27 +143,28 @@ for test in test_list:
         print(' Copied.')
 
     # -- Compile 
-    cmd = 'cd ../src; ./install_clean.sh >> ' + test_log
+    cmd = './install_clean.sh >> ' + test_log
     try:
-        process = subprocess.run(cmd,shell=True,capture_output=True,text=True,check=True)
+        process = subprocess.run(cmd, cwd='../src',shell=True,capture_output=True)
     except Exception as e:
         print('Error at compilation: ', e)
         test_stat[test] = f'{bcolors.FAIL}COMPILATION FAIL{bcolors.ENDC}'
+        exit()
         continue
     else:
         print(' Compiled.')
 
     # -- Run 
     # Copy compute:
-    cmd = 'cd ' + test+ '; cp compute.py ../../'+tmp_dir+'/ >> ' + test_log 
     try:
-        process = subprocess.run(cmd,shell=True)
+        shutil.copyfile( test+'/compute.py', '../'+tmp_dir+'/compute.py' )
     except Exception as e:
         print('Error at copy: ', e)
         test_stat[test] = f'{bcolors.FAIL}COPY FAIL{bcolors.ENDC}'
         continue
     else:
         print(' Copied.')
+
     # Get mpi proc number:
     lines = open('../'+tmp_dir+'/compute.py').readlines()
     for line in lines:
@@ -183,15 +183,17 @@ for test in test_list:
     else:
         print(f' {nnproc} processors used.')
     nnproc = str(nnproc)
+
     # Command 
-    cmd = 'cd ../src; \
-        export  INSTALLPATH=$PWD; \
-        export  PYTHONPATH=$PYTHONPATH:$INSTALLPATH/src_py; \
-        export  PYTHONPATH=$PYTHONPATH:$INSTALLPATH/pymod; \
-        export  PYTHONPATH=$PYTHONPATH:$INSTALLPATH/generate/; \
-        cd ../'+tmp_dir+'; mpirun -n ' + nnproc + ' python3 compute.py >> ' + test_log
+    cwd = '/'.join(os.getcwd().split('/')[:-1]) + '/src/'
+    cwd = cwd.replace(' ', '\ ')
+    cmd = 'export  INSTALLPATH='+cwd+'; \
+           export  PYTHONPATH=$PYTHONPATH:$INSTALLPATH/src_py; \
+           export  PYTHONPATH=$PYTHONPATH:$INSTALLPATH/pymod;  \
+           export  PYTHONPATH=$PYTHONPATH:$INSTALLPATH/generate; \
+           mpirun -n ' + nnproc + ' python3 compute.py >> ' + test_log
     try:
-        process = subprocess.run(cmd,shell=True)
+        process = subprocess.run(cmd,shell=True,cwd='../'+tmp_dir)
     except subprocess.CalledProcessError as e:
         print('Error at runtime: ', e)
         test_stat[test] = f'{bcolors.FAIL}RUN FAIL{bcolors.ENDC}'

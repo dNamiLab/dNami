@@ -143,10 +143,8 @@ f        = 1. + np.exp(eta1) + np.exp(eta2) + (k1-k2)**2/(k1+k2)**2 * np.exp(eta
 logf     = np.log(f)
 gradlogf = np.gradient(logf, xll[:])
 sol      = 2.  * np.gradient(gradlogf, xll[:]) 
-from scipy.interpolate import interp1d
-sol = interp1d(xll, sol)
 
-rho[hlo:nx+hlo] = sol(xloc[:]-x0) 
+rho[hlo:nx+hlo] = np.interp(xloc[:]-x0,xll, sol)
 
 dMpi.swap(q,hlo,dtree)
 
