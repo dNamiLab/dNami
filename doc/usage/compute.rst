@@ -110,6 +110,21 @@ If the user chooses to create stored variables in the ``rhs.py`` then these quan
 
 where :math:`\texttt{m=0}` will compute the static variables and :math:`\texttt{m=1}` will compute the non-static variables. In the case that one of the variables is used to update the RHS, then this call should be made at every sub-RK step before the call to the ``time_march()`` funtion. 
 
+Restarting a simulation
+#######################
+
+dNami offers a built-in function to restart a simulation from a previous output. During a simulation, if a user chooses to output 'restart' files, using the ``dnami_io.write_restart()`` function, these files can be fed back to a ``compute.py`` to fill the allocated memory and continue the simulation from that point. To do so, instead of filling the allocated memory with initial condition, the user can use the following code block:
+
+.. code-block:: python
+
+        dn.dnami_io.read_restart(dtree)
+        ni = dtree['num']['tint']['itn']
+        ti = dtree['eqns']['time']
+
+By default, the ``dnami_io.read_restart()`` function looks for a ``restart.bin`` file in the same folder as the ``compute.py`` and reads the information it contains (a different path can be provided with additional arguments, see :doc:`/usage/api`). It also updates information in the tree such as the timestep number and time (the above code block shows this information being extracted from the tree).  
+
+When the case is not fully periodic, the ``dnami_io.read_restart()`` will also look for a ``restartshell_i1``, ``restartshell_imax``, ``restartshell_j1``, ... depending on which direction(s) is (are) not periodic. These files contain the information outside of the core domain i.e. in the halo points and are also output by the ``dnami_io.write_restart()`` function.  
+
 Starting your own compute
 #########################
 
