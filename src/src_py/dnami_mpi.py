@@ -286,7 +286,9 @@ class type_mpi:
     #
     def swap(self, f, nh, tree):
         """
-        Convenience function to swap all directions in one call.
+        Convenience function to swap all directions including the corners in a single call.
+        A call to this function is equal to calling swapXc, swapYc and swapZc (in this order)
+        separately.
 
         Args:
           f: The input and output vector for the halo data swap
