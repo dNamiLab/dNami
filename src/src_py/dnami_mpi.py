@@ -482,8 +482,9 @@ class type_mpi:
 
     def swapY(self, f, nh, tree):
         """
-        Swap array "f(X,:)" (a function of position vector X ) in the y-direction
-        over its first ":" variables with halo size "nh".
+        Swaps the array "f(X,:)" (a function of position vector X ) in the y-direction
+        over its first ":" variables with halo size "nh". This function does not swap
+        the corners.
 
         Args:
           f: The input and output vector for the halo data swap
@@ -568,8 +569,9 @@ class type_mpi:
 
     def swapZ(self, f, nh, tree):
         """
-        Swap array "f(X,:)" (a function of position vector X ) in the z-direction
+        Swaps array "f(X,:)" (a function of position vector X ) in the z-direction
         over its first ":" variables with halo size "nh".
+        This function does not swap the corners.
 
         Args:
           f: The input and output vector for the halo data swap
@@ -618,9 +620,9 @@ class type_mpi:
 
     def swapXc(self, f, nh, tree):
         """
-        Swap array "f(X,:)" (a function of position vector X ) in the x-direction
+        Swaps array "f(X,:)" (a function of position vector X ) in the x-direction
         over its first ":" variables with halo size "nh". This swap function will
-        also swap the corners.
+        swap the corners.
 
         Args:
           f: The input and output vector for the halo data swap
@@ -798,9 +800,9 @@ class type_mpi:
 
     def swapYc(self, f, nh, tree):
         """
-        Swap array "f(X,:)" (a function of position vector X ) in the y-direction
+        Swaps array "f(X,:)" (a function of position vector X ) in the y-direction
         over its first ":" variables with halo size "nh". This swap function will
-        also swap the corners.
+        swap the corners.
 
         Args:
           f: The input and output vector for the halo data swap
@@ -938,9 +940,9 @@ class type_mpi:
 
     def swapZc(self, f, nh, tree):
         """
-        Swap array "f(X,:)" (a function of position vector X ) in the z-direction
+        Swaps array "f(X,:)" (a function of position vector X ) in the z-direction
         over its first ":" variables with halo size "nh". This swap function will
-        also swap the corners.
+        swap the corners.
 
         Args:
           f: The input and output vector for the halo data swap
