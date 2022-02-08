@@ -52,6 +52,21 @@ GNU **gfortran** compiler).
    If you are running a different Linux distribution check the documentation
    on how to install MPI.
 
+Steps to run a case 
+-------------------
+
+In general, the steps to running a case will be: 
+
+.. note::
+
+   1. Place a ``rhs.py`` (containing the governing equations) and a ``genRhs.py`` (containing the numerical parameters) in the ``dNami/src/generate/`` folder.  
+   2. Change up to ``dNami/src/`` and run the ``./install_clean.sh`` script to translate the pseudo-code and compile the generated Fortran code.  
+   3. Source the environment variables (which add the required locations to the Python path) by running ``source env_dNami.sh`` in ``dNami/src/`` 
+   4. Change into a user-created work directory (e.g. ``dNami/wrk/``) where the ``compute.py`` file has been placed. 
+   5. Run the computation in parallel e.g. with ``mpirun -np N python3 compute.py`` (where N is the number of processes) or in serial mode ``python3 compute.py`` depending on the decomposition chosen in the ``compute.py``. 
+
+The details of each of the keys files (``rhs.py``, ``genRhs.py`` and ``compute.py``) are specific to the problem to be solved. In the following section, the details of each step are given when solving the 1D Euler equations. 
+
 Solving the 1D Euler equations
 ------------------------------
 
