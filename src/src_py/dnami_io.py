@@ -36,6 +36,15 @@ def write_grid(tree):
 # =============================================================================
 
 def hello_world(tree):
+        """
+        This function prints information about the case (e.g. grid size, number of processors, etc) 
+        
+        Args:
+          tree: the dnami tree
+        Returns:
+          This function returns nothing
+        """
+
         dmpi = tree['mpi']['dMpi']
         grid = tree['grid']
 
@@ -73,8 +82,8 @@ def hello_world(tree):
 
 def write_restart(n,t,flag,tree,fpath='./restarts/'):
         """
-        Writes the whole grid to a binary file in order
-        to restart the simulation at a later.
+        Writes the state of the solved variables (defined in the rhs.py)  at timestep n and time ti to a binary file in order
+        to restart for post-processing purposes. Can also be used to restart the simulation later.
         
         Args:
           n: The number of iterations the simulation was running
@@ -257,12 +266,15 @@ def write_restart(n,t,flag,tree,fpath='./restarts/'):
 
 def read_restart(tree,fname='restart.bin'):
         """
-        Reads the restart file in order to restart the simulation.
-        
+        Reads the restart file in order to restart the simulation. By default, it look for the file 'restart.bin' where the compute.py is located but a custom path can be used.  
+
         Args:
           tree: The dnami tree data structure 
           fname: The filename of the restart file
+        Returns: 
+          This function returns the updated dNami tree
         """
+
         # unpack useful tree data
         wp   = tree['misc']['working precision']
         dmpi = tree['mpi']['dMpi']
@@ -671,6 +683,8 @@ def globalMinMax(tree,a,s):
           tree: The dnami tree data structure
           a: The array from which the min and max should be obtained
           s: A character string which will be printed together with the min and max
+        Returns: 
+          This function returns nothing but prints the values and a string 
         """
         # get the global min/max value of array 'a' with string tag 's'
         
@@ -711,6 +725,8 @@ def globalMax(tree,a,s):
           tree: The dnami tree data structure
           a: The array from which the max should be obtained
           s: A character string which will be printed together with the max value
+        Returns: 
+          This function returns nothing but prints the value and a string 
         """
         # get the global max value of array 'a' with string tag 's'
         
@@ -735,14 +751,14 @@ def globalMax(tree,a,s):
 
 def dtMax(tree,a):
         """
-        Get the global min value of all dt's obtained at target CFL
-        this would be the dt to not exceed, i.e. dtMax
+        Get the global mininumum value of a across all processor. It is used to determine the limiting timestep dt (i.e. the largest possible timestep that can be used) when a is the array of pointwise timesteps 
         
         Args:
           tree: The dnami tree data structure
           a: The array from which the min should be obtained
+        Returns:
+            The largest usable timestep dt_max 
         """
-        
         minval = a.min()
 
         dmpi = tree['mpi']['dMpi']
@@ -767,6 +783,8 @@ def set_dt(tree,dt):
         Args:
           tree: The dnami tree data structure
           dt: The dt value
+        Returns:
+          This function returns nothing
         """
         
 

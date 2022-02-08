@@ -41,12 +41,14 @@ In order to generate the html documentation the following Python packages are ne
 1. Sphinx
 2. sphinx-rtd-theme
 3. pydata-sphinx-theme
+4. sphinxcontrib.bibtex
 
 They can be installed using the following command:
 ```bash
 pip3 install -U Sphinx
 pip3 install -U sphinx-rtd-theme
 pip3 install -U pydata-sphinx-theme
+pip3 install -U sphinxcontrib.bibtex
 ```
 
 Build the documentation by changing into the doc directory and executing the following command:

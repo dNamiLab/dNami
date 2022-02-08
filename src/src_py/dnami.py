@@ -17,13 +17,12 @@ from dnami_mpi import type_mpi
 
 def cst(x):
 	"""
-        This is a doc string for the cst function
+        Converts the input to the working precision defined in the genRHs.py
 
         Args:
-            x: some parameter for something
+            x: input to be converted 
         Returns:
-            A numpy object of something
-            which could be double or float.
+            Numpy object that has the desired working precision 
         """
 	from rhsinfo import wp
 	if wp == 'float32': x = np.float32(x)
@@ -149,12 +148,12 @@ def start_mpi(tree):
 
 def unpack_bcs(tree):
 	"""
-        Please enter description.
+        Organises the list of boundary conditions based on those specified in the genRhs.py 
 
         Args: 
           tree: The dnami tree data structure
         Returns:
-            A dictionary containing all the parameters needed for the simulation.
+            A dictionary containing all the parameters needed for the simulation with updated boundary condition information.
         """
 	dMpi  = tree['mpi']['dMpi'] 
 	iSwap = dMpi.iSwap

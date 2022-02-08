@@ -35,10 +35,10 @@ def load_ax(path,wp='float64'):
 # === Restart loader -- core only 
 def read_restart(fname,wp='float64'):
     """
-    Input a restart_XXXXX file and the function will return the full core of q 
+    Input a restart_XXXXXXXX file and the function will return the full core of q. Can also be used to read custom outputs from the dnami_io.write_data() function. 
 
     Args:
-        fname: The path to the restart file. Usually written out in the work directory in /path/to/wrk/restarts/restart_XXXXXX
+        fname: The path to the restart file. Usually written out in the work directory in /path/to/wrk/restarts/restart_XXXXXXXX
     Returns:
         The timestep number n, the time t and the variables in the core of the domain q are returned
     """
@@ -64,10 +64,10 @@ def read_restart(fname,wp='float64'):
 # === Restart loader -- core and shells 
 def read_restart_wshell(fname,verbose=False,wp='float64'):
     """
-    Input a restart_XXXXX file and the function will return the full q including the shell information. 
+    Input a restart_XXXXXXXX file and the function will return the full q including the shell information. Can also be used to read custom outputs from the dnami_io.write_data() function. 
 
     Args:
-        fname: The path to the restart file. Usually written out in the work directory in /path/to/wrk/restarts/restart_XXXXXX. The shell file name will be automatically detected. 
+        fname: The path to the restart file. Usually written out in the work directory in /path/to/wrk/restarts/restart_XXXXXXXXX. The shell file name will be automatically detected. 
         verbose: print additional information
     Returns:
         The timestep number n, the time t and the variables in the full domain, including the shells, q are returned
