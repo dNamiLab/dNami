@@ -13,13 +13,14 @@ When adding a float to the pseudo-code in an ``rhs.py`` file, it should be follo
 
    F = {'f' : ' 2.0_wp * [f]_1x ' }
 
+In the Python layer, users are encouraged to use the ``dn.cst()`` function to ensure consistant floating-point precision across the layers.
 
 Spatial derivatives
 -------------------
 
 .. warning::
 
-    When specifying derivatives, make sure to leave at least one white space after the ']_1x', ']_1y' or ']_1z' notation (this is so that the pseudo-code can be correctly understood and translated). For example:
+    When specifying derivatives, make sure to leave at least one space after the ']_1x', ']_1y' or ']_1z' notation and the next symbol (this is so that the pseudo-code can be correctly understood and translated). For example:
 
    .. figure:: img/deriv_spacing.png
       :width: 60%
