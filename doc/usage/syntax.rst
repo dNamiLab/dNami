@@ -4,6 +4,16 @@ dNami syntax
 This section introduces the dNami syntax. By using the dNami syntax the 
 user can easily translate differential equations into finite difference code.
 
+Floats 
+------
+
+When adding a float to the pseudo-code in an ``rhs.py`` file, it should be followed by the suffix ``_wp`` which makes sure the floating point constant has the correct working precision chosen in the ``genRhs.py``. For example:
+
+.. code-block:: python 
+
+   F = {'f' : ' 2.0_wp * [f]_1x ' }
+
+
 First order derivative syntax
 -----------------------------
 
