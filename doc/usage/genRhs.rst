@@ -543,7 +543,7 @@ The performance gains associated with this loop-splitting technique is illustrat
 Advanced use: alias for a quantity vs storing a quantity  
 ########################################################
 
-For performance purposes, when building their ``rhs.py``, the user can choose to either have aliases for intermediate variables in their RHS expression which are replaced when the pseudo-code is turned into fortran **or** compute intermediate variables which are stored and then that memory is accessed when computing the RHS. Simplistically, the first approach results in a lower memory footprint but higher arithmetic intensity whereas the second approach requires more memory, requires accessing theses additional memory addresses but has a lower arithmetic intensity.    
+For performance purposes, when building their ``rhs.py``, the user can choose to either have aliases for intermediate variables in their RHS expression which are replaced when the pseudo-code is turned into Fortran **or** compute intermediate variables which are stored and then that memory is accessed when computing the RHS. Simplistically, the first approach results in a lower memory footprint but higher arithmetic intensity whereas the second approach requires more memory, requires accessing these additional memory addresses but has a lower arithmetic intensity.    
 
 Let us assume that the user has created an almost identical ``rhs.py`` to the one in the previous sub-section for their one-dimensional case, but this time ``p`` is a stored variable :
 
@@ -632,17 +632,17 @@ This results in the following Fortran code, note how ``qst(i-1,indvarsst(1))`` h
 	!
 	!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-	d1_FluXx_dx_0_im1jk = (q(i-1,indvars(1))*q(i-1,indvars(2))*q(i-1,indvars(2))+&
+	d1_FluMx_dx_0_im1jk = (q(i-1,indvars(1))*q(i-1,indvars(2))*q(i-1,indvars(2))+&
 			    qst(i-1,indvarsst(1)))
 
-	d1_FluXx_dx_0_ip1jk = (q(i+1,indvars(1))*q(i+1,indvars(2))*q(i+1,indvars(2))+&
+	d1_FluMx_dx_0_ip1jk = (q(i+1,indvars(1))*q(i+1,indvars(2))*q(i+1,indvars(2))+&
 			    qst(i+1,indvarsst(1)))
 
-	d1_FluXx_dx_0_ijk = -&
-		  0.5_wp*d1_FluXx_dx_0_im1jk+&
-		  0.5_wp*d1_FluXx_dx_0_ip1jk
+	d1_FluMx_dx_0_ijk = -&
+		  0.5_wp*d1_FluMx_dx_0_im1jk+&
+		  0.5_wp*d1_FluMx_dx_0_ip1jk
 
-	d1_FluXx_dx_0_ijk = d1_FluXx_dx_0_ijk*param_float(1)
+	d1_FluMx_dx_0_ijk = d1_FluMx_dx_0_ijk*param_float(1)
 
 
 
@@ -653,7 +653,7 @@ This results in the following Fortran code, note how ``qst(i-1,indvarsst(1))`` h
 	!***********************************************************
 
 
-	rhs(i,indvars(2)) =   -  ( d1_FluXx_dx_0_ijk ) 
+	rhs(i,indvars(2)) =   -  ( d1_FluMx_dx_0_ijk ) 
 
 
 
