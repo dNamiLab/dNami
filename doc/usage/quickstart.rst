@@ -56,7 +56,7 @@ GNU **gfortran** compiler).
 
     brew install open-mpi
 
-   If you are running a different Linux or Linux tool distribution check the documentation on how to install MPI.
+   If you are running a different Linux distribution check the documentation on how to install MPI.
 
 Steps to run a case 
 -------------------
