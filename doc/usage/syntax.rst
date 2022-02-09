@@ -55,7 +55,7 @@ Second order derivative syntax
 ==============================
 
 
-To specify second order derivatives, two ways are currently possible. The user can directly specify a second derivative (discretised as a second derivative) or by taking the first derivative twice as detailed below. The two approaches are mathematically equivalent but will yields different results when discretised. The curly-bracket '}' symbol is used when taking a derivative inside another derivative. This approach can also be applied to cross-derivates.   
+To specify second order derivatives, two ways are currently possible. The user can directly specify a second derivative (discretised as a second derivative) or by taking the first derivative twice as detailed below. The two approaches are mathematically equivalent but will yields different results when discretised. The curly-bracket '}' symbol is used when taking a derivative inside another derivative. This approach can also be applied to cross-derivatives.   
 
 .. table:: Second derivative notation expressed in dNami syntax
 
