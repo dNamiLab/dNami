@@ -157,25 +157,25 @@ With the equations in place, the second step involves choosing the various numer
 
 .. code-block:: python
 
-    append_Rhs(divF, 5,4, rhsname, vnamesrc_divF, update=False,rhs=rhs,stored=True)                           
+    append_Rhs(divF,5,4,rhsname,vnamesrc_divF,update=False,rhs=rhs,stored=True)                           
 
 In this example, a standard 11 point, 10 :sup:`th` order filter is used and is applied to the conservative variables using the following: 
 
 .. code-block:: python
 
-    genFilter(11,10, len(varsolved),rhs=rhs)
+    genFilter(11,10,len(varsolved),rhs=rhs)
 
 The points between the edge boundary points and the domain which is more than a half stencil away from the edge have to be dealt with differently as a full stencil of points is not available. The following code block discretises the governing equation with a progressive scheme stencil and order modification as the edge of the domain is approached:  
 
 .. code-block:: python
 
-    genBC(Save_eqns['divF']  ,3,2, rhsname , vnamesrc_divF, update=False,rhs=rhs)
+    genBC(Save_eqns['divF'],3,2,rhsname ,vnamesrc_divF,update=False,rhs=rhs)
 
 The physical boundary conditions at the edge of the domain are enforced with the following line (where derivatives are computed with a 3 point, 2 :sup:`nd` order, one-sided derivative). The ``setbc`` option specifies the boundary in question (here ``i1``) and whether the physical boundary conditions are enforced on the RHS or directly on the primitive variables (here on the ``rhs``).  
 
 .. code-block:: python
 
-    genBC(src_phybc_wave_i1,3,2,rhsname , vnamesrc_divF, setbc=[True,{'char':{'i1':['rhs']}}]  , update=False,rhs=rhs)
+    genBC(src_phybc_wave_i1,3,2,rhsname,vnamesrc_divF,setbc=[True,{'char':{'i1':['rhs']}}], update=False,rhs=rhs)
 
 The ``rhs.py`` and ``genRhs.py`` files **must be placed** in the ``src/generate/`` folder. Changing up to the ``src/`` folder and running the ``./install_clean.sh`` command will translate the symbolic expressions into Fortran code with the aforementioned numerics and compile the code. Running the command ``source env_dNami.sh`` will add the necessary environment variables to the path.  
 
@@ -195,8 +195,8 @@ The final step involves setting the run parameters and advancing the solution in
         with_grid   = [480]  # number of points
 
         # ... and time ...
-        with_dt   = dn.cst(5.00e-4) # time step
-        filtr_amp = dn.cst(0.1)    # filter amplitude
+        with_dt   = dn.cst(5.e-4) # time step
+        filtr_amp = dn.cst(0.1)   # filter amplitude
 
         # ... as fast as possible!
         with_proc = [2] # mpi proc. topology
