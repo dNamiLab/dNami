@@ -14,7 +14,9 @@ dNami uses MPI and cache blocking techniques to speed up stencil-based operation
 
 The time evolution of a variety of physical and biological processes may be described by systems of balance laws, which, if given appropriate initial and boundary conditions, dictate the future states of the systems. For instance, systems of balance laws invoking mass, momentum and energy have been incredibly successful at providing meaningful insights to the future states of realistic systems in physics (e.g.\ fluid dynamics). Yet, experimenting numerically with such systems still requires much implementation time. \texttt{dNami} (di:na:mi:) was created so that more research time is spent exploring the dynamical properties of the system of balance laws of interest to the user, and less time is wasted on its numerical implementation across the whole computational spectrum, from the initial small-scale exploratory work on a workstation to the final large-scale computations on national clusters. Thus, \texttt{dNami} is a computational framework to study problems of the form:
 
-<img src="https://render.githubusercontent.com/render/math?math=\frac{\partial\textbf{q}}{\partial t} = \textbf{F}(\textbf{q}) \,\, + \,\, \mbox{initial/boundary conditions},">
+<p align="center">
+  <img src="./doc/usage/img/gov_eq.gif" alt="gov_eq.gif" />
+</p>
 
 in a flexible and efficient manner, where $\textbf{q} \in \mathbb{R}^n$ is a vector of $n$ real-valued unknowns, $t$ is time, and $\textbf{F}(\textbf{q})$ is a generic function of $\textbf{q}$ which may include differential and algebraic operators.
 
