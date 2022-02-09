@@ -6,7 +6,7 @@ Get the code and setup your environment in Linux
 
 The following instructions will walk you through the installation
 process of dNami in Linux. You need to have a working **Python3**
-environment and a **FORTRAN** compiler (Intels **ifort** or the
+environment and a **Fortran** compiler (Intel's **ifort** or the
 GNU **gfortran** compiler).
 
 #. Clone dNami from the github repository
@@ -82,7 +82,11 @@ Setting up a basic case like this is essentially a three-step process:
 2. Specify the desired numerics in the ``genRhs.py`` file then generate and compile the fortran  code
 3. Specify the problem parameter and integrate the equations in time in the ``compute.py`` file
 
-A minimal functional example for each of these files that allow the case to be run are given in the `/exm/1d_euler_nonreflective` directory. The core elements of each of these files are presented here. The user is referred to the API documentation for the settings and function arguments not detailed here. :numref:`exworkflow` shows an overview of the file locations and steps detailed below.  
+.. note::
+
+    A minimal functional example for each of these files that allow the case to be run are given in the ``/exm/1d_euler_nonreflective`` directory. The core elements of each of these files are presented here. 
+
+The user is referred to the API documentation for the settings and function arguments not detailed here. :numref:`exworkflow` shows an overview of the file locations and steps detailed below.  
 
 .. _exworkflow: 
 .. figure:: img/dnami_example.png
