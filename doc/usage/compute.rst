@@ -14,7 +14,7 @@ The first ``dnami`` library function called in the ``compute.py`` is:
 
         dtree = dn.create_tree()
 
-This creates a dictionary of dictionaries each containing information about different aspects of the computation henceforth referred to as the 'tree'. Many dictionaries are initially empty but some contain information derived for the pseudo-code translation and compilation steps such as a list of the solved and stored variables or the number of halo points (determined by the largest finite-difference or filter stencil). For example, inspection of the `src/dnami.py` source shows an equation-related dictionary being populated with the list of solved variables:
+This creates a dictionary of dictionaries each containing information about different aspects of the computation henceforth referred to as the 'tree'. Many dictionaries are initially empty but some contain information derived for the pseudo-code translation and compilation steps such as a list of the solved and stored variables or the number of halo points (determined by the largest finite-difference or filter stencil). For example, inspection of the ``src/dnami.py`` source shows an equation-related dictionary being populated with the list of solved variables:
  
 .. code-block:: python
 
