@@ -60,7 +60,7 @@ The ``Variable Name`` must match one of the ``varname`` keys. ``Pseudo-Code Eqns
 
     .. code-block:: python
 
-        {'Variable Name': 'Pseudo-Code Eqns for -RHS'}
+        {'Variable Name': 'Pseudo-Code Eqns for -f(q)'}
 
 
 
