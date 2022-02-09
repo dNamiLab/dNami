@@ -1,7 +1,7 @@
 Quickstart guide
 ****************
 
-Get the code and setup your environment on Unix (Linux or MacOS)
+Get the code and setup your environment on Unix (Linux or macOS)
 ----------------------------------------------------------------
 
 The following instructions will walk you through the installation
@@ -50,13 +50,13 @@ GNU **gfortran** compiler).
 
     sudo apt-get -y install openmpi-bin
 
-   The following command will install **OpenMPI** on MacOS (if `homebrew <https://brew.sh/>`_  is installed):
+   The following command will install **OpenMPI** on macOS (if `homebrew <https://brew.sh/>`_  is installed):
 
    .. code-block:: bash
 
     brew install open-mpi
 
-   If you are running a different Linux distribution check the documentation on how to install MPI.
+   If you are running a different Linux or Linux tool distribution check the documentation on how to install MPI.
 
 Steps to run a case 
 -------------------
