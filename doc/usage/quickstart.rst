@@ -70,11 +70,13 @@ The details of each of the keys files (``rhs.py``, ``genRhs.py`` and ``compute.p
 Solving the 1D Euler equations
 ------------------------------
 
-As an example and quickstart guide to the steps in setting up a case in dNami, the 1D ideal gas Euler equations are integrated in time to solve the propagation of an entropy wave out of the computational domain. 
+As an example and quickstart guide to the steps in setting up a case in dNami, the 1D ideal gas Euler equations
 
 .. math::
 
    \dfrac{\partial }{\partial t} \begin{pmatrix} \rho  \\ \rho u  \\ \rho e_t \end{pmatrix}  + \dfrac{\partial }{\partial x} \begin{pmatrix} \rho u   \\ \rho u^2 + p   \\ u ( \rho e_t + p) \end{pmatrix}   = \mathbf{0}
+
+are integrated in time to solve the propagation of an entropy wave out of the computational domain.
 
 Setting up a basic case like this is essentially a three-step process:
 
@@ -107,18 +109,18 @@ To specify that we wish to advance them in conservative form, we refer to the co
 
 .. code-block:: python
 
-        consvar      = [2,3] 
+        consvar = [2,3] 
 
 
 To specify the right hand side, a dictionary of the flux divergence is created with the component-by-component contributions specified with the corresponding keys.  Note the use of the `[ ]_1x` syntax for the spatial derivative. The details of this syntax are given in XXX.  
 
 .. code-block:: python
 
-        divF    = {  
+        divF = {  
                 'rho' : ' [ rho*u          ]_1x ', 
                 'u'   : ' [ rho*u*u + p    ]_1x ', 
                 'et'  : ' [ u*(rho*et + p) ]_1x ', 
-                }
+               }
 
 Intermediate variables such as the pressure term ``p`` can be either replaced when the code is generated (via an alias) or computed during the time loop, stored and used when computing the right-hand side. In the current example, an alias for ``p`` is created using the ``varloc`` dictionary. This approach gives the user flexibility to store and output intermediate variables as well as test the impact of different combinations on computational efficiency.  
 
@@ -127,15 +129,15 @@ Intermediate variables such as the pressure term ``p`` can be either replaced wh
         varloc = { 'e' : ' (et - 0.5_wp*u*u) ',                        #internal energy
                    'p' : ' delta*rho*e       ',                        #pressure 
                    'c' : '( ( 1.0_wp + delta ) * p / rho  )**0.5_wp ', #isentropic speed of sound
-                   }
+                 }
 
 The constant coefficients involved in the equations (e.g. ``delta``) are declared at the start of the ``rhs.py`` file in the ``coefficients`` dictionary.
 
 .. code-block:: python
 
         coefficients = {
-                'delta' : 1, # R/Cv
-                }
+                         'delta' : 1, # R/Cv
+                       }
 
 Similarly, a separate set of equations for the boundary conditions can be symbolically specified in the ``rhs.py``. For instance, the 1D non-reflecting boundary conditions are implemented in this example using the following expression which gives the time-update of the rhs:
 
