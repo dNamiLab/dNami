@@ -219,7 +219,7 @@ Let us assume that the user has created the following ``rhs.py`` for their one-d
 
         # - Local variables
         varloc = { 'e'  : ' (et - 0.5_wp*u*u) ',  #internal energy
-                   'p'  : 'delta*rho*e        ',     #pressure equation of state
+                   'p'  : 'delta*rho*e        ',  #pressure equation of state
                  }
 
         # - Divergence of the flux function 
@@ -554,21 +554,21 @@ Let us assume that the user has created an almost identical ``rhs.py`` to the on
 .. code-block:: python
 
         # - Local variables
-        varloc = { 'e' : ' (et - 0.5_wp*u*u) ',  #internal energy
-                   #'p' : 'delta*rho*e     ',    #pressure equation of state - NOT USED, p IS STORED
-                        }
+        varloc = { 'e' : ' (et - 0.5_wp*u*u) ',  # internal energy
+                  #'p' : '   delta*rho*e     ',  # pressure equation of state - NOT USED, p IS STORED
+                 }
 
 	# -- Stored variables
-	varstored    = {
-		 'p' : {'symb': " delta * rho * e", 
-				 'ind':1 ,
-				 'static': False}, # pressure equation of state
-			}
+	varstored = {
+		      'p' : {'symb'   : " delta * rho * e", 
+		             'ind'    : 1,
+			     'static' : False},  # pressure equation of state
+		    }
 
         # - Divergence of the flux function 
         divF    = {  
                 'rho' : ' [ rho*u          ]_1x ', 
-                'u'   : ' [ rho*u*u + p    ]_1x ', 
+                'u'   : ' [ rho*u*u   + p  ]_1x ', 
                 'et'  : ' [ u*(rho*et + p) ]_1x ', 
                 }
 
