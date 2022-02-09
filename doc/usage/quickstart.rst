@@ -187,19 +187,19 @@ The final step involves setting the run parameters and advancing the solution in
 
         # Solve the equation ...
         # ... for fluid ...
-        delta    = dn.cst(0.4) # R/Cv
+        delta       = dn.cst(0.4) # R/Cv
 
         # ... in space ...
         L = dn.cst(1.) 
-        with_length = [L]    # domain length 
-        with_grid   = [480]  # number of points
+        with_length = [L]         # domain length 
+        with_grid   = [480]       # number of points
 
         # ... and time ...
         with_dt   = dn.cst(5.e-4) # time step
         filtr_amp = dn.cst(0.1)   # filter amplitude
 
         # ... as fast as possible!
-        with_proc = [2] # mpi proc. topology
+        with_proc = [2]           # mpi proc. topology
 
 This information is passed to the dNami Python interface which allocates the memory based on the computational parameters and prepares a number of useful aliases. The density, velocity and total energy fields can be filled with the initial conditions via references to the allocated memory. Here a half-sine wave perturbation is applied to the density field. A uniform velocity field is specified and the total energy is updated with the internal energy computed at fixed pressure corresponding to an entropy perturbation.  
 
