@@ -12,7 +12,7 @@ Assume that ones want to march in time the 2D compressible Euler equations given
 
 .. math::
 
-   \dfrac{\partial }{\partial t} \begin{pmatrix} \rho  \\ \rho u \\ \rho v  \\ \rho e_t \end{pmatrix}  + \dfrac{\partial }{\partial x} \begin{pmatrix} \rho u   \\ \rho u^2 + p \\ \rho u v    \\ u ( \rho e_t + p) \end{pmatrix}  + \dfrac{\partial }{\partial y} \begin{pmatrix} \rho v   \\ \rho u v \\ \rho v^2 + p    \\ v ( \rho e_t + p) \end{pmatrix} = 0
+   \dfrac{\partial }{\partial t} \begin{pmatrix} \rho  \\ \rho u \\ \rho v  \\ \rho e_t \end{pmatrix}  + \dfrac{\partial }{\partial x} \begin{pmatrix} \rho u   \\ \rho u^2 + p \\ \rho u v    \\ u ( \rho e_t + p) \end{pmatrix}  + \dfrac{\partial }{\partial y} \begin{pmatrix} \rho v   \\ \rho u v \\ \rho v^2 + p    \\ v ( \rho e_t + p) \end{pmatrix} = \mathbf{0}
 
 **Setting equations in rhs.py**
  
@@ -54,13 +54,13 @@ The ``Variable Name`` must match one of the ``varname`` keys. ``Pseudo-Code Eqns
 
 	.. math::
 
-   		\dfrac{\partial \textbf{q} }{\partial t} = \textbf{F}\left( \textbf{q} \right)
+   		\dfrac{\partial \textbf{q} }{\partial t} = f\left( \textbf{q} \right)
 
-    The ``'Pseudo-Code Eqns'`` fed to the code generation step and referred throughout this documentation as 'RHS' must be equal to :math:`-\textbf{F}(\textbf{q})` i.e.: 
+    The ``'Pseudo-Code Eqns'`` fed to the code generation step and referred throughout this documentation as 'RHS' must be equal to :math:`-f(\textbf{q})` i.e.: 
 
     .. code-block:: python
 
-        {'Variable Name': 'Pseudo-Code Eqns'}
+        {'Variable Name': 'Pseudo-Code Eqns for -RHS'}
 
 
 
