@@ -139,7 +139,7 @@ The constant coefficients involved in the equations (e.g. ``delta``) are declare
                          'delta' : 1, # R/Cv
                        }
 
-Similarly, a separate set of equations for the boundary conditions can be symbolically specified in the ``rhs.py``. For instance, the 1D non-reflecting boundary conditions are implemented in this example using the following expression which gives the time-update of the rhs:
+Similarly, a separate set of equations for the boundary conditions can be symbolically specified in the ``rhs.py``. For instance, the 1D non-reflecting boundary conditions are implemented in this example using the following expression which gives the time-update of the right-hand side:
 
 .. code-block:: python
 
