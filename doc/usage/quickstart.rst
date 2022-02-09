@@ -159,13 +159,13 @@ The reader is referred to the file itself and the literature for the details of 
 
 **Specifying the numerical options**
 
-With the equations in place, the second step involves choosing the various numerics. In the ``genRhs.py`` file, the user can specify a number of parameters. First the ``append_Rhs`` function allows the user to choose the discretisation scheme for the input equations and whether this sets or is appended to the current RHS (via the ``update`` argument). This means that the user can compute different terms of the RHS with different spatial schemes. In the following code block, the RHS is set using the expression detailed in the previous section using a 5 point, 4 :sup:`th` order centered finite difference stencil.  
+With the equations in place, the second step involves choosing the various numerics. In the ``genRhs.py`` file, the user can specify a number of parameters. First the ``append_Rhs`` function allows the user to choose the discretisation scheme for the input equations and whether this sets or is appended to the current RHS (via the ``update`` argument). This means that the user can compute different terms of the RHS with different spatial schemes. In the following code block, the RHS is set using the expression detailed in the previous section using a 5 point, 4\ :sup:`th` order centered finite difference stencil.  
 
 .. code-block:: python
 
     append_Rhs(divF,5,4,rhsname,vnamesrc_divF,update=False,rhs=rhs,stored=True)                           
 
-In this example, a standard 11 point, 10 :sup:`th` order filter is used and is applied to the conservative variables using the following: 
+In this example, a standard 11 point, 10\ :sup:`th` order filter is used and is applied to the conservative variables using the following: 
 
 .. code-block:: python
 
@@ -177,7 +177,7 @@ The points between the edge boundary points and the domain which is more than a 
 
     genBC(Save_eqns['divF'],3,2,rhsname ,vnamesrc_divF,update=False,rhs=rhs)
 
-The physical boundary conditions at the edge of the domain are enforced with the following line (where derivatives are computed with a 3 point, 2 :sup:`nd` order, one-sided derivative). The ``setbc`` option specifies the boundary in question (here ``i1``) and whether the physical boundary conditions are enforced on the RHS or directly on the primitive variables (here on the ``rhs``).  
+The physical boundary conditions at the edge of the domain are enforced with the following line (where derivatives are computed with a 3 point, 2\ :sup:`nd` order, one-sided derivative). The ``setbc`` option specifies the boundary in question (here ``i1``) and whether the physical boundary conditions are enforced on the RHS or directly on the primitive variables (here on the ``rhs``).  
 
 .. code-block:: python
 

@@ -185,7 +185,7 @@ The pressure and density are initialised based on isentropic ideal gas relations
    \end{matrix}
    \right.
 
-The baseflow and vortex speed are specified via the Mach numbers :math:`M_i=0.5` and :math:`M_v=0.5` respectively. The mesh and initial density condition are shown in :numref:`2d_wmesh`. The case is run at a fixed grid size and timestep for various finite-difference schemes and orders. The same 11-point, 10 :sup:`th` order filter is used for every case. The results for standard finite difference schemes from 2 :sup:`nd` to 10 :sup:`th` order are shown in :numref:`2d_wmesh_ord`.  
+The baseflow and vortex speed are specified via the Mach numbers :math:`M_i=0.5` and :math:`M_v=0.5` respectively. The mesh and initial density condition are shown in :numref:`2d_wmesh`. The case is run at a fixed grid size and timestep for various finite-difference schemes and orders. The same 11-point, 10\ :sup:`th` order filter is used for every case. The results for standard finite difference schemes from 2\ :sup:`nd` to 10\ :sup:`th` order are shown in :numref:`2d_wmesh_ord`.  
 
 .. _2d_wmesh_ord:
 .. figure:: img/2d_wavymesh_FD.png
@@ -255,7 +255,7 @@ where the derivatives of the potential :math:`\psi` and the pressure fluctuation
    \end{matrix}
    \right.
 
-The vortex is initially centered in the domain i.e. :math:`(x_0,y_0)=(0.5L_x, 0.5L_y)`. The vortex strength :math:`\Gamma` is set using :math:`\Gamma = U_{v}R \sqrt{e}` where :math:`U_{v} = 0.25`. :numref:`2d_vortex_exit` shows the density fluctuations as the vortex is advected out of the domain via the upper boundary. The governing equations are discretised using a 9 point, 8 :sup:`th` order centered finite difference scheme and the conservative variables are filtered using a standard 11 point, 10 :sup:`th` order filter. The aim of this test case is to show the ability of the boundary conditions to evacuate the vortex while generating the least amount of spurious noise. With the quasi-one dimensional approach shown here, the density fluctuation do not exceed 3.5\%.    
+The vortex is initially centered in the domain i.e. :math:`(x_0,y_0)=(0.5L_x, 0.5L_y)`. The vortex strength :math:`\Gamma` is set using :math:`\Gamma = U_{v}R \sqrt{e}` where :math:`U_{v} = 0.25`. :numref:`2d_vortex_exit` shows the density fluctuations as the vortex is advected out of the domain via the upper boundary. The governing equations are discretised using a 9 point, 8\ :sup:`th` order centered finite difference scheme and the conservative variables are filtered using a standard 11 point, 10\ :sup:`th` order filter. The aim of this test case is to show the ability of the boundary conditions to evacuate the vortex while generating the least amount of spurious noise. With the quasi-one dimensional approach shown here, the density fluctuation do not exceed 3.5\%.    
 
 
 .. only:: html
@@ -309,12 +309,12 @@ The incompressible pressure solution is projected onto an isochore in thermodyna
 
       Animation of the x-direction velocity field at :math:`z=z_{max}/2`
 
-The more common low-Mach validation case with :math:`Ma=0.1` is run. The complexity of the case arises as the flow transitions to turbulence. A lack of spatial resolution quickly leads to a degradation of the solution due to dissipation and dispersion. A more detailed discussion can be found here :cite:`debonis2013solutions`. A commonly used measure involves tracking the enstrophy (i.e. the domain integral of the squared vorticity) over time. This is strongly affected by numerical methods (e.g. the amount of filtering or the numerical dissipation introduced by the discretisation). With dNami pseudo-code, different formulations of the governing equations can easily be implemented. The ``rhs.py`` file for the 3D TGV case contains two versions of the equations. :numref:`3d_tgv_formulation` shows a comparison between conservative and skew-symmetric formulations for various grid sizes and a comparison to a spectral method based reference :cite:`wang2013high` of the enstrophy  over reduced time. All three finite-difference based computations presented in the graph use an 11 point, 10 :sup:`th` order scheme.  
+The more common low-Mach validation case with :math:`Ma=0.1` is run. The complexity of the case arises as the flow transitions to turbulence. A lack of spatial resolution quickly leads to a degradation of the solution due to dissipation and dispersion. A more detailed discussion can be found here :cite:`debonis2013solutions`. A commonly used measure involves tracking the enstrophy (i.e. the domain integral of the squared vorticity) over time. This is strongly affected by numerical methods (e.g. the amount of filtering or the numerical dissipation introduced by the discretisation). With dNami pseudo-code, different formulations of the governing equations can easily be implemented. The ``rhs.py`` file for the 3D TGV case contains two versions of the equations. :numref:`3d_tgv_formulation` shows a comparison between conservative and skew-symmetric formulations for various grid sizes and a comparison to a spectral method based reference :cite:`wang2013high` of the enstrophy  over reduced time. All three finite-difference based computations presented in the graph use an 11 point, 10\ :sup:`th` order scheme.  
 
 .. _3d_tgv_formulation:
 .. figure:: img/3d_tgv_enstrophy.png
    :align: center
    :width: 70%
 
-   Comparison of the enstrophy vs time profile for the conservative formulation using 600 :sup:`3` points (blue), conservative formulation using 260 :sup:`3` points (red), skew symmetric formulation using 260 :sup:`3` points (green) and the 512 degree of freedom spectral solution (dashed black).
+   Comparison of the enstrophy vs time profile for the conservative formulation using 600\ :sup:`3` points (blue), conservative formulation using 260\ :sup:`3` points (red), skew symmetric formulation using 260\ :sup:`3` points (green) and the 512 degree of freedom spectral solution (dashed black).
 

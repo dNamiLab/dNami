@@ -146,7 +146,7 @@ Finally, at least one equation must be specified to set the RHS used to march th
 
 	append_Rhs(divF,5,4,rhsname,vnamesrc_divF,update=False,rhs=rhs,stored=False)
 
-which generates the discretised version of ``divF`` using a 5 point, 4 :sup:`th` order centered finite difference scheme with ``rhsname`` being used to generate code comments and ``vnamesrc_divF`` being used to generate intermediate variable names. The ``update=False`` argument guarantees that the components of ``divF`` are being used to set the RHS rather than be added to existing terms. The ``stored=False`` argument determines if the stored variables (see the related Advanced use section below) are computed with the stencil/order given as input to the ``append_Rhs()`` function; note that only one call with ``stored=True`` is possible, i.e. all stored quantities will be discretised with the same scheme. 
+which generates the discretised version of ``divF`` using a 5 point, 4\ :sup:`th` order centered finite difference scheme with ``rhsname`` being used to generate code comments and ``vnamesrc_divF`` being used to generate intermediate variable names. The ``update=False`` argument guarantees that the components of ``divF`` are being used to set the RHS rather than be added to existing terms. The ``stored=False`` argument determines if the stored variables (see the related Advanced use section below) are computed with the stencil/order given as input to the ``append_Rhs()`` function; note that only one call with ``stored=True`` is possible, i.e. all stored quantities will be discretised with the same scheme. 
 
 This ends the list of compulsory steps when creating a ``genRhs.py``. 
 
@@ -162,7 +162,7 @@ The user has access to a number of additional automatic code-generation steps de
 
 *Adding explicit filtering*
 
-To add explicit filtering to the computation, the user can call the ``genFilter`` function. Currently, the function relies on pre-specified coefficients for a given stencil/order (which can be found at the start of the ``genKer.py`` file). For example, the following code block generates code to apply a standard 11 point, 10 :sup:`th` order filter to each of the directions (between 1 and 3 depending on ``dim``): 
+To add explicit filtering to the computation, the user can call the ``genFilter`` function. Currently, the function relies on pre-specified coefficients for a given stencil/order (which can be found at the start of the ``genKer.py`` file). For example, the following code block generates code to apply a standard 11 point, 10\ :sup:`th` order filter to each of the directions (between 1 and 3 depending on ``dim``): 
 
 .. code-block:: python
 
