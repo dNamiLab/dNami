@@ -305,7 +305,7 @@ class type_mpi:
 
     def swapX(self, f, nh, tree):
         """
-        Swap array "f(X,:)" (a function of position vector X ) in the x-direction
+        Swaps array "f(X,:)" (a function of position vector X ) in the x-direction
         over its first ":" variables with halo size "nh".
 
         Args:
