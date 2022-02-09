@@ -69,7 +69,7 @@ By default, the grid is written to ``out/axes.bin``. It contains the information
      :width: 80%
      :align: center
 
-     Distribution of grid points along a spatial direction with periodic and non-periodic boundary conditions
+     Distribution of grid points along a spatial direction with periodic and non-periodic boundary conditions. The black dots represent the location of the grid points. The same number of points is used for each case. 
         
 
 Allocating memory
