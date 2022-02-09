@@ -167,7 +167,7 @@ To add explicit filtering to the computation, the user can call the ``genFilter`
 .. code-block:: python
 
     # Generate Filters (if required):      
-    genFilter(11,10, len(varsolved),rhs=rhs)
+    genFilter(11,10,len(varsolved),rhs=rhs)
 
 The user can specify the filter amplitude in the ``compute.py``. 
 
