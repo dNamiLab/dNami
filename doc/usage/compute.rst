@@ -21,7 +21,7 @@ This creates a dictionary of dictionaries each containing information about diff
         for v in varsolved:
                 dtree['eqns']['qvec']['solved'].append([v,varname[v]])   
 
-where ``varsolved`` was imported from information generated from the `rhs.py` file. In the case of the 1D Euler equations solved in the quickstart guide, this list would contain `rho, u, et` which are the density, the velocity and the total energy. After this tree creating step, the information about the computational parameters have to be given to the tree e.g. the grid size, the MPI domain decomposition, etc. For instance, the number of x-direction grid points ``nxgb`` can be set in the relevant section of the tree as:
+where ``varsolved`` was imported from information generated from the ``rhs.py`` file. In the case of the 1D Euler equations solved in the quickstart guide, this list would contain `rho, u, et` which are the density, the velocity and the total energy. After this tree creating step, the information about the computational parameters have to be given to the tree e.g. the grid size, the MPI domain decomposition, etc. For instance, the number of x-direction grid points ``nxgb`` can be set in the relevant section of the tree as:
 
 .. code-block:: python
 
