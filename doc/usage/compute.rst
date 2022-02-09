@@ -8,7 +8,7 @@ Each of the following code blocks assume that the ``dnami`` Python library has b
 Creating the tree
 #################
 
-The first ``dnami`` library function called in the `compute.py` is: 
+The first ``dnami`` library function called in the ``compute.py`` is: 
 
 .. code-block:: python
 
