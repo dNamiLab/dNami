@@ -128,7 +128,7 @@ If the user chooses to create stored variables in the ``rhs.py`` then these quan
    if 'qstored' in dtree['eqns']['qvec']['views'].keys():
         dn.dnamiF.stored(intparam,fltparam,data,m)      
 
-where :math:`\texttt{m=0}` will compute the static variables and :math:`\texttt{m=1}` will compute the non-static variables. In the case that one of the variables is used to update the RHS, then this call should be made at every sub-RK step before the call to the ``time_march()`` funtion. 
+where :math:`m=0` will compute the static variables and :math:`m=1` will compute the non-static variables. In the case that one of the variables is used to update the RHS, then this call should be made at every sub-RK step before the call to the ``time_march()`` funtion. 
 
 Restarting a simulation
 #######################
