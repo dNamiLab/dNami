@@ -16,7 +16,7 @@ For the specific inputs, users are invited to check the relevant :doc:`/usage/ap
 Plotting data 
 #############
 
-Below is a basic code block for reading a plotting a slice of a 3D data field output by dNami. The example assumes that the user has run the 3D TGV case (source files are in ``exm/3d_tgv``) for at least 15000 timesteps. The code-block imports ``matplotlib`` for plotting purposes. The example shows how to load the 3D data array, extract an (x,y) plane of the x-direction velocity field at half the z-direction height and plot it.   
+Below is a basic code block for reading and plotting a slice of a 3D data field output by dNami. The example assumes that the user has run the 3D TGV case (source files are in ``exm/3d_tgv``) for at least 15000 timesteps. The code-block imports ``matplotlib`` for plotting purposes. The example shows how to load the 3D data array, extract an (x,y) plane of the x-direction velocity field at half the z-direction height and plot it.   
 
 .. code-block:: python
 
