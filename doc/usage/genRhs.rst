@@ -152,7 +152,7 @@ This ends the list of compulsory steps when creating a ``genRhs.py``.
 
 .. warning::
 
-    When no boundary conditions are specified in a given direction, the default behaviour assumes that that direction is **periodic**. 
+    When no boundary conditions are specified in a given direction, the default behaviour assumes that the direction is **periodic**. 
         
 
 
