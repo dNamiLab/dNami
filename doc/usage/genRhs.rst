@@ -111,7 +111,7 @@ The first lines in any ``genRhs.py`` will involve importing the necessary code-c
         
         wp = 'float64'
 
-dNami offer the flexibility of using a combination of different numerical schemes as well as a filter with each relying on a stencil size that need not be identical. :numref:`hlo_glob`. illustrates the stencils for a filter that uses 11 points and a finite-difference scheme that uses 5 points. 
+dNami offers the flexibility of using a combination of different numerical schemes as well as a filter with each relying on a stencil size that need not be identical. :numref:`hlo_glob`. illustrates the stencils for a filter that uses 11 points and a finite-difference scheme that uses 5 points. 
 
 .. _hlo_glob: 
 .. figure:: img/halo_glob.png
@@ -133,18 +133,18 @@ Next, the user must initialise the ``rhs`` class which is used to store and tran
     from genKer import rhs_info    
     rhs = rhs_info()
 
-Then, the Runge-Kutta time-marching steps are generated with calls to the following functions:
+Then, the Runge--Kutta time-marching steps are generated with calls to the following functions:
 
 .. code-block:: python
 
-    genrk3(len(varsolved)      ,rhs=rhs) 
+    genrk3(      len(varsolved),rhs=rhs) 
     genrk3update(len(varsolved),rhs=rhs)
 
 Finally, at least one equation must be specified to set the RHS used to march the variables in time, for example:
 
 .. code-block:: python
 
-	append_Rhs(divF, 5, 4, rhsname,vnamesrc_divF,update=False,rhs=rhs,stored=False)
+	append_Rhs(divF,5,4,rhsname,vnamesrc_divF,update=False,rhs=rhs,stored=False)
 
 which generates the discretised version of ``divF`` using a 5 point, 4 :sup:`th` order centered finite difference scheme with ``rhsname`` being used to generate code comments and ``vnamesrc_divF`` being used to generate intermediate variable names. The ``update=False`` argument guarantees that the components of ``divF`` are being used to set the RHS rather than be added to existing terms. The ``stored=False`` argument determines if the stored variables (see the related Advanced use section below) are computed with the stencil/order given as input to the ``append_Rhs()`` function; note that only one call with ``stored=True`` is possible, i.e. all stored quantities will be discretised with the same scheme. 
 
