@@ -112,7 +112,7 @@ To specify that we wish to advance them in conservative form, we refer to the co
         consvar = [2,3] 
 
 
-To specify the right hand side, a dictionary of the flux divergence is created with the component-by-component contributions specified with the corresponding keys.  Note the use of the `[ ]_1x` syntax for the spatial derivative. The details of this syntax are given in XXX.  
+To specify the right hand side, a dictionary of the flux divergence is created with the component-by-component contributions specified with the corresponding keys.  Note the use of the `[ ]_1x` syntax for the spatial derivative. The details of this syntax are given in :doc:`/usage/syntax`.  
 
 .. code-block:: python
 
