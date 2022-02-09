@@ -39,7 +39,7 @@ The time evolution of a variety of physical and biological processes may be desc
 \frac{\partial\textbf{q}}{\partial t} = f(\textbf{q}) \,\, + \,\, \mbox{initial/boundary conditions},
 \end{equation}
 
-in a flexible and efficient manner, where $\textbf{q} \in \mathbb{R}^n$ is a vector of $n$ real-valued unknowns, $t$ is time, and $\textbf{F}(\textbf{q})$ is a generic function of $\textbf{q}$ which may include differential and algebraic operators.
+in a flexible and efficient manner, where $f{q} \in \mathbb{R}^n$ is a vector of $n$ real-valued unknowns, $t$ is time, and $\textbf{F}(\textbf{q})$ is a generic function of $\textbf{q}$ which may include differential and algebraic operators.
 
 The ability of \texttt{dNami} to clearly separate the problem statement from its numerical implementation (often a major time sink in research laboratories) is rooted in the flexibility of the Python language so as to let the user define her/his own system of balance laws in the most natural way (i.e.\ using a human-readable syntax), which is then interpreted in Fortran to build a computationally-efficient library of \autoref{eq:gov_eq} which is callable from Python. Users can then easily interact with their own system of balance laws, including at runtime, thereby making it possible to integrate solutions to \autoref{eq:gov_eq} with other tools and libraries (e.g.\ optimisation and stability tools) to fully explore the properties of the system, seamlessly from small to large-scale calculations.
 
