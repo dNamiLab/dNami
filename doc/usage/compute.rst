@@ -121,7 +121,7 @@ The integer parameters (which are organised in a set pre-defined order) are used
 Computing stored variables
 ##########################
 
-If the user chooses to create stored variables in the ``rhs.py`` then these quantities can be computed by invoking the appropriate function in the ``compute.py``. When specifying the stored variable in the ``rhs.py``, the users can choose whether the variable is 'static' or not. This distinction can be used to differentiate between fields that need to calculated every time step (e.g. if the pressure is calculated and stored then used to update the RHS) or at regular intervals during the computation (e.g. an output of the vorticity field). To compute the value, the following code block is used:  
+If the user chooses to create stored variables in the ``rhs.py`` then these quantities can be computed by invoking the appropriate function in the ``compute.py``. When specifying the stored variable in the ``rhs.py``, the user can choose whether the variable is 'static' or not. This distinction can be used to differentiate between fields that need to be calculated every time step (e.g. if the pressure is calculated and stored then used to update the RHS) or at regular intervals during the computation (e.g. an output of the vorticity field). To compute the value, the following code block is used:  
 
 .. code-block:: python
 
