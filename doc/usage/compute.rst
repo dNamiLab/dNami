@@ -51,6 +51,26 @@ With the information supplied in the previous section, the appropriate number of
 
 Note that ``dtree['mpi']['dMpi']`` is a class.
 
+Creating the grid and writing to file
+##########################################
+
+The next step involved creating the computational grid based on the number of grid points and length in each spatial direction. The following lines, create the grid and then output it to a file. 
+
+.. code-block:: python
+
+        dtree = dn.create_grid(dtree)
+        dn.dnami_io.write_grid(dtree)
+
+
+By default, the grid is written to ``out/axes.bin``. It contains the information about the grid in each spatial direction. For each given direction, a different distribution of points is adopted is said direction is periodic or not. :numref:`grid_points` illustrates the distribution of points along a domain of size :math:`L` for both cases. Ff the direction is non-periodic, then the first (and last) point is located on the boundary. If the direction is periodic then the grid starts :math:`\Delta l/2` into the domain and ends :math:`\Delta l/2` from the end of the domain where :math:`\Delta l /2` is the grid spacing in :math:`x`,  :math:`y` or :math:`z`. 
+
+.. _grid_points:
+.. figure:: img/grid_points.png
+     :width: 80%
+     :align: center
+
+     Distribution of grid points along a spatial direction with periodic and non-periodic boundary conditions
+        
 
 Allocating memory
 #################
