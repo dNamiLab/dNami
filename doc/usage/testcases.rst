@@ -115,7 +115,7 @@ This case solves the two-dimensional gasdynamics equations in curvilinear coordi
         \rho u J V + \dfrac{\partial \eta}{\partial x} p \\
         \rho v J V - \dfrac{\partial \xi}{\partial x} p \\
         (\rho e_t +p ) J V \\
-       \end{pmatrix}  = 0    
+       \end{pmatrix}  = \textbf{0}    
        \end{equation}
 
 .. math::

@@ -50,15 +50,19 @@ The ``Variable Name`` must match one of the ``varname`` keys. ``Pseudo-Code Eqns
 
 .. warning::
 
-	Although dNami marches in times systems of the form:
+	Although dNami marches in time systems of the form:
 
 	.. math::
 
-   		\dfrac{\partial \textbf{q} }{\partial t} = \textbf{RHS}\left( \textbf{q} \right)
+   		\dfrac{\partial \textbf{q} }{\partial t} = \textbf{F}\left( \textbf{q} \right)
 
-	The ``'Pseudo-Code Eqns'`` are written on the left in::
+    The ``'Pseudo-Code Eqns'`` fed to the code generation step and referred throughout this documentation as 'RHS' must be equal to :math:`-\textbf{F}(\textbf{q})` i.e.: 
 
-		{'Variable Name': 'Pseudo-Code Eqns'}
+    .. code-block:: python
+
+        {'Variable Name': 'Pseudo-Code Eqns'}
+
+
 
 For the x derivative of the RHS in the 2D Euler equations we would write:
 
@@ -538,7 +542,6 @@ This will procude the following three 'do-loops' in the Fortran code:
 
            enddo
 
-The performance gains associated with this loop-splitting technique is illustrated for a more realistic case in the Performance section. 
 
 Advanced use: alias for a quantity vs storing a quantity  
 ########################################################

@@ -35,7 +35,7 @@ GNU **gfortran** compiler).
    If you want to run dNami in a distributed memory environment (cluster) or
    on multiple cores you also need to install **MPI** and **mpi4py**.
    If you already have a working MPI installation you can install mpi4py
-   using the Python package installter pip:
+   using the Python package installer pip:
 
    .. code-block:: bash
 
@@ -103,7 +103,7 @@ The ``rhs.py`` uses a list to define the variables to be advanced in time and py
 
         varsolved = ['rho','u','et']
 
-To specify that we wish to advance them in conservative form, we refer to the corresponding position in the above list with the ``consvar`` list (the index starts at 1 as this will be used in the fortran layer).  
+To specify that we wish to advance them in conservative form, we refer to the corresponding position in the above list with the ``consvar`` list (the index starts at 1 as this will be used in the Fortran layer).  
 
 .. code-block:: python
 
@@ -175,7 +175,7 @@ The physical boundary conditions at the edge of the domain are enforced with the
 
     genBC(src_phybc_wave_i1,3,2,rhsname , vnamesrc_divF, setbc=[True,{'char':{'i1':['rhs']}}]  , update=False,rhs=rhs)
 
-The ``rhs.py`` and ``genRhs.py`` files **must be placed** in the ``src/generate/`` folder. Changing up to the ``src/`` folder and running the ``./install_clean.sh`` command will translate the symbolic expressions into fortran code with the aforementioned numerics and compile the code. Running the command ``source env_dNami.sh`` will add the necessary environment variables to the path.  
+The ``rhs.py`` and ``genRhs.py`` files **must be placed** in the ``src/generate/`` folder. Changing up to the ``src/`` folder and running the ``./install_clean.sh`` command will translate the symbolic expressions into Fortran code with the aforementioned numerics and compile the code. Running the command ``source env_dNami.sh`` will add the necessary environment variables to the path.  
 
 **Specifying the parameters and running the computation**
 
