@@ -258,12 +258,14 @@ where the derivatives of the potential :math:`\psi` and the pressure fluctuation
 The vortex is initially centered in the domain i.e. :math:`(x_0,y_0)=(0.5L_x, 0.5L_y)`. The vortex strength :math:`\Gamma` is set using :math:`\Gamma = U_{v}R \sqrt{e}` where :math:`U_{v} = 0.25`. :numref:`2d_vortex_exit` shows the density fluctuations as the vortex is advected out of the domain via the upper boundary. The governing equations are discretised using a 9 point, 8 :sup:`th` order centered finite difference scheme and the conservative variables are filtered using a standard 11 point, 10 :sup:`th` order filter. The aim of this test case is to show the ability of the boundary conditions to evacuate the vortex while generating the least amount of spurious noise. With the quasi-one dimensional approach shown here, the density fluctuation do not exceed 3.5\%.    
 
 
-.. _2d_vortex_exit:
-.. figure:: img/2d_vortexexit_drho.png
-   :align: center
-   :width: 100%
+.. only:: html
 
-   Density fluctuations at various times during the interaction of the vortex with the non-reflective boundary. Vertical velocity contours are shown (with values in the range only at the start of the simulation).
+   .. _2d_vortex_exit:
+   .. figure:: img/vortex_exit.gif 
+      :width: 80%
+      :align: center
+
+      Density fluctuations at various times during the interaction of the vortex with the non-reflective boundary (min/max set to 2.5%). Vertical velocity contours are shown (with values in the range only at the start of the simulation).
 
 
 Three-dimensional cases
