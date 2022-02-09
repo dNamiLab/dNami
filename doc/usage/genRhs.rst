@@ -88,7 +88,7 @@ Another option is to allocate static memory for ``'p'`` and compute ``'p'`` befo
 .. code-block:: python
 	
 	varloc    = {'e' : ' (et - 0.5_wp*u*u) '}                      
-	varstored = {'p' : {'symb': 'rho*e', 'ind':1 , 'static': True}
+	varstored = {'p' : {'symb': 'rho*e', 'ind': 1, 'static': True}
 
 In this example, an equation is provided to compute ``'e'`` from ``varname`` and ``'p'`` is stored at the first location of the stored-data memory. For what follows, we will assume that the ``x`` and ``y`` derivative of the flux function have been grouped in one dictionary ``divF`` as :
 
