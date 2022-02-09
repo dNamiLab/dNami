@@ -125,7 +125,7 @@ where :math:`J` is the Jacobian of the transformation between computational and 
 .. math::
    J \equiv \left( \dfrac{\partial \xi}{\partial x} \dfrac{\partial \eta}{\partial y} - \dfrac{\partial \eta}{\partial x}\dfrac{\partial \xi}{\partial y} \right)^{-1}
 
-where :math:`U` and :math:`V` are the contra-variant velocities (i.e. the project of the velocities onto the curvilinear coordinates):
+where :math:`U` and :math:`V` are the contra-variant velocities (i.e. the projection of the velocities onto the curvilinear coordinates):
 
 .. math::
 
