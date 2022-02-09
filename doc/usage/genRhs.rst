@@ -198,13 +198,13 @@ The following code block details the two steps: after making a copy of the equat
         #... <- append_Rhs() calls made here 
 
         # Progressive stencil/order adjustement from domain to boundary 
-            genBC(Save_eqns['divF']  ,3,2, rhsname , vnamesrc_divF, update=False,rhs=rhs)
+        genBC(Save_eqns['divF'],3,2,rhsname,vnamesrc_divF,update=False,rhs=rhs)
 
-        # Boundary conditions on d(q)/dt 
-            #i1
-            genBC(src_phybc_wave_i1,3,2,rhsname , vnamesrc_divFbc, setbc=[True,{'char':{'i1':['rhs']}}]  , update=False,rhs=rhs)
-            #imax
-            genBC(src_phybc_wave_imax,3,2,rhsname ,vnamesrc_divFbc, setbc=[True,{'char':{'imax':['rhs']}}]  , update=False,rhs=rhs)
+        # Boundary conditions on d(q)/dt
+        #i1
+        genBC(src_phybc_wave_i1  ,3,2,rhsname,vnamesrc_divFbc,setbc=[True,{'char':{'i1'. :['rhs']}}],update=False,rhs=rhs)
+        #imax
+        genBC(src_phybc_wave_imax,3,2,rhsname,vnamesrc_divFbc,setbc=[True,{'char':{'imax':['rhs']}}],update=False,rhs=rhs)
 
 In 3D, if non-periodic condition are desired then a boundary condition for each physical boundary must be supplied i.e. face ``i1``, line ``i1j1``, corner ``i1j1k1``, face ``imax``, line ``imaxj1`` and so on ...  
 
@@ -218,37 +218,38 @@ Let us assume that the user has created the following ``rhs.py`` for their one-d
 .. code-block:: python
 
         # - Local variables
-        varloc = { 'e' : ' (et - 0.5_wp*u*u) ',  #internal energy
-                   'p' : 'delta*rho*e        ',     #pressure equation of state
-                        }
+        varloc = { 'e'  : ' (et - 0.5_wp*u*u) ',  #internal energy
+                   'p'  : 'delta*rho*e        ',     #pressure equation of state
+                 }
 
         # - Divergence of the flux function 
-        divF    = {  
-                'rho' : ' [ rho*u          ]_1x ', 
-                'u'   : ' [ rho*u*u + p    ]_1x ', 
-                'et'  : ' [ u*(rho*et + p) ]_1x ', 
-                }
+        divF   = {  
+                  'rho' : ' [ rho*u          ]_1x ', 
+                  'u'   : ' [ rho*u*u + p    ]_1x ', 
+                  'et'  : ' [ u*(rho*et + p) ]_1x ', 
+                 }
 
 In addition, the dictionaries containing the term nomenclature for the Fortran code are:
 
 .. code-block:: python
 
         # .. for comments in the Fortran file
-        rhsname = {'rho'  : 'd(rho)/dt',
-                   'u'    : 'd(rho u)/dt',
-                   'et'   : 'd(rho et)/dt',
-                   }
+        rhsname       = {'rho'  : 'd(rho)/dt',
+                         'u'    : 'd(rho u)/dt',
+                         'et'   : 'd(rho et)/dt',
+                        }
 
         # .. name tags to use for intermediate variables created by the constructor
         vnamesrc_divF = {'rho'  : 'FluRx',
                          'u'    : 'FluMx',
-                         'et'   : 'FluEx'}
+                         'et'   : 'FluEx',
+			}
 
 which are used to set variable names and generate comments in the Fortran code blocks below. Simply passing the ``divF`` dictionary to the ``append_Rhs`` function: 
 
 .. code-block:: python
 
-	append_Rhs(divF, 3, 2, rhsname,vnamesrc_divF,update=False,rhs=rhs)
+	append_Rhs(divF,3,2,rhsname,vnamesrc_divF,update=False,rhs=rhs)
 
 will produce the following Fortran code:
 
@@ -384,9 +385,9 @@ This is a single 'do-loop' over the points in the x-direction which updates all 
 
 .. code-block:: python
 
-    append_Rhs({'rho': divF['rho']}, 3,2, {'rho': rhsname['rho']}, {'rho':vnamesrc_divF['rho']}, update=False,rhs=rhs,stored=True)
-    append_Rhs({'u'  : divF['u']  }, 3,2, {'u'  : rhsname['u']  }, {'u'  :vnamesrc_divF['u']  }, update=False,rhs=rhs,stored=False)                           
-    append_Rhs({'et' : divF['et'] }, 3,2, {'et' : rhsname['et'] }, {'et' :vnamesrc_divF['et'] }, update=False,rhs=rhs,stored=False)                           
+    append_Rhs({'rho': divF['rho']}, 3, 2, {'rho': rhsname['rho']}, {'rho':vnamesrc_divF['rho']}, update=False,rhs=rhs,stored=True )
+    append_Rhs({'u'  : divF['u']  }, 3, 2, {'u'  : rhsname['u']  }, {'u'  :vnamesrc_divF['u']  }, update=False,rhs=rhs,stored=False)                           
+    append_Rhs({'et' : divF['et'] }, 3, 2, {'et' : rhsname['et'] }, {'et' :vnamesrc_divF['et'] }, update=False,rhs=rhs,stored=False)                           
 
 This will procude the following three 'do-loops' in the Fortran code:
 
