@@ -70,21 +70,23 @@ The details of each of the keys files (``rhs.py``, ``genRhs.py`` and ``compute.p
 Solving the 1D Euler equations
 ------------------------------
 
-As an example and quickstart guide to the steps in setting up a case in dNami, the 1D ideal gas Euler equations are integrated in time to solve the propagation of an entropy wave out of the computational domain. 
+As an example and quickstart guide to the steps in setting up a case in dNami, the 1D ideal gas Euler equations
 
 .. math::
 
    \dfrac{\partial }{\partial t} \begin{pmatrix} \rho  \\ \rho u  \\ \rho e_t \end{pmatrix}  + \dfrac{\partial }{\partial x} \begin{pmatrix} \rho u   \\ \rho u^2 + p   \\ u ( \rho e_t + p) \end{pmatrix}   = \mathbf{0}
 
+are integrated in time to solve the propagation of an entropy wave out of the computational domain.
+
 Setting up a basic case like this is essentially a three-step process:
 
 1. Specify the governing equations and the boundary conditions in symbolic form using the dNami syntax in the ``rhs.py`` file
-2. Specify the desired numerics in the ``genRhs.py`` file then generate and compile the fortran  code
+2. Specify the desired numerics in the ``genRhs.py`` file then generate and compile the Fortran  code
 3. Specify the problem parameter and integrate the equations in time in the ``compute.py`` file
 
 .. note::
 
-    A minimal functional example for each of these files that allow the case to be run are given in the ``/exm/1d_euler_nonreflective`` directory. The core elements of each of these files are presented here. 
+    A minimal functional example for each of these files that allows the case to be run are given in the ``/exm/1d_euler_nonreflective`` directory. The core elements of each of these files are presented here. 
 
 The user is referred to the API documentation for the settings and function arguments not detailed here. :numref:`exworkflow` shows an overview of the file locations and steps detailed below.  
 
@@ -107,18 +109,18 @@ To specify that we wish to advance them in conservative form, we refer to the co
 
 .. code-block:: python
 
-        consvar      = [2,3] 
+        consvar = [2,3] 
 
 
 To specify the right hand side, a dictionary of the flux divergence is created with the component-by-component contributions specified with the corresponding keys.  Note the use of the `[ ]_1x` syntax for the spatial derivative. The details of this syntax are given in XXX.  
 
 .. code-block:: python
 
-        divF    = {  
+        divF = {  
                 'rho' : ' [ rho*u          ]_1x ', 
                 'u'   : ' [ rho*u*u + p    ]_1x ', 
                 'et'  : ' [ u*(rho*et + p) ]_1x ', 
-                }
+               }
 
 Intermediate variables such as the pressure term ``p`` can be either replaced when the code is generated (via an alias) or computed during the time loop, stored and used when computing the right-hand side. In the current example, an alias for ``p`` is created using the ``varloc`` dictionary. This approach gives the user flexibility to store and output intermediate variables as well as test the impact of different combinations on computational efficiency.  
 
@@ -127,17 +129,17 @@ Intermediate variables such as the pressure term ``p`` can be either replaced wh
         varloc = { 'e' : ' (et - 0.5_wp*u*u) ',                        #internal energy
                    'p' : ' delta*rho*e       ',                        #pressure 
                    'c' : '( ( 1.0_wp + delta ) * p / rho  )**0.5_wp ', #isentropic speed of sound
-                   }
+                 }
 
 The constant coefficients involved in the equations (e.g. ``delta``) are declared at the start of the ``rhs.py`` file in the ``coefficients`` dictionary.
 
 .. code-block:: python
 
         coefficients = {
-                'delta' : 1, # R/Cv
-                }
+                         'delta' : 1, # R/Cv
+                       }
 
-Similarly, a separate set of equations for the boundary conditions can be symbolically specified in the ``rhs.py``. For instance, the 1D non-reflecting boundary conditions are implemented in this example using the following expression which gives the time-update of the rhs:
+Similarly, a separate set of equations for the boundary conditions can be symbolically specified in the ``rhs.py``. For instance, the 1D non-reflecting boundary conditions are implemented in this example using the following expression which gives the time-update of the right-hand side:
 
 .. code-block:: python
 
@@ -155,25 +157,25 @@ With the equations in place, the second step involves choosing the various numer
 
 .. code-block:: python
 
-    append_Rhs(divF, 5,4, rhsname, vnamesrc_divF, update=False,rhs=rhs,stored=True)                           
+    append_Rhs(divF,5,4,rhsname,vnamesrc_divF,update=False,rhs=rhs,stored=True)                           
 
 In this example, a standard 11 point, 10 :sup:`th` order filter is used and is applied to the conservative variables using the following: 
 
 .. code-block:: python
 
-    genFilter(11,10, len(varsolved),rhs=rhs)
+    genFilter(11,10,len(varsolved),rhs=rhs)
 
 The points between the edge boundary points and the domain which is more than a half stencil away from the edge have to be dealt with differently as a full stencil of points is not available. The following code block discretises the governing equation with a progressive scheme stencil and order modification as the edge of the domain is approached:  
 
 .. code-block:: python
 
-    genBC(Save_eqns['divF']  ,3,2, rhsname , vnamesrc_divF, update=False,rhs=rhs)
+    genBC(Save_eqns['divF'],3,2,rhsname ,vnamesrc_divF,update=False,rhs=rhs)
 
 The physical boundary conditions at the edge of the domain are enforced with the following line (where derivatives are computed with a 3 point, 2 :sup:`nd` order, one-sided derivative). The ``setbc`` option specifies the boundary in question (here ``i1``) and whether the physical boundary conditions are enforced on the RHS or directly on the primitive variables (here on the ``rhs``).  
 
 .. code-block:: python
 
-    genBC(src_phybc_wave_i1,3,2,rhsname , vnamesrc_divF, setbc=[True,{'char':{'i1':['rhs']}}]  , update=False,rhs=rhs)
+    genBC(src_phybc_wave_i1,3,2,rhsname,vnamesrc_divF,setbc=[True,{'char':{'i1':['rhs']}}], update=False,rhs=rhs)
 
 The ``rhs.py`` and ``genRhs.py`` files **must be placed** in the ``src/generate/`` folder. Changing up to the ``src/`` folder and running the ``./install_clean.sh`` command will translate the symbolic expressions into Fortran code with the aforementioned numerics and compile the code. Running the command ``source env_dNami.sh`` will add the necessary environment variables to the path.  
 
@@ -185,21 +187,21 @@ The final step involves setting the run parameters and advancing the solution in
 
         # Solve the equation ...
         # ... for fluid ...
-        delta    = dn.cst(0.4) # R/Cv
+        delta       = dn.cst(0.4) # R/Cv
 
         # ... in space ...
         L = dn.cst(1.) 
-        with_length = [L]    # domain length 
-        with_grid   = [480]  # number of points
+        with_length = [L]         # domain length 
+        with_grid   = [480]       # number of points
 
         # ... and time ...
-        with_dt   = dn.cst(5.00e-4) # time step
-        filtr_amp = dn.cst(0.1)    # filter amplitude
+        with_dt   = dn.cst(5.e-4) # time step
+        filtr_amp = dn.cst(0.1)   # filter amplitude
 
         # ... as fast as possible!
-        with_proc = [2] # mpi proc. topology
+        with_proc = [2]           # mpi proc. topology
 
-This information is passed to the dNami python interface which allocates the memory based on the computational parameters and prepares a number of useful aliases. The density, velocity and total energy fields can be filled with the initial conditions via references to the allocated memory. Here a half-sine wave perturbation is applied to the density field. A uniform velocity field is specified and the total energy is updated with the internal energy computed at fixed pressure corresponding to an entropy perturbation.  
+This information is passed to the dNami Python interface which allocates the memory based on the computational parameters and prepares a number of useful aliases. The density, velocity and total energy fields can be filled with the initial conditions via references to the allocated memory. Here a half-sine wave perturbation is applied to the density field. A uniform velocity field is specified and the total energy is updated with the internal energy computed at fixed pressure corresponding to an entropy perturbation.  
 
 .. code-block:: python
 
@@ -213,7 +215,7 @@ This information is passed to the dNami python interface which allocates the mem
         # -- Update total energy
         et [:] = eos_e(rho[:],p0) + dn.cst(0.5)*u0*u0 
 
-During the time loop, the user can set the frequency at which operations and outputs take place. A few example steps are given here. First, the RHS is updated using the R-K scheme implemented in dNami. Filtering is applied every ``mod_filter`` timesteps. A restart file i.e. the current state of the primitive variables at time ``ti`` is written out at a frequency ``mod_rstart``. Finally, run information such a global extrema and CFL values are printed to the standard output every ``mod_output``. Other run-time output are possible via the ``write_data`` function (e.g. the user can write out the pressure at a custom frequency).   
+During the time loop, the user can set the frequency at which operations and outputs take place. A few example steps are given here. First, the RHS is updated using the RK scheme implemented in dNami. Filtering is applied every ``mod_filter`` timesteps. A restart file i.e. the current state of the primitive variables at time ``ti`` is written out at a frequency ``mod_rstart``. Finally, run information such a global extrema and CFL values are printed to the standard output every ``mod_output``. Other run-time output are possible via the ``write_data`` function (e.g. the user can write out the pressure at a custom frequency).   
 
 .. code-block:: python
 
