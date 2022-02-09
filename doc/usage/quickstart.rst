@@ -1,11 +1,11 @@
 Quickstart guide
 ****************
 
-Get the code and setup your environment in Linux
-------------------------------------------------
+Get the code and setup your environment on Unix (Linux or MacOS)
+----------------------------------------------------------------
 
 The following instructions will walk you through the installation
-process of dNami in Linux. You need to have a working **Python3**
+process of dNami on Unix. You need to have a working **Python3**
 environment and a **Fortran** compiler (Intel's **ifort** or the
 GNU **gfortran** compiler).
 
@@ -42,15 +42,21 @@ GNU **gfortran** compiler).
     python3 -m pip install --user mpi4py
 
    If you don't have a working MPI installation you can use your
-   Linux distributions package manager to install MPI. The following command
-   will install **OpenMPI** on Ubuntu:
+   Linux distributions package manager to install MPI. 
+
+   The following command will install **OpenMPI** on Ubuntu:
 
    .. code-block:: bash
 
     sudo apt-get -y install openmpi-bin
 
-   If you are running a different Linux distribution check the documentation
-   on how to install MPI.
+   The following command will install **OpenMPI** on MacOS (if `homebrew <https://brew.sh/>`_  is installed):
+
+   .. code-block:: bash
+
+    brew install open-mpi
+
+   If you are running a different Linux distribution check the documentation on how to install MPI.
 
 Steps to run a case 
 -------------------
