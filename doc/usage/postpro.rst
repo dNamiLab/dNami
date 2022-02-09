@@ -34,7 +34,7 @@ Below is a basic code block for reading and plotting a slice of a 3D data field 
 
         # -- Create figure
         fig = plt.figure(figsize=(4,4))
-        ax = fig.add_axes([0.10,0.1,0.85,0.85])
+        ax = fig.add_axes([0.1,0.1,0.85,0.85])
 
         ar = 1. # figure aspect ratio
 
