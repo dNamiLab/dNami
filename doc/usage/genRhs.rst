@@ -80,14 +80,14 @@ In this expression the pressure is introduced through a new symbol, ``'p'``, not
 
         varloc = { 'e' : ' (et - 0.5_wp*u*u) ',                        
                    'p' : '       rho*e       ',                        
-                   }
+                 }
 
 dNami will automatically replace any occurrence of ``'p'`` with the corresponding combination of ``varname`` variables in all treatment of ``'Pseudo-Code Eqns'`` provided to the kernel (through ``append_Rhs`` or ``genBC``).
 Another option is to allocate static memory for ``'p'`` and compute ``'p'`` before filling the RHS, where only memory access to that location are done. This is done through the ``varstored`` dictionary:
 
 .. code-block:: python
 	
-	varloc = { 'e' : ' (et - 0.5_wp*u*u) '}                      
+	varloc    = {'e' : ' (et - 0.5_wp*u*u) '}                      
 	varstored = {'p' : {'symb': 'rho*e', 'ind':1 , 'static': True}
 
 In this example, an equation is provided to compute ``'e'`` from ``varname`` and ``'p'`` is stored at the first location of the stored-data memory. For what follows, we will assume that the ``x`` and ``y`` derivative of the flux function have been grouped in one dictionary ``divF`` as :
