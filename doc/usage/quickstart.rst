@@ -81,12 +81,12 @@ are integrated in time to solve the propagation of an entropy wave out of the co
 Setting up a basic case like this is essentially a three-step process:
 
 1. Specify the governing equations and the boundary conditions in symbolic form using the dNami syntax in the ``rhs.py`` file
-2. Specify the desired numerics in the ``genRhs.py`` file then generate and compile the fortran  code
+2. Specify the desired numerics in the ``genRhs.py`` file then generate and compile the Fortran  code
 3. Specify the problem parameter and integrate the equations in time in the ``compute.py`` file
 
 .. note::
 
-    A minimal functional example for each of these files that allow the case to be run are given in the ``/exm/1d_euler_nonreflective`` directory. The core elements of each of these files are presented here. 
+    A minimal functional example for each of these files that allows the case to be run are given in the ``/exm/1d_euler_nonreflective`` directory. The core elements of each of these files are presented here. 
 
 The user is referred to the API documentation for the settings and function arguments not detailed here. :numref:`exworkflow` shows an overview of the file locations and steps detailed below.  
 
