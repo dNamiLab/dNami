@@ -201,7 +201,7 @@ The final step involves setting the run parameters and advancing the solution in
         # ... as fast as possible!
         with_proc = [2] # mpi proc. topology
 
-This information is passed to the dNami python interface which allocates the memory based on the computational parameters and prepares a number of useful aliases. The density, velocity and total energy fields can be filled with the initial conditions via references to the allocated memory. Here a half-sine wave perturbation is applied to the density field. A uniform velocity field is specified and the total energy is updated with the internal energy computed at fixed pressure corresponding to an entropy perturbation.  
+This information is passed to the dNami Python interface which allocates the memory based on the computational parameters and prepares a number of useful aliases. The density, velocity and total energy fields can be filled with the initial conditions via references to the allocated memory. Here a half-sine wave perturbation is applied to the density field. A uniform velocity field is specified and the total energy is updated with the internal energy computed at fixed pressure corresponding to an entropy perturbation.  
 
 .. code-block:: python
 
@@ -215,7 +215,7 @@ This information is passed to the dNami python interface which allocates the mem
         # -- Update total energy
         et [:] = eos_e(rho[:],p0) + dn.cst(0.5)*u0*u0 
 
-During the time loop, the user can set the frequency at which operations and outputs take place. A few example steps are given here. First, the RHS is updated using the R-K scheme implemented in dNami. Filtering is applied every ``mod_filter`` timesteps. A restart file i.e. the current state of the primitive variables at time ``ti`` is written out at a frequency ``mod_rstart``. Finally, run information such a global extrema and CFL values are printed to the standard output every ``mod_output``. Other run-time output are possible via the ``write_data`` function (e.g. the user can write out the pressure at a custom frequency).   
+During the time loop, the user can set the frequency at which operations and outputs take place. A few example steps are given here. First, the RHS is updated using the RK scheme implemented in dNami. Filtering is applied every ``mod_filter`` timesteps. A restart file i.e. the current state of the primitive variables at time ``ti`` is written out at a frequency ``mod_rstart``. Finally, run information such a global extrema and CFL values are printed to the standard output every ``mod_output``. Other run-time output are possible via the ``write_data`` function (e.g. the user can write out the pressure at a custom frequency).   
 
 .. code-block:: python
 
