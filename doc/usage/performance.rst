@@ -50,13 +50,6 @@ overall problem size of 26.8 billion points
 
 The scalability is satisfactory up to 200 nodes,
 apart from some fluctuations observed between job
-submissions (unknown origin).
-Compared to the Intel Xeon Platinum 8280L, the AMD node reveals a
-larger sensitivity of the MPI communication kernel of dNami to
-a lower memory bandwidth (which is half the Intel one), but a limited
-impact on the compute-kernel (30% slower).
-This demonstrates the ability of the HPC layer to mitigate the
-negative impact of the lower memory bandwidth per core on AMD nodes.
-Note that the OpenMP layer, which is under development, was not included
+submissions (unknown origin). Note that the OpenMP layer, which is under development, was not included
 in the scalability test.
 
