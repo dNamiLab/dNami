@@ -47,6 +47,8 @@ To get started with dNami, please check out the :doc:`Quickstart guide </usage/q
    usage/api
    usage/syntax
    usage/performance
+   usage/contrib
+   usage/license
    usage/references
 
 Indices and tables
