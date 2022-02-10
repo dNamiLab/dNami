@@ -185,7 +185,10 @@ The physical boundary conditions at the edge of the domain are enforced with the
 
     genBC(src_phybc_wave_i1,3,2,rhsname,vnamesrc_divF,setbc=[True,{'char':{'i1':['rhs']}}], update=False,rhs=rhs)
 
-The ``rhs.py`` and ``genRhs.py`` files **must be placed** in the ``src/generate/`` folder. Changing up to the ``src/`` folder and running the ``./install_clean.sh`` command will translate the symbolic expressions into Fortran code with the aforementioned numerics and compile the code. Running the command ``source env_dNami.sh`` will add the necessary environment variables to the path.  
+.. warning::
+    The ``rhs.py`` and ``genRhs.py`` files **must be placed** in the ``src/generate/`` folder.
+    
+Changing up to the ``src/`` folder and running the ``./install_clean.sh`` command will translate the symbolic expressions into Fortran code with the aforementioned numerics and compile the code. Running the command ``source env_dNami.sh`` will add the necessary environment variables to the path.  
 
 **Specifying the parameters and running the computation**
 
