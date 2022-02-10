@@ -479,8 +479,8 @@ def write_data(field,n,t,tree,fpath='./out/',fname='output'):
         
         Args:
           field: list of fields to write out e.g. ['divV', 'p'] where the strings are the names of the predefined stored variables 
-          n: The number of iterations
-          t: The timestep
+          n: The iteration count at which the data is written
+          t: The physical time of iteration n
           tree: The dnami tree data structure
           fpath: The output directory
           fname: The output filename
