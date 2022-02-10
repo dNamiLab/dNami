@@ -10,9 +10,9 @@ def load_ax(path,wp='float64'):
     Args:
         path: The path to the axis file. Usually written out in the work directory in /path/to/wrk/out/axes.bin 
     Returns:
-        If its 1D problem x,nxgb is returned
-        If its 2D problem x,y,nxgb,nygb is returned
-        If its 3D problem x,y,z,nxgb,nygb,nzgb is returned
+        If it is a 1D problem x,nxgb is returned
+        If it is a 2D problem x,y,nxgb,nygb is returned
+        If it is a 3D problem x,y,z,nxgb,nygb,nzgb is returned
     """
     with open(path,"rb") as fh:
         head = np.fromfile(fh,dtype=wp,count=6)
