@@ -301,7 +301,6 @@ for n in range(ni,nitmax+ni):
             intparam[7] = nrk
             dMpi.swap(q,hlo,dtree) 
             if 'qstored' in dtree['eqns']['qvec']['views'].keys():
-                dMpi.swap(q,hlo,dtree) 
                 dn.dnamiF.stored(intparam,fltparam,data,0)
             dn.dnamiF.time_march(intparam,fltparam,data)
 

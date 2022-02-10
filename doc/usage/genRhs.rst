@@ -572,7 +572,7 @@ Let us assume that the user has created an almost identical ``rhs.py`` to the on
                 'et'  : ' [ u*(rho*et + p) ]_1x ', 
                 }
 
-This results in the following Fortran code, note how ``qst(i-1,indvarsst(1))`` has replaced ``(q(i-1,indvars(3))-0.5_wp*q(i-1,indvars(2))*q(i-1,indvars(2)))`` from the previous sub-section. This change in ``rhs.py`` would be accompanied by the relevant call in the ``compute.py`` to compute the stored variable before advancing the solution in time (see the relevant sub-section in :doc:`/usage/compute`). 
+This results in the following Fortran code, note how ``qst(i-1,indvarsst(1))`` has replaced ``(q(i-1,indvars(3))-0.5_wp*q(i-1,indvars(2))*q(i-1,indvars(2)))`` from the previous sub-section: 
 
 .. code-block:: fortran
 
@@ -698,3 +698,23 @@ This results in the following Fortran code, note how ``qst(i-1,indvarsst(1))`` h
 	rhs(i,indvars(3)) =   -  ( d1_FluEx_dx_0_ijk ) 
 
 	   enddo
+
+This change in ``rhs.py`` would be accompanied by the relevant call in the ``compute.py`` to compute the stored variable before advancing the solution in time shown below:
+
+.. code-block:: python
+
+    # ... inside the time-loop ...
+
+        # ... inside the RK loop ...
+
+        dMpi.swap(q,hlo,dtree)  
+        if 'qstored' in dtree['eqns']['qvec']['views'].keys():
+            dn.dnamiF.stored(intparam,fltparam,data)
+            dMpi.swap(qstored,hlo,dtree)   
+        dn.dnamiF.time_march(intparam,fltparam,data)  
+
+    # ... inside the time-loop ...
+
+This ensure that before each call the time advancement function, the non-static stored variables are updated. 
+
+
