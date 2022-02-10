@@ -41,11 +41,11 @@ To get started with dNami, please check out the :doc:`Quickstart guide </usage/q
 
    usage/quickstart
    usage/testcases
-   usage/genRhs   
+   usage/genRhs
+   usage/syntax   
    usage/compute
    usage/postpro
    usage/api
-   usage/syntax
    usage/performance
    usage/contrib
    usage/license
