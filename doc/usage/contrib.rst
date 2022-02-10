@@ -14,6 +14,32 @@ Extending the documentation
 If you want to add additional content to the documentation, add/edit *.rst* files in the ``doc/usage``
 directory and also update ``doc/index.rst`` (if necessary). Please make sure the documentation compiles locally before submitting a pull request. 
 
+In order to generate the html documentation the following Python packages are needed:
+
+	1. Sphinx
+	2. sphinx-rtd-theme
+	3. pydata-sphinx-theme
+	4. sphinxcontrib.bibtex
+
+They can be installed using the following command:
+
+.. code-block:: bash
+
+	pip3 install -U Sphinx
+	pip3 install -U sphinx-rtd-theme
+	pip3 install -U pydata-sphinx-theme
+	pip3 install -U sphinxcontrib.bibtex
+
+
+Build the documentation by changing into the ``doc`` directory and executing the following command:
+
+.. code-block:: bash
+
+	make html
+
+After building the documentation the ``_build/html`` directory should contain the index.html startpage.
+
+
 Issues and support
 ##################################
 

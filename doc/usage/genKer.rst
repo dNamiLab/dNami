@@ -5,7 +5,7 @@
 genKer
 ------
 
-The genKer dNami module is the its source-to-source transaltion engine. 
+The genKer dNami module is the its source-to-source translation engine. 
 
 Function in genKer
 ~~~~~~~~~~~~~~~~~~
