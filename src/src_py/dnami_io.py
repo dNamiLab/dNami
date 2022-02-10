@@ -1,6 +1,6 @@
 """
 The dnami_io file provides a set 
-of functions to write and read the grid.
+of functions to perform I/O operations.
 """
 from dnami import np, sys
 
