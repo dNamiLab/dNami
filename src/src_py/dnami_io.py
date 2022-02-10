@@ -268,7 +268,7 @@ def write_restart(n,t,flag,tree,fpath='./restarts/'):
 
 def read_restart(tree,fname='restart.bin'):
         """
-        Reads the restart file in order to restart the simulation. By default, it look for the file 'restart.bin' where the compute.py is located but a custom path can be used.  
+        Reads the restart file in order to restart the simulation. By default, it looks for the file 'restart.bin' where the compute.py is located but a custom path can be used.  
 
         Args:
           tree: The dnami tree data structure 
@@ -480,7 +480,7 @@ def write_data(field,n,t,tree,fpath='./out/',fname='output'):
         Write out a custom field that is not included in the restart file.
         
         Args:
-          field: list of fields to write out e.g. ['divV', 'p'] where the strings are the named of stored variables 
+          field: list of fields to write out e.g. ['divV', 'p'] where the strings are the names of the predefined stored variables 
           n: The number of iterations
           t: The timestep
           tree: The dnami tree data structure
