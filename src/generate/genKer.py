@@ -1,6 +1,6 @@
 """
 This module contains functions for generating 
-the FORTRAN code
+the Fortran code
 """
 
 import re
