@@ -82,16 +82,15 @@ def hello_world(tree):
 
 def write_restart(n,t,flag,tree,fpath='./restarts/'):
         """
-        Writes the state of the solved variables (defined in the rhs.py)  at timestep n and time ti to a binary file in order
+        Writes the state of the solved variables (defined in the rhs.py) at timestep n and time ti to a binary file in order
         to restart for post-processing purposes. Can also be used to restart the simulation later.
         
         Args:
           n: The number of iterations the simulation was running
           t: The timestep
-          flag: = 0 : all boundary shells will be written (if any) in addition to the core to files in the fpath folder 
-                      and the file names will be stamped with the iteration number
-                = 1 : core domain is written to './out/liv/' for users wanting to use the "live view" plotting tools
-                      This can be usefull when designing a very new case
+          flag: If set to 0 all boundary shells will be written (if any) in addition to the core to files in the fpath folder 
+          and the file names will be stamped with the iteration number. If set to 1 the core domain is written to './out/liv/' 
+          for users wanting to use the "live view" plotting tools which may be usefull when designing a new problem
           fpath: The output directory of the restart file, the default is restarts
         """
         # file name switch (for live views)
