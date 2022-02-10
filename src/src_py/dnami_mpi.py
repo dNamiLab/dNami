@@ -305,8 +305,8 @@ class type_mpi:
 
     def swapX(self, f, nh, tree):
         """
-        Swaps array "f(X,:)" (a function of position vector X ) in the x-direction
-        over its first ":" variables with halo size "nh".
+        Swaps array "f(X,0:nv)" (a function of position vector X e.g. X=(x,y,z)) in the x-direction
+        over all its "nv" variables with halo size "nh". This function does not swap the corners.
 
         Args:
           f: The input and output vector for the halo data swap
@@ -482,16 +482,14 @@ class type_mpi:
 
     def swapY(self, f, nh, tree):
         """
-        Swaps the array "f(X,:)" (a function of position vector X ) in the y-direction
-        over its first ":" variables with halo size "nh". This function does not swap
-        the corners.
-
+        Swaps array "f(X,0:nv)" (a function of position vector X e.g. X=(x,y,z)) in the y-direction
+        over all its "nv" variables with halo size "nh". This function does not swap the corners.
+        
         Args:
           f: The input and output vector for the halo data swap
           nh: The width of the halo data regions
           tree: The dnami tree data structure
         """
-        #               ->                                   ->
         wp = tree['misc']['working precision']
         ndim = tree['eqns']['ndim']
         iSwap = tree['mpi']['dMpi'].iSwap
@@ -569,9 +567,8 @@ class type_mpi:
 
     def swapZ(self, f, nh, tree):
         """
-        Swaps array "f(X,:)" (a function of position vector X ) in the z-direction
-        over its first ":" variables with halo size "nh".
-        This function does not swap the corners.
+        Swaps array "f(X,0:nv)" (a function of position vector X e.g. X=(x,y,z)) in the z-direction
+        over all its "nv" variables with halo size "nh". This function does not swap the corners.
 
         Args:
           f: The input and output vector for the halo data swap
@@ -620,9 +617,8 @@ class type_mpi:
 
     def swapXc(self, f, nh, tree):
         """
-        Swaps array "f(X,:)" (a function of position vector X ) in the x-direction
-        over its first ":" variables with halo size "nh". This swap function will
-        swap the corners.
+        Swaps array "f(X,0:nv)" (a function of position vector X e.g. X=(x,y,z)) in the x-direction
+        over all its "nv" variables with halo size "nh". This function will also swap corners.
 
         Args:
           f: The input and output vector for the halo data swap
@@ -800,10 +796,9 @@ class type_mpi:
 
     def swapYc(self, f, nh, tree):
         """
-        Swaps array "f(X,:)" (a function of position vector X ) in the y-direction
-        over its first ":" variables with halo size "nh". This swap function will
-        swap the corners.
-
+        Swaps array "f(X,0:nv)" (a function of position vector X e.g. X=(x,y,z)) in the y-direction
+        over all its "nv" variables with halo size "nh". This function will also swap corners.
+        
         Args:
           f: The input and output vector for the halo data swap
           nh: The width of the halo data regions
@@ -940,10 +935,9 @@ class type_mpi:
 
     def swapZc(self, f, nh, tree):
         """
-        Swaps array "f(X,:)" (a function of position vector X ) in the z-direction
-        over its first ":" variables with halo size "nh". This swap function will
-        swap the corners.
-
+        Swaps array "f(X,0:nv)" (a function of position vector X e.g. X=(x,y,z)) in the z-direction
+        over all its "nv" variables with halo size "nh". This function will also swap corners.
+        
         Args:
           f: The input and output vector for the halo data swap
           nh: The width of the halo data regions
