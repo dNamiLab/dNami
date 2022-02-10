@@ -684,7 +684,7 @@ def globalMinMax(tree,a,s):
           a: The array from which the min and max should be obtained
           s: A character string which will be printed together with the min and max
         Returns: 
-          This function returns nothing but prints the values and a string 
+          This function returns nothing but prints the global min/max values of "a" with string tag "s" to the terminal  
         """
         # get the global min/max value of array 'a' with string tag 's'
         
