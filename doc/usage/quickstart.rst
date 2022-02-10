@@ -17,7 +17,7 @@ GNU **gfortran** compiler).
 
     git clone git@github.com:dNamiLab/dNami.git
     
-  By default, this will create a ``dNami`` folder containing the source code. 
+   By default, this will create a ``dNami`` folder containing the source code. 
 
 #. Install the dependencies
 
