@@ -1,6 +1,8 @@
 Contributing
 ***************************
 
+We very much look forward to growing the dNami developer/user community. The dNami project is at its early stage and we have not demonstrated its full potential yet. However, it is mature enough to benefit from the momentum of a community of enthusiasts. We therefore welcome contributions. At the moment we are keen to grow the areas below.
+
 Contributing examples and test cases
 ####################################
 
