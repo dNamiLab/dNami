@@ -88,7 +88,7 @@ def write_restart(n,t,flag,tree,fpath='./restarts/'):
         Args:
           n: The number of iterations the simulation was running
           t: The timestep
-          flag: If set to 0 all boundary shells will be written (if any) in addition to the core to files in the fpath folder and the file names will be stamped with the iteration number. If set to 1 the core domain is written to './out/liv/' for users wanting to use the "live view" plotting tools which may be usefull when designing a new problem
+          flag: If set to 0 all boundary shells will be written (if any) in addition to the core to files in the fpath folder and the file names will be stamped with the iteration number. If set to 1 the core domain is written to './out/liv/restart.bin' (and overwritten) for users wanting to use the "live view" plotting tools which may be usefull when designing a new problem
           fpath: The output directory of the restart file, the default is restarts
         """
         # file name switch (for live views)
