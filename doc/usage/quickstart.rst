@@ -11,11 +11,13 @@ GNU **gfortran** compiler).
 
 #. Clone dNami from the github repository
 
-   In your home directory execute the following command
+   Navigate to the location you wish to place the code in and execute the following command:
 
    .. code-block:: bash
 
     git clone git@github.com:dNamiLab/dNami.git
+    
+  By default, this will create a ``dNami`` folder containing the source code. 
 
 #. Install the dependencies
 
