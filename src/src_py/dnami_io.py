@@ -10,7 +10,7 @@ from dnami import np, sys
 
 def write_grid(tree):
         """
-        This functions writes the grid
+        This functions writes the axes to file in './out'
         
         Args:
           tree: the dnami tree
@@ -88,7 +88,10 @@ def write_restart(n,t,flag,tree,fpath='./restarts/'):
         Args:
           n: The number of iterations the simulation was running
           t: The timestep
-          flag: If this parameter is 0 all boundary shells will be written (if any) in addition to the core, otherwiese only the core
+          flag: = 0 : all boundary shells will be written (if any) in addition to the core to files in the fpath folder 
+                      and the file names will be stamped with the iteration number
+                = 1 : core domain is written to './out/liv/' for users wanting to use the "live view" plotting tools
+                      This can be usefull when designing a very new case
           fpath: The output directory of the restart file, the default is restarts
         """
         # file name switch (for live views)
