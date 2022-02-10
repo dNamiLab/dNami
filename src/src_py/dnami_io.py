@@ -483,7 +483,7 @@ def write_data(field,n,t,tree,fpath='./out/',fname='output'):
           t: The physical time of iteration n
           tree: The dnami tree data structure
           fpath: The output directory
-          fname: The output filename
+          fname: The output filename to which the iteration stamp n will be added
         """
         # File name switch (for live views)
         ndim = tree['eqns']['ndim']     
