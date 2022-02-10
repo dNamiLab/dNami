@@ -111,7 +111,7 @@ Src_skew = {'rho' : '0.5_wp*( [rho*u]_1x + [rho*v]_1y + [rho*w]_1z '
                    '+   u*[rho*et]_1x + v*[rho*et]_1y + w*[rho*et]_1z '
                    '+rho*et*( '+divops+') ) + [p*u]_1x + [p*v]_1y + [p*w]_1z '}
 
-# Navier-Stokes Diffusive terms only 
+#Navier-Stokes Diffusive terms only 
 
 Fx = {'u'   : ' - visc *( 2.0_wp * {u}_1x - 2.0_wp/3.0_wp * ( '+ ddivops +'  ) )',
       'v'   : ' - visc *( {u}_1y + {v}_1x )', 
