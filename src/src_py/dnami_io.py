@@ -726,7 +726,7 @@ def globalMax(tree,a,s):
           a: The array from which the max should be obtained
           s: A character string which will be printed together with the max value
         Returns: 
-          This function returns nothing but prints the value and a string 
+          This function returns nothing but prints the global max value of "a" with string tag "s" to the terminal 
         """
         # get the global max value of array 'a' with string tag 's'
         
@@ -751,13 +751,13 @@ def globalMax(tree,a,s):
 
 def dtMax(tree,a):
         """
-        Get the global mininumum value of a across all processor. It is used to determine the limiting timestep dt (i.e. the largest possible timestep that can be used) when a is the array of pointwise timesteps 
+        When running at constant CFL this function looks for the most constraining time step
         
         Args:
           tree: The dnami tree data structure
-          a: The array from which the min should be obtained
+          a: The array from which the most constraining time step is to be found, usually a field of point-by-point pre-computed dt's derived from a preset CFL value
         Returns:
-            The largest usable timestep dt_max 
+            The largest usable timestep which satisfies the CFL constraint everywhere in the domain
         """
         minval = a.min()
 
@@ -778,11 +778,11 @@ def dtMax(tree,a):
 
 def set_dt(tree,dt):
         """
-        Broadcast dt value from global min search and assign it.
+        Set the timestep value to use.
         
         Args:
           tree: The dnami tree data structure
-          dt: The dt value
+          dt: The dt value to be used
         Returns:
           This function returns nothing
         """
