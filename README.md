@@ -1,3 +1,5 @@
+[![status](https://joss.theoj.org/papers/55bf7f16fdc987f57c157e550bf9a7f9/status.svg)](https://joss.theoj.org/papers/55bf7f16fdc987f57c157e550bf9a7f9)
+
 # dNami
 **dNami** [di:nɑ:mi:] is an open-source multi-language (Python, Fortran, C) framework for solving systems of balance laws using explicit numerical schemes on structured meshes. 
 dNami uses MPI, loop-unrolling and cache blocking techniques to speed up stencil-based operations.
