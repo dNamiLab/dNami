@@ -96,7 +96,7 @@ In this example, an equation is provided to compute ``'e'`` from ``varname`` and
 	
 	divF = {'rho' : ' [ rho*u           ]_1x  + [ rho*v           ]_1y ', 
     		'u'   : ' [ rho*u*u + p     ]_1x  + [ rho*u*v         ]_1y ', 
-    		'v'   : ' [ rho*v*u         ]_1x  + [ rho*v*v         ]_1y ', 
+    		'v'   : ' [ rho*v*u         ]_1x  + [ rho*v*v + p     ]_1y ', 
     		'et'  : ' [ (rho*et + p )*u ]_1x  + [ (rho*et + p )*v ]_1y ', 
                 }
 
