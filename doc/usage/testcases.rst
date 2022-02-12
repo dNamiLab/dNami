@@ -278,7 +278,7 @@ This case solves the compressible Navier-Stokes equations in 3D which are:
 .. math::
 
    \dfrac{\partial }{\partial t} \begin{pmatrix} \rho  \\ \rho u \\ \rho v  \\ \rho w \\ \rho e_t \end{pmatrix}  + \dfrac{\partial }{\partial x} \begin{pmatrix} \rho u   \\ \rho u^2 + p \\ \rho u v  \\ \rho u w  \\ u ( \rho e_t + p) \end{pmatrix}  + \dfrac{\partial }{\partial y} \begin{pmatrix} \rho v   \\ \rho u v \\ \rho v^2 + p   \\ \rho v w \\ v ( \rho e_t + p) \end{pmatrix}  + \dfrac{\partial }{\partial z} 
-   \begin{pmatrix} \rho w  \\ \rho u w \\ \rho vw + p   \\ \rho w^2 \\ w ( \rho e_t + p) \end{pmatrix}= \mathbf{d}
+   \begin{pmatrix} \rho w  \\ \rho u w \\ \rho vw  \\ \rho w^2 + p  \\ w ( \rho e_t + p) \end{pmatrix}= \mathbf{d}
 
 where :math:`\textbf{d}` is a vector of diffusive terms. 
 
