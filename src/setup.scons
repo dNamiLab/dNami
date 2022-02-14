@@ -34,7 +34,7 @@ if ifortPath:
 
   f90Args   = '-O3 -fPIC -qopenmp -fno-alias -fno-fnalias -ip -unroll0  -xSKYLAKE-AVX512  -g -fp-model precise -fp-model source  -fp-model consistent -qoverride-limits '
 
-  f90Args   = '-O3 -fPIC -qopenmp -fno-alias -fno-fnalias -ip -unroll0  -xSKYLAKE-AVX512  -g -fp-model precise -fp-model source   -qoverride-limits '
+  f90Args   = '-O3 -fPIC -fno-alias -fno-fnalias -ip -unroll0  -xSKYLAKE-AVX512  -g -fp-model precise -fp-model source   -qoverride-limits '
   
   # f90Args   = '-O3 -fPIC -xCORE-AVX2 -g -fp-model strict -fp-model source -fp-model consistent -qoverride-limits '
   
