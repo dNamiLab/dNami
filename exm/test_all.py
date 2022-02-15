@@ -218,7 +218,12 @@ for test in test_list:
 
     print(' Reference value: {}. Output data: {}'.format(ref_dat, out_dat))
 
-    if np.abs(ref_dat-out_dat)/ref_dat < 1e-8:
+    if ref_dat != 0.:
+        delta = np.abs(ref_dat-out_dat)/ref_dat
+    else:
+        delta = np.abs(ref_dat-out_dat)
+
+    if  delta < 1e-8:
         print(f'STATUS: {bcolors.OKGREEN}PASS{bcolors.ENDC}' )
         test_stat[test] = f'{bcolors.OKGREEN}PASS{bcolors.ENDC}'
     else:
@@ -241,5 +246,5 @@ subprocess.run(cmd,shell=True)
 print('All done. Synopsis:')
 
 for key in test_stat.keys():
-    print(' ' + key + ': ' + test_stat[key])
+    print('{:25} '.format(key)  +  ': ' + test_stat[key])
 
