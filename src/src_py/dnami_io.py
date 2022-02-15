@@ -413,7 +413,6 @@ def read_restart(tree,fname='restart.bin'):
 
                         head = np.empty(headsize,dtype=wp)
                         if iMpi:
-                           dat     =     np.empty((sizeloc['i'],sizeloc['j'],sizeloc['k'],nvar),dtype=wp)
                            header[dire] = MPIWP.Create_contiguous(headsize)
                            header[dire].Commit()    
                            fh[dire] = MPI.File.Open(dmpi.comm_torus,fnameshell[dire],MPI.MODE_RDONLY)
@@ -422,7 +421,7 @@ def read_restart(tree,fname='restart.bin'):
                            header[dire].Free()      
                            fh[dire].Close()
                         else:
-                            print("To add read the header")
+                           head = np.fromfile(dnameshell[dire],dtype=wp,count=headsize)
 
                         if (position[dire[0]][0] == 1 and dire[1] == '1') or (position[dire[0]][1] == nglb[dire[0]] and dire[1:] == 'max' ):
 
