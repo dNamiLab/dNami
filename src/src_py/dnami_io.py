@@ -357,15 +357,19 @@ def read_restart(tree,fname='restart.bin'):
                 if ioproc:
                         print('Reading boundary shell data from the restart file.')     
                 dirBC = []
-                if 'i1' in bcs['bcun']:
+                if 'i1' in bcs['allbc']:
                     dirBC = dirBC + ['i1','imax']
-                if 'j1' in bcs['bcun']:
+                if 'j1' in bcs['allbc']:
                     dirBC = dirBC + ['j1','jmax']
-                if 'k1' in bcs['bcun']:
+                if 'k1' in bcs['allbc']:
                     dirBC = dirBC + ['k1','kmax']
 
                 for direction in dirBC:
                         fnameshell[direction] = 'restartshell_'+direction
+                        if ioproc:
+                            print('   Adding ...', fnameshell[direction])     
+
+
 
         if fnameshell != {}:
                 position = {'i':[dmpi.ibeg,dmpi.iend],
@@ -379,6 +383,7 @@ def read_restart(tree,fname='restart.bin'):
                 subarray= {}
 
                 for idx,dire in enumerate(dirBC):
+
                         wposition = {'i':dmpi.ibeg,
                                      'j':dmpi.jbeg,
                                      'k':dmpi.kbeg}
@@ -411,18 +416,6 @@ def read_restart(tree,fname='restart.bin'):
 
                         sizeglb[dire[0]] = hlo
 
-                        head = np.empty(headsize,dtype=wp)
-                        if iMpi:
-                           header[dire] = MPIWP.Create_contiguous(headsize)
-                           header[dire].Commit()    
-                           fh[dire] = MPI.File.Open(dmpi.comm_torus,fnameshell[dire],MPI.MODE_RDONLY)
-                           fh[dire].Set_view(0,MPIWP,header[dire])
-                           fh[dire].Read_at(0,head)
-                           header[dire].Free()      
-                           fh[dire].Close()
-                        else:
-                           head = np.fromfile(dnameshell[dire],dtype=wp,count=headsize)
-
                         if (position[dire[0]][0] == 1 and dire[1] == '1') or (position[dire[0]][1] == nglb[dire[0]] and dire[1:] == 'max' ):
 
                                 sizeglb[dire[0]] = hlo
@@ -436,9 +429,9 @@ def read_restart(tree,fname='restart.bin'):
                                 wposition[dire[0]] = 1
 
                                 # body
-                                #dat     =     np.empty((sizeloc['i'],sizeloc['j'],sizeloc['k'],nvar),dtype=wp)
                                 dat  = np.empty(sizeloc['i']*sizeloc['j']*sizeloc['k']*nvar,dtype=wp)
 
+                                ## TO FIX
                                 if iMpi:
                                   # Read the data from the shell file on each process 
                                   fh[dire] = MPI.File.Open(dmpi.combc[dire],fnameshell[dire],MPI.MODE_RDONLY)
@@ -451,21 +444,22 @@ def read_restart(tree,fname='restart.bin'):
                                   fh[dire].Read_all(dat)
                                   subarray.Free()
                                   fh[dire].Close()
-
-                                  if ndim == 3:
-                                          q[index['i'][0]:index['i'][1]
-                                           ,index['j'][0]:index['j'][1]
-                                           ,index['k'][0]:index['k'][1],0:nvar] = dat.reshape((sizeloc['i'],sizeloc['j'],sizeloc['k'],nvar))
-                                  elif ndim == 2:
-                                          q[index['i'][0]:index['i'][1]
-                                           ,index['j'][0]:index['j'][1],0:nvar] = dat.reshape((sizeloc['i'],sizeloc['j'],nvar))
-                                  else:
-                                          q[index['i'][0]:index['i'][1],0:nvar] = dat.reshape((sizeloc['i'],nvar))
                                 else:
-                                        pass
-                                        # with open(fnameshell[dire],"rb") as fh[dire]:
-                                        #         np.concatenate((head,np.reshape(dat,(sizeglb['i']*sizeglb['j']*sizeglb['k']*nvar)))).tofile(fh[dire])
-                                        # fh[dire].closed  
+                                  with open(fnameshell[dire],"rb") as fh:
+                                      head = np.fromfile(fh,dtype=wp,count=headsize)
+                                      dat  = np.fromfile(fh,dtype=wp,count=sizeloc['i']*sizeloc['j']*sizeloc['k']*nvar)
+
+                                # -- Fill actual memory 
+                                if ndim == 3:
+                                        q[index['i'][0]:index['i'][1]
+                                         ,index['j'][0]:index['j'][1]
+                                         ,index['k'][0]:index['k'][1],0:nvar] = dat.reshape((sizeloc['i'],sizeloc['j'],sizeloc['k'],nvar)).copy()
+                                elif ndim == 2:
+                                        q[index['i'][0]:index['i'][1]
+                                         ,index['j'][0]:index['j'][1],0:nvar] = dat.reshape((sizeloc['i'],sizeloc['j'],nvar)).copy()
+                                else:
+                                        q[index['i'][0]:index['i'][1],0:nvar] = dat.reshape((sizeloc['i'],nvar)).copy()
+
         return tree
 
 
