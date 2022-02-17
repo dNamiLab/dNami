@@ -6,6 +6,7 @@ export  PYTHONPATH=$PYTHONPATH:$INSTALLPATH/generate/
 
 # - post processing functions
 export  PYTHONPATH=$PYTHONPATH:$INSTALLPATH/../pst/utils
+export  OMP_NUM_THREADS=1
 
 # -- 
 #export  KMP_AFFINITY='verbose,granularity=fine,compact,1,0'
