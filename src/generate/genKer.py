@@ -276,7 +276,7 @@ fltDicBc[4] = flt_10_4
 fltDicBc[3] = flt_10_3
 fltDicBc[2] = flt_10_2
 fltDicBc[1] = [i*0.5 for i in flt_7_1]
-fltDicBc[0] = [i*0.5 for i in flt_4_0]
+fltDicBc[0] = [i*0.0 for i in flt_4_0]
 
 operators = ('\+', '\*','\-','\/','\^','\(','\)','\,') 
 
@@ -1811,7 +1811,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 											addvarbc = False
 											for var in varbc:
 												if 'face' in varbc[var]:
-													if varbc[var]['face'] == dir1 : addvarbc = True
+													if (varbc[var]['face'] == dir1) or (varbc[var]['face'] == dir2) : addvarbc = True
 												elif 'edge' in varbc[var]:
 													if varbc[var]['edge'] == dir1+dir2: addvarbc = True
 												else:
@@ -1828,7 +1828,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 											var2process['varbcstatic'] = staticvarbc
 											var2process['varbc']       = dynamicvarbc
 												
-	
+											
 											for k in var2process:
 												if var2process[k] != {}:
 													edgecallname_stored[k] = k+'_edges_'+dir1+'_'+dir2+'_'+str(layer1)

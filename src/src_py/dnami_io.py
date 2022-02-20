@@ -104,7 +104,7 @@ def write_restart(n,t,flag,tree,fpath='./restarts/'):
                         if ndim == 3:   
                                 dirBC = dirBC + ['j1','jmax','k1','kmax']
                         for dir in dirBC:
-                                fnameshell[dir] = fpath + 'restartshell_'+ str(n).zfill(8)+'_'+dir
+                                fnameshell[dir] = fpath + 'restartshell_'+ dir +'_'+ str(n).zfill(8)
                 
         else:
                 fname = './out/liv/restart.bin'
@@ -367,8 +367,8 @@ def read_restart(tree,fname='restart.bin'):
         if fnameshell != {}     :
 
                 position = {'i':[dmpi.ibeg,dmpi.iend],
-                                'j':[dmpi.jbeg,dmpi.jend],
-                                'k':[dmpi.kbeg,dmpi.kend]}
+                            'j':[dmpi.jbeg,dmpi.jend],
+                            'k':[dmpi.kbeg,dmpi.kend]}
 
                 nglb    = {'i':nxgb,'j':nygb,'k':nzgb}
 
@@ -376,7 +376,7 @@ def read_restart(tree,fname='restart.bin'):
                 header  = {}
                 subarray= {}
 
-                for dir in ['i1','imax','j1','jmax','k1','kmax']:
+                for dir in dirBC:
 
                         wposition = {'i':dmpi.ibeg,
                                      'j':dmpi.jbeg,
@@ -411,14 +411,14 @@ def read_restart(tree,fname='restart.bin'):
 
                         # header
                         headsize = 7; head = np.empty(headsize,dtype=wp)
-                        head[:]  = [headsize,n,t,nxgb,nygb,nzgb,nvar] # implicit type conversion        
+                        # head[:]  = [headsize,n,t,nxgb,nygb,nzgb,nvar] # implicit type conversion        
                 
                         if iMpi:
                                 header[dir] = MPIWP.Create_contiguous(headsize)
                                 header[dir].Commit()    
-                                fh[dir] = MPI.File.Open(dmpi.comm_torus,fnameshell[dir],MPI.MODE_WRONLY|MPI.MODE_CREATE)
+                                fh[dir] = MPI.File.Open(dmpi.comm_torus,fnameshell[dir],MPI.MODE_RDONLY)
                                 fh[dir].Set_view(0,MPIWP,header[dir])
-                                if ioproc: fh[dir].Read_at(0,head)
+                                fh[dir].Read_at(0,head)
                                 header[dir].Free()      
                                 fh[dir].Close()
                                         
@@ -434,38 +434,36 @@ def read_restart(tree,fname='restart.bin'):
                                         index[dir[0]]   = [index[dir[0]][1],index[dir[0]][1]+hlo]                               
 
                                 wposition[dir[0]] = 1
-
+ 
                                 # body
                                 dat     =     np.empty((sizeloc['i'],sizeloc['j'],sizeloc['k'],nvar),dtype=wp)  
 
-                                if ndim == 3:
-                                        dat     =     q[index['i'][0]:index['i'][1]
-                                                           ,index['j'][0]:index['j'][1]
-                                                           ,index['k'][0]:index['k'][1],0:nvar].copy()
-                                elif ndim == 2:
-                                        dat     =     q[index['i'][0]:index['i'][1]
-                                                           ,index['j'][0]:index['j'][1]
-                                                           ,np.newaxis,0:nvar].copy()   
-                                else:
-                                        dat     =     q[index['i'][0]:index['i'][1]
-                                                           ,np.newaxis
-                                                           ,np.newaxis,0:nvar].copy()   
-
                                 if iMpi:
-                                        fh[dir]  = MPI.File.Open(dmpi.combc[dir],fnameshell[dir],MPI.MODE_WRONLY|MPI.MODE_CREATE)
+                                        fh[dir]  = MPI.File.Open(dmpi.combc[dir],fnameshell[dir],MPI.MODE_RDONLY)
                                         subarray = MPIWP.Create_subarray((  sizeglb['i'],    sizeglb['j'],    sizeglb['k'],  nvar),
                                                                                                          (  sizeloc['i'],    sizeloc['j'],    sizeloc['k'],  nvar),
                                                                                                          (wposition['i']-1,wposition['j']-1,wposition['k']-1,   0))
                                         subarray.Commit()
                                         disp = MPIWP.Get_size()*headsize
                                         fh[dir].Set_view(disp,MPIWP,subarray)
-                                        fh[dir].Write_all(dat)
+                                        fh[dir].Read_all(dat)
                                         subarray.Free()
                                         fh[dir].Close()
                                 else:
-                                        with open(fnameshell[dir],"wb") as fh[dir]:
+                                        with open(fnameshell[dir],"rb") as fh[dir]:
                                                 np.concatenate((head,np.reshape(dat,(sizeloc['i']*sizeloc['j']*sizeloc['k']*nvar)))).tofile(fh[dir])
-                                        fh[dir].closed          
+                                        fh[dir].closed         
+
+
+                                if ndim == 3:
+                                     q[index['i'][0]:index['i'][1]
+                                      ,index['j'][0]:index['j'][1]
+                                      ,index['k'][0]:index['k'][1],0:nvar] = dat.reshape((sizeloc['i'],sizeloc['j'],sizeloc['k'],nvar)).copy()
+                                elif ndim == 2:
+                                     q[index['i'][0]:index['i'][1]
+                                      ,index['j'][0]:index['j'][1],0:nvar] = dat.reshape((sizeloc['i'],sizeloc['j'],nvar)).copy()   
+                                else:
+                                     q[index['i'][0]:index['i'][1],0:nvar] = dat.reshape((sizeloc['i'],nvar)).copy()         
         return tree
 
 
