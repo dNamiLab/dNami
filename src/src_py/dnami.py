@@ -256,12 +256,12 @@ def unpack_bcs(tree):
 
 		if dirBC == 'jmaxk1':
 			if dMpi.jend == nygb and dMpi.kbeg == 1:
-				iSwap['imax'] = False
+				iSwap['jmax'] = False
 				iSwap['k1']   = False				
 				bcs['mybc']   = bcs['mybc'] + bcs['allbc'][dirBC]
 
 		if dirBC == 'jmaxkmax':
-			if dMpi.iend == nygb and dMpi.kend == nzgb:
+			if dMpi.jend == nygb and dMpi.kend == nzgb:
 				iSwap['jmax'] = False
 				iSwap['kmax'] = False				
 				bcs['mybc'] = bcs['mybc'] + bcs['allbc'][dirBC]			

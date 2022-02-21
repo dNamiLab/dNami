@@ -697,7 +697,7 @@ class type_mpi:
         elif ndim == 3:
             nv = np.size(f, 3)
             # positive x-dir
-            buf = np.empty(nh * (ny + 2 * nh) * nz * nv, dtype=wp)
+            buf = np.empty(nh * (ny + 2 * nh) * (nz + 2 * nh) * nv, dtype=wp)
             # t0=timer()
             # buf = f[nx:nh+nx,0:2*nh+ny,nh:nh+nz,0:nv].copy().reshape((nh*(ny+2*nh)*nz*nv,1))
             # print("f is ",f[:,:,:,0])
@@ -710,8 +710,8 @@ class type_mpi:
                 nh + nx,
                 0,
                 2 * nh + ny,
-                nh,
-                nh + nz,
+                0,
+                2 * nh + nz,
                 nx + 2 * nh,
                 ny + 2 * nh,
                 nz + 2 * nh,
@@ -735,8 +735,8 @@ class type_mpi:
                     nh,
                     0,
                     2 * nh + ny,
-                    nh,
-                    nh + nz,
+                    0,
+                    2 * nh + nz,
                     nx + 2 * nh,
                     ny + 2 * nh,
                     nz + 2 * nh,
@@ -746,7 +746,7 @@ class type_mpi:
             # sys.exit()
             # t3=timer()
             # negative x-dir
-            buf = np.empty(nh * (ny + 2 * nh) * nz * nv, dtype=wp)
+            buf = np.empty(nh * (ny + 2 * nh) * (nz + 2 * nh) * nv, dtype=wp)
             # t4=timer()
             # buf = f[nh:2*nh,0:2*nh+ny,nh:nh+nz,0:nv].copy().reshape((nh*(ny+2*nh)*nz*nv,1))
             dnamiF.pack(
@@ -756,8 +756,8 @@ class type_mpi:
                 2 * nh,
                 0,
                 2 * nh + ny,
-                nh,
-                nh + nz,
+                0,
+                2 * nh + nz,
                 nx + 2 * nh,
                 ny + 2 * nh,
                 nz + 2 * nh,
@@ -781,8 +781,8 @@ class type_mpi:
                     nx + 2 * nh,
                     0,
                     2 * nh + ny,
-                    nh,
-                    nh + nz,
+                    0,
+                    2 * nh + nz,
                     nx + 2 * nh,
                     ny + 2 * nh,
                     nz + 2 * nh,
@@ -846,7 +846,7 @@ class type_mpi:
         elif ndim == 3:
             nv = np.size(f, 3)
             # positive y-dir
-            buf = np.empty(nh * (nx + 2 * nh) * nz * nv, dtype=wp)
+            buf = np.empty(nh * (nx + 2 * nh) * (nz + 2 * nh) * nv, dtype=wp)
             # t0=timer()
             # buf = f[0:2*nh+nx,ny:nh+ny,nh:nh+nz,0:nv].copy().reshape((nh*(nx+2*nh)*nz*nv,1))
             dnamiF.pack(
@@ -856,8 +856,8 @@ class type_mpi:
                 2 * nh + nx,
                 ny,
                 nh + ny,
-                nh,
-                nh + nz,
+                0,
+                2 * nh + nz,
                 nx + 2 * nh,
                 ny + 2 * nh,
                 nz + 2 * nh,
@@ -881,15 +881,15 @@ class type_mpi:
                     2 * nh + nx,
                     0,
                     nh,
-                    nh,
-                    nh + nz,
+                    0,
+                    2 * nh + nz,
                     nx + 2 * nh,
                     ny + 2 * nh,
                     nz + 2 * nh,
                     nv)
             # t3=timer()
             # negative y-dir
-            buf = np.empty(nh * (nx + 2 * nh) * nz * nv, dtype=wp)
+            buf = np.empty(nh * (nx + 2 * nh) * (nz + 2 * nh) * nv, dtype=wp)
             # t4=timer()
             # buf = f[0:2*nh+nx,nh:2*nh,nh:nh+nz,0:nv].copy().reshape((nh*(nx+2*nh)*nz*nv,1))
             dnamiF.pack(
@@ -899,8 +899,8 @@ class type_mpi:
                 2 * nh + nx,
                 nh,
                 2 * nh,
-                nh,
-                nh + nz,
+                0,
+                2 * nh + nz,
                 nx + 2 * nh,
                 ny + 2 * nh,
                 nz + 2 * nh,
@@ -923,8 +923,8 @@ class type_mpi:
                     2 * nh + nx,
                     ny + nh,
                     ny + 2 * nh,
-                    nh,
-                    nh + nz,
+                    0,
+                    2 * nh + nz,
                     nx + 2 * nh,
                     ny + 2 * nh,
                     nz + 2 * nh,
