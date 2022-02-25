@@ -113,7 +113,7 @@ The ``rhs.py`` uses a list to define the variables to be advanced in time and py
 
         varsolved = ['rho','u','et']
 
-To specify that we wish to advance them in conservative form, we refer to the corresponding position in the above list with the ``consvar`` list (the index starts at 1 as this will be used in the Fortran layer).  
+To specify that we wish to advance them in conservative form  we refer to the corresponding position in the above list with the ``consvar`` list (the index starts at 1 as this will be used in the Fortran layer). For more details on this aspect, see the :doc:`/usage/genRhs` section. 
 
 .. code-block:: python
 

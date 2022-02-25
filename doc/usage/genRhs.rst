@@ -154,7 +154,17 @@ This ends the list of compulsory steps when creating a ``genRhs.py``.
 
     When no boundary conditions are specified in a given direction, the default behaviour assumes that the direction is **periodic**. 
         
+*Conservative formulation*
 
+dNami offers the user the possibility of advancing the equations in time using a conservative formulation. In the example equations given above, the 'solved' variables are ``rho``, ``u``, ``v`` and ``et`` but the quantities advanced in time by the Runge--Kutta scheme are ``rho``, ``rho*u``, ``rho*v`` and ``rho*et``, referred to as the conserved variables. In practice, the switch to conserved variables is usually done to leverage conservation properties of some finite-difference formulations and having access to the 'solved' variables is useful for setting initial conditions, boundary conditions and outputting information at run time.  This requires a transformation between the solved variables and the conserved variables before and after the Runge--Kutta steps. Currently, given a list of solved variables and a variable with the protected name ``rho`` e.g.    
+
+``varsolved = [rho, var1, var2, var3, var4, var5, ..., varN]``
+
+the user can choose which variables will be time-advanced in the form ``rho*varN`` using the ``consvar`` list (note that indexing starts at 1 as this information is passed to the Fortran layer) e.g.
+
+``consvar = [3,5,6]``
+
+which corresponds to ``var2``, ``var4`` and ``var5``. Note that a mix of equations formulated in a conservative and non-conservative manner can be advanced simultaneously. 
 
 **Filling out the genRhs.py: Optional steps**
 
