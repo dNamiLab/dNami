@@ -3910,9 +3910,9 @@ def genFilter(stencil,order,nvar,dirBC='',indbc='',fltbeg=2,rhs=None):
 			if dim > 2:
 				up.write('!$OMP DO SCHEDULE(GUIDED,4) COLLAPSE(2) \n')	
 				fltbc.write('!$OMP DO SCHEDULE(GUIDED,4) COLLAPSE(2) \n')
-			else:
-				up.write('!$OMP DO SCHEDULE(GUIDED,4)  \n')	
-				fltbc.write('!$OMP DO SCHEDULE(GUIDED,4)  \n')					
+			# else:
+			# 	up.write('!$OMP DO SCHEDULE(GUIDED,4)  \n')	
+			# 	fltbc.write('!$OMP DO SCHEDULE(GUIDED,4)  \n')					
 
 			loop_create('begin',up   , bc=dirBC[0])
 			loop_create('begin',fltbc, bc=dirBC[0])
@@ -4007,8 +4007,9 @@ def genFilter(stencil,order,nvar,dirBC='',indbc='',fltbeg=2,rhs=None):
 		if indbc == hlo_rhs-1:
 			loop_create('end',up   , bc=dirBC[0])
 			loop_create('end',fltbc, bc=dirBC[0])
-			up.write('\n'+'!$OMP END DO \n')
-			fltbc.write('\n'+'!$OMP END DO \n')
+			if dim > 2:
+				up.write('\n'+'!$OMP END DO \n')
+				fltbc.write('\n'+'!$OMP END DO \n')
 		up.close()
 		fltbc.close()	
 

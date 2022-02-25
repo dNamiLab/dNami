@@ -191,6 +191,7 @@ for test in test_list:
            export  PYTHONPATH=$PYTHONPATH:$INSTALLPATH/src_py; \
            export  PYTHONPATH=$PYTHONPATH:$INSTALLPATH/pymod;  \
            export  PYTHONPATH=$PYTHONPATH:$INSTALLPATH/generate; \
+           export  OMP_NUM_THREADS=1; \
            mpirun -n ' + nnproc + ' python3 compute.py >> ' + test_log
     try:
         process = subprocess.run(cmd,shell=True,cwd='../'+tmp_dir)

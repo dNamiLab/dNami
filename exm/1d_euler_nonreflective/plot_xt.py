@@ -25,14 +25,18 @@ rho0 = np.float64(1.)
 u0 = np.float64(0.295803989135199)
 
 
-# -- Create an array to store the density fluctuations
-rhop = np.zeros( (x.size, len(folders))  )
 
-for k, ff in enumerate(folders): 
+for k, ff in enumerate(folders): 	
+
 
     print('Reading file ...', ff)
 
     t,f = read_restart_wshell(ff)
+
+    if k ==0:
+        # -- Create an array to store the density fluctuations
+        rhop = np.zeros( (f[:,0].size, len(folders))  )
+
     rhop[:,k] = (f[:,0]-rho0)*1e3
 
 
