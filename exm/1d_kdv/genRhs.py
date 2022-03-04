@@ -24,7 +24,6 @@ def main():
     genrk3update(len(varsolved),rhs=rhs)
 
 # Generate RHS:
-    Save_eqns = {'divF':divF.copy()}
     append_Rhs(divF, 5,4, rhsname, vnamesrc_divF, update=False,rhs=rhs,stored=True)                           
 # Generate Filters (if required):      
     genFilter(11,10, len(varsolved),rhs=rhs)

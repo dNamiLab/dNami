@@ -25,9 +25,6 @@ def main():
       genrk3update(len(varsolved),rhs=rhs)
 
 # Generate RHS:
-      Save_eqns = {}
-      Save_eqns = {'Src_conv':Src_conv.copy(),'Src_dif': Src_dif.copy()}
-
 # Adding convective and diffusive terms to the RHS with different schemes
       append_Rhs(Src_conv, 13, 4, rhsname,locname_conv,update=False,rhs=rhs)                           
       append_Rhs(Src_dif , 5 , 4 , rhsname,locname_dif ,update=True ,rhs=rhs,stored=True)

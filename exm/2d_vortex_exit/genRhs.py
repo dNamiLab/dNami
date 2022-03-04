@@ -23,14 +23,13 @@ def main():
     genrk3update(len(varsolved),rhs=rhs)
 
 # Generate RHS:
-    Save_eqns = {'divF':divF.copy()}
     append_Rhs(divF, 9,8, rhsname, vnamesrc_divF, update=False,rhs=rhs)                           
 
 # Generate Filters (if required):      
     genFilter(11,10, len(varsolved),rhs=rhs)
 
 # Boundary conditions
-    genBC(Save_eqns['divF']  ,9,8, rhsname , vnamesrc_divF, update=False,rhs=rhs)
+    genBC(divF  ,9,8, rhsname , vnamesrc_divF, update=False,rhs=rhs)
 
     # ------------ I 
     #i1

@@ -1041,7 +1041,7 @@ def compute_storedbc(StoredVar,Stencil,Order,output,localvar,dirBC,update=False,
 			            updatest = updatest,
 			            updateqbc= updateqbc)
 
-def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=False):		
+def append_Rhs(Flux,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=False):		
 		"""
 			append_Rhs is a user-level function. It instructs the kernel to generate the Fortran sources codes that loops over the domain to compute all arithmetic expressions needed to build the RHS.
 			Each call to append_Rhs creates a new loop that contains instructions needed to compute equations contained in Flx.
@@ -1067,6 +1067,7 @@ def append_Rhs(Flx,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fals
 		varbc        = rhs.varbc
 		varsolved    = rhs.varsolved
 		consvar      = rhs.consvar
+		Flx          = Flux.copy() #make a copy of input so that it does not get modified 
 
 
 
