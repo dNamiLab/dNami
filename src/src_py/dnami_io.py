@@ -104,7 +104,7 @@ def write_restart(n,t,flag,tree,fpath='./restarts/'):
                         if ndim == 3:   
                                 dirBC = dirBC + ['j1','jmax','k1','kmax']
                         for dir in dirBC:
-                                fnameshell[dir] = fpath + 'restartshell_'+ str(n).zfill(8)+'_'+dir
+                                fnameshell[dir] = fpath + 'restartshell_'+dir+'_'+str(n).zfill(8) 
                 
         else:
                 fname = './out/liv/restart.bin'
@@ -431,7 +431,6 @@ def read_restart(tree,fname='restart.bin'):
                                 # body
                                 dat  = np.empty(sizeloc['i']*sizeloc['j']*sizeloc['k']*nvar,dtype=wp)
 
-                                ## TO FIX
                                 if iMpi:
                                   # Read the data from the shell file on each process 
                                   fh[dire] = MPI.File.Open(dmpi.combc[dire],fnameshell[dire],MPI.MODE_RDONLY)
@@ -491,7 +490,7 @@ def write_data(field,n,t,tree,fpath='./out/',fname='output'):
                 if ndim == 3:   
                         dirBC = dirBC + ['j1','jmax','k1','kmax']
                 for dir in dirBC:
-                        fnameshell[dir] = path + 'outputshell_'+str(n).zfill(8) +'_'+dir
+                        fnameshell[dir] = path + 'outputshell_'+ dir +'_'+ str(n).zfill(8)
         
         
         # unpack useful tree data

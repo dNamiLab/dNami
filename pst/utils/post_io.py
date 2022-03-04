@@ -84,8 +84,8 @@ def read_restart_wshell(fname,verbose=False,wp='float64'):
     fnamesh[1] = fnamesh[-1]
 
     try:
-        n, t, qi1    = read_restart(fname=fnamesh[0] +'shell_' + fnamesh[1] + '_i1'  )
-        n, t, qimax  = read_restart(fname=fnamesh[0] +'shell_' + fnamesh[1] + '_imax')
+        n, t, qi1    = read_restart(fname=fnamesh[0] +'shell_' + 'i1_'  + fnamesh[1])
+        n, t, qimax  = read_restart(fname=fnamesh[0] +'shell_' + 'imax_'+ fnamesh[1])
         hloi = True
         if verbose:
             print(' > Read ishell ..')
@@ -94,8 +94,8 @@ def read_restart_wshell(fname,verbose=False,wp='float64'):
         hloi = False 
 
     try:
-        n, t, qj1    = read_restart(fname=fnamesh[0] +'shell_' + fnamesh[1] + '_j1'  )
-        n, t, qjmax  = read_restart(fname=fnamesh[0] +'shell_' + fnamesh[1] + '_jmax'  )
+        n, t, qj1    = read_restart(fname=fnamesh[0] +'shell_' + 'j1_'  + fnamesh[1] )
+        n, t, qjmax  = read_restart(fname=fnamesh[0] +'shell_' + 'jmax_'+ fnamesh[1] )
         hloj = True
         if verbose:
             print(' > Read jshell ..')
@@ -104,8 +104,8 @@ def read_restart_wshell(fname,verbose=False,wp='float64'):
         hloj = False 
 
     try:
-        n, t, qk1    = read_restart(fname=fnamesh[0] +'shell_' + fnamesh[1] + '_k1'  )
-        n, t, qkmax  = read_restart(fname=fnamesh[0] +'shell_' + fnamesh[1] + '_kmax'  )
+        n, t, qk1    = read_restart(fname=fnamesh[0] +'shell_' + 'k1_'  + fnamesh[1])
+        n, t, qkmax  = read_restart(fname=fnamesh[0] +'shell_' + 'kmax_'+ fnamesh[1])
         hlok = True
         if verbose:
             print(' > Read kshell ..')

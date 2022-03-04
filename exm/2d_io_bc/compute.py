@@ -104,7 +104,7 @@ dMpi.swap(q,hlo,dtree)
 if dMpi.ioproc:
     for shell in glob.glob('restartshell*'):
         rname = shell.split('_')
-        rname = rname[0] + '_' + rname[-1]
+        rname = rname[0] + '_' + rname[-2]
         shutil.copyfile(shell, rname)
 
 # -- Read it back in  
