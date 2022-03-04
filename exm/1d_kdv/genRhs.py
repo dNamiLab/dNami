@@ -1,7 +1,7 @@
 import sys
 import re
 import numpy as np
-from genKer import rhsinfo, genrk3, genrk3update, genFilter, genBC, append_Rhs, genbcsrc
+from genKer import genrk3, genrk3update, genFilter, genBC, append_Rhs
 import os 
 
 wp = 'float64'
@@ -29,7 +29,7 @@ def main():
     genFilter(11,10, len(varsolved),rhs=rhs)
 
     # Extract RHS info:
-    rhsinfo(rhs)
+    rhs.export()
 
 if __name__ == '__main__':
     main()

@@ -22,7 +22,16 @@ except:
  
 class rhs_info:
 	def __init__(self):
-		from genRhs	import dim, wp
+		try: 
+			from genRhs	import dim
+		except:
+			exception('dim not define. Try fixing the number of spatial dimension (dim = 1, dim = 2 or dim = 3)',message='error')
+
+		try: 
+			from genRhs	import wp
+		except:
+			exception('wp not defined. Try fixing the working precision',message='error')
+
 
 		try:
 			from genRhs import consvar
@@ -54,6 +63,15 @@ class rhs_info:
 		except:
 			exception('varname not defined',message='error')
 
+		try:
+			from genRhs import hlo_glob
+		except:
+			exception('The number of hlo cells, hlo_glob, needs to be defined in genRhs. It is not automatically computed yet.',message='error')								   
+		try:
+			from genRhs import incPATH
+		except:
+			exception('incPATH not defined in genRhs',message='error')	
+		
 		self.wp     	  = wp     	 
 		self.dim     	  = dim     	 
 		self.stencil 	  = 1 	 
@@ -64,8 +82,45 @@ class rhs_info:
 		self.varstored    = varstored  
 		self.varsolved    = varsolved
 		self.varbc        = varbc
+		self.varloc	      = varloc
 		self.hlo_rhs      = 1
+		self.hlo_glob     = hlo_glob
 		self.bc_info      = [{},{}]
+		self.incPATH      = incPATH
+
+	def export(self):
+		"""
+			 rhsinfo is a user-level function that needs to be called at the end of genRhs.py in order to write necessary rhs information to be used at runtime.
+			 """
+		genBC_calls(self)
+
+		wp     	     = self.wp     	     
+		dim     	 	 = self.dim     	     
+		stencil 	 	 = self.stencil 	     
+		order        = self.order         
+		coefficients = self.coefficients  
+		varname      = self.varname   
+		varsolved    = self.varsolved
+		varstored    = self.varstored    
+		hlo_rhs      = self.hlo_rhs  
+		bc_info      = self.bc_info     
+		varbc        = self.varbc
+
+
+		instpath = os.environ['INSTALLPATH']
+		rhsinf = open(instpath+'/pymod/rhsinfo.py','w')
+
+		rhsinf.write('wp = \''+str(wp)+'\'\n')
+		rhsinf.write('dim = '+str(dim)+'\n')
+		rhsinf.write('stencil = '+str(stencil)+'\n')
+		rhsinf.write('order = '+str(order)+'\n')
+		rhsinf.write('coefficients = '+str(coefficients)+'\n')
+		rhsinf.write('varname = '+str(varname)+'\n')
+		rhsinf.write('varsolved = '+str(varsolved)+'\n')	
+		rhsinf.write('varstored = '+str(varstored)+'\n')
+		rhsinf.write('hlo_rhs = '+str(hlo_rhs)+'\n')
+		rhsinf.write('bc_info = '+str(bc_info)+'\n')
+		rhsinf.write('varbc = '+str(varbc)+'\n')	
 
 
 
@@ -287,7 +342,7 @@ Variables  = lambda input: [s.strip() for s in opsplit(input)]
 Operations = lambda input: re.findall(oplist,input)
 
 
-def dNamiVar(var,rangei,rangej,rangek):
+def dNamiVar(var,rangei,rangej,rangek,rhs):
 	"""
 			dNamiVar is a kernel-internal function. It translates a symbolic word into a valid Fortran data access.
 			
@@ -313,12 +368,14 @@ def dNamiVar(var,rangei,rangej,rangek):
 				>>> dNamiVar('u',1,2,5)
 				'qst(1,2,3,10)'					
 			"""
-	from genRhs import dim
-
-	try:
-		from genRhs import varbc
-	except:
-		varbc = {}
+	dim   = rhs.dim
+	varbc = rhs.varbc
+	varstored    = rhs.varstored
+	varloc       = rhs.varloc
+	coefficients = rhs.coefficients
+	varsolved		 = rhs.varsolved
+	varname			 = rhs.varname	
+	hlo_glob 	   = rhs.hlo_glob
 
 	bcbydir   = {'face':{'i' :[],'j' :[],'k' :[]},
 	    	     'edge':{'ij':[],'jk':[],'ik':[]}}
@@ -334,7 +391,6 @@ def dNamiVar(var,rangei,rangej,rangek):
 		else:
 			exception('Missing bc location for variable '+v+' in varbc (must contain a \'face\' or \'edge\' key)',message='error')
 					
-		
 	
 	for dirloc in bcbydir:
 		for dir in bcbydir[dirloc]:
@@ -343,28 +399,6 @@ def dNamiVar(var,rangei,rangej,rangek):
 			from collections import Counter	
 			if 	not (Counter(Counter(knownbcs).values())[1] == len(knownbcs)):
 				exception('Several occurrences of identical indices for a given bc location (i.e. face or edge) in "varbc" ('+dirloc+', '+dir+','+str(knownbcs)+'). This ambiguity is not managed yet — generation aborted.',message='error')
-
-	try:
-		from genRhs import varstored
-	except:
-		varstored = {}	
-	try:
-		from genRhs import varloc
-	except:
-		varloc = {}		
-	try:
-		from genRhs import coefficients
-	except:
-		coefficients = {}		
-	try:
-		from genRhs import varsolved
-	except:
-		exception('varsolved not defined',message='error')
-
-	try:
-		from genRhs import varname
-	except:
-		exception('varname not defined',message='error')	
 
 
 	sizebc   = {'face':{'i'  :{3:'('+rangej+','+rangek,
@@ -386,10 +420,7 @@ def dNamiVar(var,rangei,rangej,rangek):
 							   2:'(1',
 							   1:'(1'}}} 
 
-	try:
-		from genRhs import hlo_glob
-	except:
-		exception('The number of hlo cells, hlo_glob, needs to be defined in genRhs. It is not automatically computed yet.',message='error')								   
+	
 
 	domainBorder = {'face':{'i1'  : 1-hlo_glob,
 							  'imax': 'nx +'+str(hlo_glob),
@@ -437,16 +468,16 @@ def dNamiVar(var,rangei,rangej,rangek):
 				elif var in coefficients:
 					dvar = 'param_float('+str(coefficients[var])+' + 5)' 				
 				elif var in varloc:
-					dvar = op_to_dNami(varloc[var],rangei,rangej,rangek)		
+					dvar = op_to_dNami(varloc[var],rangei,rangej,rangek,rhs)		
 
 	elif var in coefficients:
 		dvar = 'param_float('+str(coefficients[var])+' + 5)' 				
 	elif var in varloc:
-		dvar = op_to_dNami(varloc[var],rangei,rangej,rangek)
+		dvar = op_to_dNami(varloc[var],rangei,rangej,rangek,rhs)
 		
 	return dvar
 
-def op_to_dNami(source,i='i',j='j',k='k'):
+def op_to_dNami(source,i='i',j='j',k='k',rhs=None):
 	"""
 			op_to_dNami is a kernel-internal function. It translates pseudo-code containing a mix of symbolic arithmetic expression and Fortran syntax into a valid Fortran syntax.
 			
@@ -468,7 +499,7 @@ def op_to_dNami(source,i='i',j='j',k='k'):
 	rhs_line = ''
 	for v, op in zip(Variables(source)[0:-1],Operations(source)):
 		if op=='^' : op = '**'
-		newterm = (dNamiVar(v,rangei,rangej,rangek) + op)
+		newterm = (dNamiVar(v,rangei,rangej,rangek,rhs) + op)
 		
 		if (len(rhs_line)>1) and ( (rhs_line[-1] == '+' ) or (rhs_line[-1] == '-' ) ):
 
@@ -476,8 +507,8 @@ def op_to_dNami(source,i='i',j='j',k='k'):
 			rhsadd = '{:>20}{:}'.format('',newterm)
 			rhs_line = rhs_line + rhsadd
 		else:	
-			rhs_line = rhs_line + dNamiVar(v,rangei,rangej,rangek) + op 
-	rhs_line = rhs_line +  dNamiVar(Variables(source)[-1],rangei,rangej,rangek)
+			rhs_line = rhs_line + dNamiVar(v,rangei,rangej,rangek,rhs) + op 
+	rhs_line = rhs_line +  dNamiVar(Variables(source)[-1],rangei,rangej,rangek,rhs)
 	return rhs_line
 
 def comment(message):
@@ -493,7 +524,7 @@ def comment(message):
 	msg = msg +'\n\n'
 	return msg
 
-def genNbg(expr, dir , stencil, i='i',j='j',k='k',vname='v',dirBc=None,indbc='',der='first'):
+def genNbg(expr, dir , stencil, i='i',j='j',k='k',vname='v',dirBc=None,indbc='',der='first',rhs=None):
 	"""
 			dNamiVar is a kernel-internal function. It prepares neighbourhood for spatial derivatives computation.
 			
@@ -540,13 +571,13 @@ def genNbg(expr, dir , stencil, i='i',j='j',k='k',vname='v',dirBc=None,indbc='',
 		for shift in range(-hlo,hlo+1,1):
 			if   dir == 'x' :
 				vnamebg.append(genVname(vname,  i=i+'{:+d}'.format(shift),j=j,k=k))
-				exprnbg.append(op_to_dNami(expr,i=i+'{:+d}'.format(shift),j=j,k=k))
+				exprnbg.append(op_to_dNami(expr,i=i+'{:+d}'.format(shift),j=j,k=k,rhs=rhs))
 			elif dir == 'y' :
 				vnamebg.append(genVname(vname,  i=i,j=j+'{:+d}'.format(shift),k=k))
-				exprnbg.append(op_to_dNami(expr,i=i,j=j+'{:+d}'.format(shift),k=k))
+				exprnbg.append(op_to_dNami(expr,i=i,j=j+'{:+d}'.format(shift),k=k,rhs=rhs))
 			elif dir == 'z':
 				vnamebg.append(genVname(vname,  i=i,j=j,k=k+'{:+d}'.format(shift)))
-				exprnbg.append(op_to_dNami(expr,i=i,j=j,k=k+'{:+d}'.format(shift)))
+				exprnbg.append(op_to_dNami(expr,i=i,j=j,k=k+'{:+d}'.format(shift),rhs=rhs))
 	else:
 		lenOneSidedBC = 3
 		if (der == 'second'): lenOneSidedBC = 4
@@ -557,13 +588,13 @@ def genNbg(expr, dir , stencil, i='i',j='j',k='k',vname='v',dirBc=None,indbc='',
 		for shift in range(0,lenOneSidedBC,1):
 			if   dir == 'x' :
 				vnamebg.append(genVname(vname,  i=i+'{:+d}'.format(offsetdir*shift),j=j,k=k))
-				exprnbg.append(op_to_dNami(expr,i=i+'{:+d}'.format(offsetdir*shift),j=j,k=k))
+				exprnbg.append(op_to_dNami(expr,i=i+'{:+d}'.format(offsetdir*shift),j=j,k=k,rhs=rhs))
 			elif dir == 'y' :
 				vnamebg.append(genVname(vname,  i=i,j=j+'{:+d}'.format(offsetdir*shift),k=k))
-				exprnbg.append(op_to_dNami(expr,i=i,j=j+'{:+d}'.format(offsetdir*shift),k=k))
+				exprnbg.append(op_to_dNami(expr,i=i,j=j+'{:+d}'.format(offsetdir*shift),k=k,rhs=rhs))
 			elif dir == 'z':
 				vnamebg.append(genVname(vname,  i=i,j=j,k=k+'{:+d}'.format(offsetdir*shift)))
-				exprnbg.append(op_to_dNami(expr,i=i,j=j,k=k+'{:+d}'.format(offsetdir*shift)))			
+				exprnbg.append(op_to_dNami(expr,i=i,j=j,k=k+'{:+d}'.format(offsetdir*shift),rhs=rhs))			
 
 	return [exprnbg, vnamebg]
 
@@ -789,11 +820,12 @@ def createNbg(vnamebg,exprnbg,file,der='first',indbc=None,bc=False):
 			file.write(vnamebg[shift  ]+' = '+exprnbg[shift  ])
 			file.write('\n\n')
 
-def updateRHS(vname,expr,i='i',j='j',k='k',update=False,updateq=False):
+def updateRHS(vname,expr,i='i',j='j',k='k',update=False,updateq=False,rhs=None):
 	"""
 			updateRHS is a kernel-internal function. Produces Fortran code with arithmetic expression corresponding to the RHS or an update of the RHS.
 			"""			
-	from genRhs import varname, dim
+	varname = rhs.varname
+	dim     = rhs.dim
 
 	if dim == 3:
 		rhs = 'rhs('+i+','+j+','+k+',indvars('+str(varname[vname])+'))'
@@ -822,11 +854,13 @@ def updateRHS(vname,expr,i='i',j='j',k='k',update=False,updateq=False):
 
 	return out
 
-def updateStored(vname,expr,i='i',j='j',k='k',update=False):
+def updateStored(vname,expr,i='i',j='j',k='k',update=False,rhs=None):
 	"""
 			updateStored is a kernel-internal function. Produces Fortran code with arithmetic expression corresponding to the stored variable.
 			"""		
-	from genRhs import varstored, dim
+
+	varstored = rhs.varstored
+	dim       = rhs.dim
 
 	if dim == 3:
 		stored = 'qst('+i+','+j+','+k+',indvarsst('+str(varstored[vname]['ind'])+'))'
@@ -842,11 +876,13 @@ def updateStored(vname,expr,i='i',j='j',k='k',update=False):
 	
 	return storedout
 
-def updateVarbc(vname,expr,i='i',j='j',k='k',update=False):
+def updateVarbc(vname,expr,i='i',j='j',k='k',update=False,rhs=None):
 	"""
 			updateVarbc is a kernel-internal function. Produces Fortran code with arithmetic expression corresponding to an update of q vector at boundary.
 			"""		
-	from genRhs import varbc, dim
+
+	varbc = rhs.varbc
+	dim   = rhs.dim
 
 	sizebc   = {'face':{'i'  :{3:'('+j+','+k,
 							   2:'('+j,
@@ -909,7 +945,7 @@ def compute_stored(StoredVar,Stencil,Order,output,localvar,update=False,rhs=None
 	history={'x':{'var':[],'symb':[]},'y':{'var':[],'symb':[]},'z':{'var':[],'symb':[]}}
 	history2={'x':[[],[]],'y':[[],[]],'z':[[],[]]}
 	dhistory={'x':[[],[],[],[]],'y':[[],[],[],[]],'z':[[],[],[],[]]}
-	loop_create('begin',output)
+	loop_create('begin',output,rhs=rhs)
 	for vstored in  StoredVar.keys():
 		output.write(comment('building stored variable '+ vstored))
 	
@@ -922,8 +958,8 @@ def compute_stored(StoredVar,Stencil,Order,output,localvar,update=False,rhs=None
 		output.write('!'.ljust(60,'~')+'\n\n')	
 		
 		# for vn in dirrhs:				
-		[Out,locvar,history]  = genSymbDer1(StoredVar[vstored]['symb'],output,locvar,order=Order,stencil=Stencil,indi='i',indj='j',indk='k',vname=vstored,history=history,dhistory=dhistory)			
-		[Out,locvar,history2] = genSymbDer2(Out,output,locvar,order=Order,stencil=Stencil,indi='i',indj='j',indk='k',vname=vstored,history=history2)
+		[Out,locvar,history]  = genSymbDer1(StoredVar[vstored]['symb'],output,locvar,order=Order,stencil=Stencil,indi='i',indj='j',indk='k',vname=vstored,history=history,dhistory=dhistory,rhs=rhs)			
+		[Out,locvar,history2] = genSymbDer2(Out,output,locvar,order=Order,stencil=Stencil,indi='i',indj='j',indk='k',vname=vstored,history=history2,rhs=rhs)
 		for v in ['x','y','z']:
 			if len(history[v]['symb']) != 0:
 				for s in history[v]['symb']:	
@@ -932,9 +968,9 @@ def compute_stored(StoredVar,Stencil,Order,output,localvar,update=False,rhs=None
 		if(history2 != {'x':[[],[]],'y':[[],[]],'z':[[],[]]} ): hlo_rhs = max(hlo_rhs, int((Stencil-1)/2))
 		output.write(comment('Update stored variables '+StoredVar[vstored]['symb']))
 		
-		exp_stored = op_to_dNami(Out) 
+		exp_stored = op_to_dNami(Out,rhs=rhs) 
 	
-		output.write(updateStored(vstored,exp_stored,update=update)+'\n\n')
+		output.write(updateStored(vstored,exp_stored,update=update,rhs=rhs)+'\n\n')
 	
 	tmpvar = ''
 	for var1 in locvar: 
@@ -954,7 +990,7 @@ def compute_stored(StoredVar,Stencil,Order,output,localvar,update=False,rhs=None
 	rhs.hlo_rhs = hlo_rhs	
 	rhs.stencil = max(rhs.stencil,Stencil)
 	rhs.order   = max(rhs.order,Order)
-	loop_create('end',output)
+	loop_create('end',output,rhs=rhs)
 
 def compute_storedbc(StoredVar,Stencil,Order,output,localvar,dirBC,update=False,updateqbc=False,rhs=None):		
 		"""
@@ -1039,7 +1075,7 @@ def compute_storedbc(StoredVar,Stencil,Order,output,localvar,dirBC,update=False,
 			            vname    = rhsname,
 			            update   = update,
 			            updatest = updatest,
-			            updateqbc= updateqbc)
+			            updateqbc= updateqbc,rhs=rhs)
 
 def append_Rhs(Flux,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=False):		
 		"""
@@ -1057,10 +1093,13 @@ def append_Rhs(Flux,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fal
 					stored (logical): trigger the generation of stored variables with the current choice of (Stencil,Order).	
 
 			"""
-		from genRhs import incPATH
 
-		dim = rhs.dim
-		wp  = rhs.wp
+		if rhs == None:
+			exception('rhs is empty. Initialise rhs, through rhs = rhs_info(), before generating RHS',message='error')	
+
+		incPATH 		 = rhs.incPATH
+		dim 				 = rhs.dim
+		wp  				 = rhs.wp
 		coefficients = rhs.coefficients
 		varname      = rhs.varname
 		varstored    = rhs.varstored
@@ -1163,9 +1202,9 @@ def append_Rhs(Flux,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fal
 				dummy  = open(incPATH+'updateFilter_'+d,'w') 
 				dummy  = open(incPATH+'Filter_'+d,'w')       								
 
-			gendtype()
-			globvar()
-			loop(lbeg,lend)
+			gendtype(rhs=rhs)
+			globvar(rhs=rhs)
+			loop(lbeg,lend,rhs=rhs)
 			geninit(init,len(varsolved),rhs=rhs)
 			if consvar != []:
 				genP2C(cns,'conservative',rhs=rhs)
@@ -1181,7 +1220,7 @@ def append_Rhs(Flux,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fal
 		history2={'x':[[],[]],'y':[[],[]],'z':[[],[]]}
 		dhistory={'x':[[],[],[],[]],'y':[[],[],[],[]],'z':[[],[],[],[]]}
 
-		loop_create('begin',output)
+		loop_create('begin',output,rhs=rhs)
 
 		for rhsvar in  Flx.keys():
 
@@ -1197,8 +1236,8 @@ def append_Rhs(Flux,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fal
 			
 			# for vn in dirrhs:				
 
-			[Flx[rhsvar],locvar,history]  = genSymbDer1(Flx[rhsvar],output,locvar,order=Order,stencil=Stencil,indi='i',indj='j',indk='k',vname=vname[rhsvar],history=history,dhistory=dhistory)			
-			[Flx[rhsvar],locvar,history2] = genSymbDer2(Flx[rhsvar],output,locvar,order=Order,stencil=Stencil,indi='i',indj='j',indk='k',vname=vname[rhsvar],history=history2)
+			[Flx[rhsvar],locvar,history]  = genSymbDer1(Flx[rhsvar],output,locvar,order=Order,stencil=Stencil,indi='i',indj='j',indk='k',vname=vname[rhsvar],history=history,dhistory=dhistory,rhs=rhs)			
+			[Flx[rhsvar],locvar,history2] = genSymbDer2(Flx[rhsvar],output,locvar,order=Order,stencil=Stencil,indi='i',indj='j',indk='k',vname=vname[rhsvar],history=history2,rhs=rhs)
 
 			for v in ['x','y','z']:
 				if len(history[v]['symb']) != 0:
@@ -1211,9 +1250,9 @@ def append_Rhs(Flux,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fal
 			output.write(comment('Update RHS terms for '+rhsname[rhsvar]))
 			
 			exp_rhs = ' - '
-			exp_rhs = exp_rhs + ' ( ' + op_to_dNami(Flx[rhsvar]) + ' ) '
+			exp_rhs = exp_rhs + ' ( ' + op_to_dNami(Flx[rhsvar],rhs=rhs) + ' ) '
 		
-			output.write(updateRHS(rhsvar,exp_rhs,update=update)+'\n\n')
+			output.write(updateRHS(rhsvar,exp_rhs,update=update,rhs=rhs)+'\n\n')
 		
 		tmpvar = ''
 		for var1 in locvar: 
@@ -1235,9 +1274,9 @@ def append_Rhs(Flux,Stencil,Order,rhsname,vname,update=False,rhs=None,stored=Fal
 		rhs.stencil = max(rhs.stencil,Stencil)
 		rhs.order   = max(rhs.order,Order)
 
-		loop_create('end',output)
+		loop_create('end',output,rhs=rhs)
 
-def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}}],update=False,rhs=None,stored=False):
+def genBC(Equations,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}}],update=False,rhs=None,stored=False):
 		"""
 			genBC is a user-level function. It instructs the kernel to generate the Fortran sources codes that loops over the domain boundaries to compute all arithmetic expressions needed to build the RHS.
 			Each call to genBC creates a new loop that contains instructions needed to compute equations for the RHS at the domain boundaries.
@@ -1255,8 +1294,10 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 
 			"""
 
-		from genRhs import incPATH
+		if rhs == None:
+			exception('rhs is empty. Initialise rhs, through rhs = rhs_info(), before generating BC.',message='error')	
 
+		incPATH 		 = rhs.incPATH
 		dim          = rhs.dim
 		wp           = rhs.wp
 		coefficients = rhs.coefficients
@@ -1264,6 +1305,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 		varstored    = rhs.varstored
 		varsolved    = rhs.varsolved
 		varbc        = rhs.varbc
+		Eqns         = Equations.copy() 
 
 		if rhs.stencil == 1:
 			exception('RHS must be defined before BCs',message='error')
@@ -1407,7 +1449,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 			
 										create_bcsubroutine(st,k+'_faces_'+bcdir,
 														 'include_BClocVar_'+k+'_'+bcdir+'.f90',
-														 'include_BCLoops_'+k+'_' +bcdir+'.f90',indrange)
+														 'include_BCLoops_'+k+'_' +bcdir+'.f90',indrange,rhs=rhs)
 
 
 								
@@ -1503,7 +1545,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 		
 									create_bcsubroutine(st,k+'_faces_'+bcdir,
 													 'include_BClocVar_'+k+'_'+bcdir+'.f90',
-													 'include_BCLoops_'+k+'_' +bcdir+'.f90',indrange)	
+													 'include_BCLoops_'+k+'_' +bcdir+'.f90',indrange,rhs=rhs)	
 									
 								
 							
@@ -1597,7 +1639,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 	
 						create_bcsubroutine(rhs_for,bcname+'bc'+'_faces_'+str(dirBC)+'_'+str(bcnum),
 										 'include_PhyBClocVar_'+bcname+'_'+dirBC+'_'+bctype+'.f90',
-										 'include_PhyBCLoops_'+bcname+'_'+dirBC+'_'+bctype+'.f90' ,indrange, phy=bctype)
+										 'include_PhyBCLoops_'+bcname+'_'+dirBC+'_'+bctype+'.f90' ,indrange, phy=bctype,rhs=rhs)
 	
 					else:
 						
@@ -1615,7 +1657,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 	
 							create_bcsubroutine(rhs_for,'_faces_'+str(dirBC)+'_'+str(layer),
 										 'include_BClocVar_'+dirBC+'_'+str(layer)+'.f90',
-										 'include_BCLoops_'+dirBC+'_'+str(layer)+'.f90',indrange)
+										 'include_BCLoops_'+dirBC+'_'+str(layer)+'.f90',indrange,rhs=rhs)
 	
 	
 				else:	
@@ -1687,7 +1729,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 					            DirDic  = DirDic,
 					            vname   = vname,
 					            update  = update,
-					            updateq = updateq)				
+					            updateq = updateq,rhs=rhs)				
 					
 				else:	
 	
@@ -1703,7 +1745,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 						            indi    =indi,indj =indj,indk =indk,
 						            DirDic  = DirDic,
 						            vname   = vname,
-						            update  = update)
+						            update  = update,rhs=rhs)
 #
 #		Generate edges	
 #
@@ -1908,7 +1950,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 									            indi    = indi,indj = indj,indk = indk,
 									            DirDic  = DirDic,
 									            vname   = vname,
-									            update  = update)
+									            update  = update,rhs=rhs)
 
 											# stored generate fortran src static/dyna
 											if stored:
@@ -1932,7 +1974,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 												            vname    = vname_st,
 												            update   = False,
 												            updateqbc= updateqbc,
-												            updatest = updatest)
+												            updatest = updatest,rhs=rhs)
 
 #														
 #											Create the second layer of subroutines with the newly generated eqns (for layer 2)	            											
@@ -1964,7 +2006,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 												bcedges  = open(incPATH+'bcsrc_edges_'+dir1+'_'+dir2+'_'+str(layer1)+'_'+str(layer2)+'.for','w')
 												create_bcsubroutine(bcedges,'_edges_'+dir1+'_'+dir2+'_'+str(layer1)+'_'+str(layer2),
 																	'include_edges_'+dir1+'_'+dir2+'_'+str(layer1)+'_'+str(layer2)+'_BClocVar.f90',
-																	'include_edges_'+dir1+'_'+dir2+'_'+str(layer1)+'_'+str(layer2)+'_BCLoops.f90',indrange)
+																	'include_edges_'+dir1+'_'+dir2+'_'+str(layer1)+'_'+str(layer2)+'_BCLoops.f90',indrange,rhs=rhs)
 												bcedges.close()
 												bcedges  = open(incPATH+'bcsrc_edges_'  +dir1+'_'+dir2+'_'+str(layer1)+'_'+str(layer2)+'.for','r')
 												cname = bcedges.readlines()[8][10:]
@@ -1979,7 +2021,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 														bcedges_stored[k]  = open(incPATH+'bcsrc_'+k+'_edges_'+dir1+'_'+dir2+'_'+str(layer1)+'_'+str(layer2)+'.for','w')														
 														create_bcsubroutine(bcedges_stored[k],k+'_edges_'+dir1+'_'+dir2+'_'+str(layer1)+'_'+str(layer2),
 																'include_'+k+'_edges_'+dir1+'_'+dir2+'_'+str(layer1)+'_'+str(layer2)+'_BClocVar.f90',
-																'include_'+k+'_edges_'+dir1+'_'+dir2+'_'+str(layer1)+'_'+str(layer2)+'_BCLoops.f90' ,indrange)
+																'include_'+k+'_edges_'+dir1+'_'+dir2+'_'+str(layer1)+'_'+str(layer2)+'_BCLoops.f90' ,indrange,rhs=rhs)
 														bcedges_stored[k].close()
 														bcedges_stored[k]  = open(incPATH+'bcsrc_'+k+'_edges_'+dir1+'_'+dir2+'_'+str(layer1)+'_'+str(layer2)+'.for','r')
 														cname = bcedges_stored[k].readlines()[8][10:]
@@ -1990,7 +2032,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 #														
 
 										if not update:		
-											create_bccalls(efname,edgecallname,bcall)
+											create_bccalls(efname,edgecallname,bcall,rhs=rhs)
 											efname.close()
 
 										# stored add calls static/dynamic
@@ -2013,7 +2055,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 											var2process['varbc']       = dynamicvarbc
 											for k in var2process:
 												if var2process[k] != {}:
-													create_bccalls(efname_stored[k],edgecallname_stored[k],bcall_stored[k])
+													create_bccalls(efname_stored[k],edgecallname_stored[k],bcall_stored[k],rhs=rhs)
 													efname_stored[k].close()
 													
 #       
@@ -2108,7 +2150,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 										        DirDic  = DirDic,
 										        vname   = vname,
 										        update  = update,
-										        updateq = updateq)
+										        updateq = updateq,rhs=rhs)
 	
 #
 #											Create second layer subroutine with the newly generates eqns (and accumulate calls)	
@@ -2138,14 +2180,14 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 											
 											create_bcsubroutine(bcedges,'_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2),
 																'include_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2)+'_BClocVar.f90',
-																'include_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2)+'_BCLoops.f90',indrange)
+																'include_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2)+'_BCLoops.f90',indrange,rhs=rhs)
 											bcedges.close()
 											bcedges  = open(incPATH+'bcsrc_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_'+dir2+'_0'+'_'+str(layer2)+'.for','r')
 											cname = bcedges.readlines()[8][10:]
 											bcall    = bcall + '      call '+ cname
 	
 											
-										create_bccalls(efname,edgecallname,bcall)
+										create_bccalls(efname,edgecallname,bcall,rhs=rhs)
 										efname.close()
 
 				else: # dir1 is a new physical BC related to a 0 0 layer (i1j1,...)
@@ -2190,7 +2232,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 				        DirDic  = DirDic,
 				        vname   = vname,
 				        update  = update,
-				        updateq = updateq)
+				        updateq = updateq,rhs=rhs)
 #
 #						Create second layer subroutine with the newly generates eqns (and accumulate calls)	
 #
@@ -2218,7 +2260,7 @@ def genBC(Eqns,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['rhs']}
 					
 					create_bcsubroutine(bcedges,'_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_0_0',
 										'include_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_0_0'+'_BClocVar.f90',
-										'include_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_0_0'+'_BCLoops.f90',indrange)
+										'include_edges_PhyBC_'+bcname+'_'+bctype+'_'+dir1+'_0_0'+'_BCLoops.f90',indrange,rhs=rhs)
 					bcedges.close()				
 
 
@@ -2227,16 +2269,16 @@ def genBC_calls(rhs):
 	"""
 		 genBC_calls is a kernel-internal function. It generates the Fortran codes that calls for boundary treatments.	
 		 """
-	from genRhs import incPATH
-	
-	dim = rhs.dim
-	wp  = rhs.wp
-	varname = rhs.varname
+
+	incPATH 	= rhs.incPATH
+	dim 			= rhs.dim
+	wp  			= rhs.wp
+	varname 	= rhs.varname
 	varstored = rhs.varstored
 	varsolved = rhs.varsolved
 	varbc     = rhs.varbc
 	
-	hlo_rhs = rhs.hlo_rhs
+	hlo_rhs 		= rhs.hlo_rhs
 	stencil_rhs = rhs.stencil
 	order_rhs   = rhs.order
 
@@ -2600,18 +2642,19 @@ def genBC_calls(rhs):
 	
 	rhs.bc_info[1] = bcdone					
 
-def loop(beg,end):
+def loop(beg,end,rhs=None):
 	"""
 		 loop is a kernel-internal function. It trigger the creation of loop begin or ending in produced Fortran codes.
 		 """
-	loop_create("begin",beg)
-	loop_create("end"  ,end)
+	loop_create("begin",beg,rhs=rhs)
+	loop_create("end"  ,end,rhs=rhs)
 
-def loop_create(type,input,bc='all',edge='all',corner='all'):
+def loop_create(type,input,bc='all',edge='all',corner='all',rhs=None):
 	"""
 		 loop_create is a kernel-internal function. It gives developers the opportunity to tailor loop statements in all the Fortran codes. 
 		 """
-	from genRhs import dim
+
+	dim = rhs.dim
 
 	if dim == 3:		
 		if type == 'begin':
@@ -2639,21 +2682,15 @@ def loop_create(type,input,bc='all',edge='all',corner='all'):
 		elif type=='end':	
 			if((bc != 'i') and (edge != 'i') and (corner != 'i')):input.write('   enddo'+'\n')		
 
-def globvar():
+def globvar(rhs=None):
 	"""
 		 globvar is a kernel-internal function. It creates Fortran static array declarations in all Fortran codes.
 		 """
-	from genRhs import dim, incPATH
 
-	try:
-		from genRhs import varstored
-	except:
-		varstored = {}	
-
-	try:
-		from genRhs import varbc
-	except:
-		varbc = {}
+	incPATH        = rhs.incPATH
+	dim 					 = rhs.dim	
+	varstored      = rhs.varstored
+	varbc 				 = rhs.varbc
 
 	globalvarRhs   = open(incPATH+'includeRHS_globVar.f90','w')  
 	globalvarRk3   = open(incPATH+'includeRHS_globVar_rk3.f90','w')
@@ -2907,13 +2944,13 @@ def genSymbDer1(exp,output,locvar,
 				indi='i',indj='j',indk='k',
 				vname='symb',
 				history={'x':{'var':[],'symb':[]},'y':{'var':[],'symb':[]},'z':{'var':[],'symb':[]}},
-				dhistory={'x':[[],[],[],[]],'y':[[],[],[],[]],'z':[[],[],[],[]]}):
+				dhistory={'x':[[],[],[],[]],'y':[[],[],[],[]],'z':[[],[],[],[]]},rhs=None):
 		"""
 			 genSymbDer1 is a kernel-internal function that scan the given exp pseudo-code for first order derivative computation. It then trigger kernel-internal procedure to generate the associated Fortran codes.	
 			 """
 
-		from genRhs import dim
 
+		dim    = rhs.dim
 		vname  = vname.strip()
 
 		for v in dirvars:
@@ -3007,7 +3044,7 @@ def genSymbDer1(exp,output,locvar,
 													indirk = indk+'{:+d}'.format(shift)	
 					
 												ddname = genVname(vlocnam,      i=indiri,j=indirj,k=indirk)
-												[dexprnbg,dvnamebg] = genNbg(dderexp.group(0), vv , stencil, i=indiri,j=indirj,k=indirk,vname=ddname+'_')
+												[dexprnbg,dvnamebg] = genNbg(dderexp.group(0), vv , stencil, i=indiri,j=indirj,k=indirk,vname=ddname+'_',rhs=rhs)
 												locvar.append(dvnamebg)
 												createNbg(dvnamebg,dexprnbg,output)
 												output.write(der(dvnamebg,order,stencil,varname=ddname))
@@ -3030,7 +3067,7 @@ def genSymbDer1(exp,output,locvar,
 													indirk = indk+'{:+d}'.format(shift)	
 					
 												ddname = genVname(vlocnam,      i=indiri,j=indirj,k=indirk)
-												[dexprnbg,dvnamebg] = genNbg(dderexp.group(0), vv , stencil, i=indiri,j=indirj,k=indirk,vname=ddname+'_')
+												[dexprnbg,dvnamebg] = genNbg(dderexp.group(0), vv , stencil, i=indiri,j=indirj,k=indirk,vname=ddname+'_',rhs=rhs)
 												locvar.append(dvnamebg)
 												createNbg(dvnamebg,dexprnbg,output)
 												output.write(der(dvnamebg,order,stencil,varname=ddname))
@@ -3063,7 +3100,7 @@ def genSymbDer1(exp,output,locvar,
 
 						if( dsubdname == {'x':[[],[]],'y':[[],[]],'z':[[],[]]}):
 							dname =  genVname('d1_'+vname+'_d'+v+'_'+str(i)+'_',indi,indj,indk)
-							[exprnbg,vnamebg] = genNbg(derexp.group(0),v,stencil,vname='d1_'+vname+'_d'+v+'_'+str(i)+'_')
+							[exprnbg,vnamebg] = genNbg(derexp.group(0),v,stencil,vname='d1_'+vname+'_d'+v+'_'+str(i)+'_',rhs=rhs)
 							locvar.append(vnamebg)
 			
 							createNbg(vnamebg,exprnbg,output)
@@ -3098,7 +3135,7 @@ def genSymbDer1(exp,output,locvar,
 						subptr = re.findall(der1[v],derexp.group(0))
 						
 						dname =  genVname('d1_'+vname+'_d'+v+'_'+str(i)+'_',indi,indj,indk)
-						[exprnbg,vnamebg] = genNbg(subptr[0],v,stencil,vname='d1_'+vname+'_d'+v+'_'+str(i)+'_')
+						[exprnbg,vnamebg] = genNbg(subptr[0],v,stencil,vname='d1_'+vname+'_d'+v+'_'+str(i)+'_',rhs=rhs)
 						locvar.append(vnamebg)
 		
 						createNbg(vnamebg,exprnbg,output)
@@ -3130,13 +3167,13 @@ def genSymbDer2(exp,output,locvar,
 				order=2,stencil=3,
 				indi='i',indj='j',indk='k',
 				vname='symb',
-				history={'x':[[],[]],'y':[[],[]],'z':[[],[]]}):
+				history={'x':[[],[]],'y':[[],[]],'z':[[],[]]},rhs=None):
 		"""
 			 genSymbDer2 is a kernel-internal function that scan the given exp pseudo-code for second order derivative computation. It then trigger kernel-internal procedure to generate the associated Fortran codes.	
 			 """
-		from genRhs import dim
 
-		vname = vname.strip()
+		dim 	 = rhs.dim
+		vname  = vname.strip()
 		indiri = indi
 		indirj = indj
 		indirk = indk
@@ -3180,7 +3217,7 @@ def genSymbDer2(exp,output,locvar,
 			
 	
 						dname = genVname('d2_'+vname+'_d'+v+'_'+str(i)+'_',      i=indiri,j=indirj,k=indirk)
-						[exprnbg,vnamebg] = genNbg(derexp.group(0), v , stencil, i=indiri,j=indirj,k=indirk,vname=dname+'_')
+						[exprnbg,vnamebg] = genNbg(derexp.group(0), v , stencil, i=indiri,j=indirj,k=indirk,vname=dname+'_',rhs=rhs)
 						locvar.append(vnamebg)
 						createNbg(vnamebg,exprnbg,output,'second')
 						output.write(dder(vnamebg,order,stencil,varname=dname))
@@ -3216,12 +3253,12 @@ def genSymbDer1_bc(bcdic,exp,output,locvar,
 				   indi='i',indj='j',indk='k',
 				   vname='symb',
 				   history={'x':{'var':[],'symb':[]},'y':{'var':[],'symb':[]},'z':{'var':[],'symb':[]}},
-				   dhistory={'x':[[],[],[],[]],'y':[[],[],[],[]],'z':[[],[],[],[]]}):
+				   dhistory={'x':[[],[],[],[]],'y':[[],[],[],[]],'z':[[],[],[],[]]},rhs=None):
 		"""
 			 genSymbDer1_bc is a kernel-internal function that scan the given exp pseudo-code for first order derivative computation. It then trigger kernel-internal procedure to generate the associated Fortran codes at the domain boundaries.	
 			 """
-		from genRhs import dim
 
+		dim 	    = rhs.dim
 		dirBc_v   = '    '
 		dirBc_vv  = '    '
 		bclayer_v = int((stencil-1)/2)
@@ -3377,7 +3414,7 @@ def genSymbDer1_bc(bcdic,exp,output,locvar,
 													ddname = genVname(vlocnam,
 																      i=indiri,j=indirj,k=indirk)
 													[dexprnbg,dvnamebg] = genNbg(dderexp.group(0), vv , stencil, 
-																	  i=indiri,j=indirj,k=indirk,vname=ddname+'_',dirBc=dirBc_vv,indbc=bclayer_vv)
+																	  i=indiri,j=indirj,k=indirk,vname=ddname+'_',dirBc=dirBc_vv,indbc=bclayer_vv,rhs=rhs)
 													locvar.append(dvnamebg)
 													createNbg(dvnamebg,dexprnbg,output,indbc=bclayer_vv,bc=bc)
 													output.write(der(dvnamebg,order,stencil,varname=ddname,dirBC=dirBc_vv,indbc=bclayer_vv,bc=bc))
@@ -3437,7 +3474,7 @@ def genSymbDer1_bc(bcdic,exp,output,locvar,
 
 												ddname = genVname(vlocnam, i=indiri,j=indirj,k=indirk)
 												[dexprnbg,dvnamebg] = genNbg(dderexp.group(0), vv , stencil, 
-																  i=indiri,j=indirj,k=indirk,vname=ddname+'_',dirBc=dirBc_vv,indbc=bclayer_vv)
+																  i=indiri,j=indirj,k=indirk,vname=ddname+'_',dirBc=dirBc_vv,indbc=bclayer_vv,rhs=rhs)
 												locvar.append(dvnamebg)
 												createNbg(dvnamebg,dexprnbg,output,indbc=bclayer_vv,bc=bc)									
 												output.write(der(dvnamebg,order,stencil,varname=ddname,dirBC=dirBc_vv,indbc=bclayer_vv,bc=bc))
@@ -3492,7 +3529,7 @@ def genSymbDer1_bc(bcdic,exp,output,locvar,
 
 												ddname = genVname(vlocnam, i=indiri,j=indirj,k=indirk)
 												[dexprnbg,dvnamebg] = genNbg(dderexp.group(0), vv , stencil, 
-																  i=indiri,j=indirj,k=indirk,vname=ddname+'_',dirBc=dirBc_vv,indbc=bclayer_vv)
+																  i=indiri,j=indirj,k=indirk,vname=ddname+'_',dirBc=dirBc_vv,indbc=bclayer_vv,rhs=rhs)
 												locvar.append(dvnamebg)
 												createNbg(dvnamebg,dexprnbg,output,indbc=bclayer_vv,bc=bc)
 												output.write(der(dvnamebg,order,stencil,varname=ddname,dirBC=dirBc_vv,indbc=bclayer_vv,bc=bc))
@@ -3543,7 +3580,7 @@ def genSymbDer1_bc(bcdic,exp,output,locvar,
 		
 							dname =  genVname('d1_'+vname+'_d'+v+'_'+str(i)+'_', i=indi,j=indj,k=indk)
 							[exprnbg,vnamebg] = genNbg(derexp.group(0),v,stencil,i=indi,j=indj,k=indk,
-												vname='d1_'+vname+'_d'+v+'_'+str(i)+'_',dirBc=dirBc_v,indbc=indbc_v)
+												vname='d1_'+vname+'_d'+v+'_'+str(i)+'_',dirBc=dirBc_v,indbc=indbc_v,rhs=rhs)
 							locvar.append(vnamebg)
 			
 							createNbg(vnamebg,exprnbg,output,indbc=indbc_v,bc=bc)
@@ -3594,7 +3631,7 @@ def genSymbDer1_bc(bcdic,exp,output,locvar,
 
 						dname =  genVname('d1_'+vname+'_d'+v+'_'+str(i)+'_', i=indi,j=indj,k=indk)
 						[exprnbg,vnamebg] = genNbg(subptr[0],v,stencil,i=indi,j=indj,k=indk,
-											vname='d1_'+vname+'_d'+v+'_'+str(i)+'_',dirBc=dirBc_v,indbc=indbc_v)
+											vname='d1_'+vname+'_d'+v+'_'+str(i)+'_',dirBc=dirBc_v,indbc=indbc_v,rhs=rhs)
 						locvar.append(vnamebg)
 		
 						createNbg(vnamebg,exprnbg,output,indbc=indbc_v,bc=bc)
@@ -3627,11 +3664,12 @@ def genSymbDer2_bc(bcdic,exp,output,locvar,
 				   order=2,stencil=3,
 				   indi='i',indj='j',indk='k',
 				   vname='symb',
-				   history={'x':[[],[]],'y':[[],[]],'z':[[],[]]}):
+				   history={'x':[[],[]],'y':[[],[]],'z':[[],[]]},rhs=None):
 		"""
 			 genSymbDer2_bc is a kernel-internal function that scan the given exp pseudo-code for second order derivative computation. It then trigger kernel-internal procedure to generate the associated Fortran codes at the domain boundaries.	
 			 """
-		from genRhs import dim
+
+		dim = rhs.dim
 
 		dirBc   = '    '
 		bclayer = int((stencil-1)/2)
@@ -3699,7 +3737,7 @@ def genSymbDer2_bc(bcdic,exp,output,locvar,
 			
 	
 						dname = genVname(vlocnam,   i=indiri,j=indirj,k=indirk)
-						[exprnbg,vnamebg] = genNbg(derexp.group(0), v , stencil, i=indiri,j=indirj,k=indirk,vname=dname+'_',dirBc=dirBc,indbc=bclayer,der='second')
+						[exprnbg,vnamebg] = genNbg(derexp.group(0), v , stencil, i=indiri,j=indirj,k=indirk,vname=dname+'_',dirBc=dirBc,indbc=bclayer,der='second',rhs=rhs)
 						locvar.append(vnamebg)
 						createNbg(vnamebg,exprnbg,output,'second',indbc=bclayer,bc=bc)
 						output.write(dder(vnamebg,order,stencil,varname=dname,indbc=bclayer,bc=bc))
@@ -3730,46 +3768,13 @@ def genSymbDer2_bc(bcdic,exp,output,locvar,
 				# print(history)	
 		return [exp,locvar,history]
 
-def rhsinfo(rhs):
-	"""
-			 rhsinfo is a user-level function that needs to be called at the end of genRhs.py in order to write necessary rhs information to be used at runtime.
-			 """
-	genBC_calls(rhs)
-
-	wp     	     = rhs.wp     	     
-	dim     	 = rhs.dim     	     
-	stencil 	 = rhs.stencil 	     
-	order        = rhs.order         
-	coefficients = rhs.coefficients  
-	varname      = rhs.varname   
-	varsolved    = rhs.varsolved
-	varstored    = rhs.varstored    
-	hlo_rhs      = rhs.hlo_rhs  
-	bc_info      = rhs.bc_info     
-	varbc        = rhs.varbc
-
-
-	instpath = os.environ['INSTALLPATH']
-	rhsinf = open(instpath+'/pymod/rhsinfo.py','w')
-
-	rhsinf.write('wp = \''+str(wp)+'\'\n')
-	rhsinf.write('dim = '+str(dim)+'\n')
-	rhsinf.write('stencil = '+str(stencil)+'\n')
-	rhsinf.write('order = '+str(order)+'\n')
-	rhsinf.write('coefficients = '+str(coefficients)+'\n')
-	rhsinf.write('varname = '+str(varname)+'\n')
-	rhsinf.write('varsolved = '+str(varsolved)+'\n')	
-	rhsinf.write('varstored = '+str(varstored)+'\n')
-	rhsinf.write('hlo_rhs = '+str(hlo_rhs)+'\n')
-	rhsinf.write('bc_info = '+str(bc_info)+'\n')
-	rhsinf.write('varbc = '+str(varbc)+'\n')
-
-def gendtype():
+def gendtype(rhs=None):
 	"""
 		 gendtype is a kernel-internal function called by append_Rhs to specify floating point number precision in the Fortran sources (through the wp parameter specify in genRhs.py by the user).
 		 """
-
-	from genRhs import incPATH,wp
+	
+	incPATH = rhs.incPATH
+	wp      = rhs.wp
 
 	dtype = open(incPATH+'/dtypes.h','w')
 
@@ -3797,9 +3802,12 @@ def genFilter(stencil,order,nvar,dirBC='',indbc='',fltbeg=2,rhs=None):
 		 		 rhs (class): contains all RHS informations necessary at runtime.
 
 		 """
-	from genRhs import incPATH
+
+	if rhs == None:
+		exception('rhs is empty. Initialise rhs, through rhs = rhs_info(), before generating filters.',message='error')	 
 
 	dim     = rhs.dim
+	incPATH = rhs.incPATH
 
 	if indbc == '':
 
@@ -3915,8 +3923,8 @@ def genFilter(stencil,order,nvar,dirBC='',indbc='',fltbeg=2,rhs=None):
 			# 	up.write('!$OMP DO SCHEDULE(GUIDED,4)  \n')	
 			# 	fltbc.write('!$OMP DO SCHEDULE(GUIDED,4)  \n')					
 
-			loop_create('begin',up   , bc=dirBC[0])
-			loop_create('begin',fltbc, bc=dirBC[0])
+			loop_create('begin',up   , bc=dirBC[0],rhs=rhs)
+			loop_create('begin',fltbc, bc=dirBC[0],rhs=rhs)
 
 			up.write('\n')
 			fltbc.write('\n')
@@ -4006,8 +4014,8 @@ def genFilter(stencil,order,nvar,dirBC='',indbc='',fltbeg=2,rhs=None):
 
 		up.write('\n')
 		if indbc == hlo_rhs-1:
-			loop_create('end',up   , bc=dirBC[0])
-			loop_create('end',fltbc, bc=dirBC[0])
+			loop_create('end',up   , bc=dirBC[0],rhs=rhs)
+			loop_create('end',fltbc, bc=dirBC[0],rhs=rhs)
 			if dim > 2:
 				up.write('\n'+'!$OMP END DO \n')
 				fltbc.write('\n'+'!$OMP END DO \n')
@@ -4024,9 +4032,12 @@ def genrk3(nvar,rhs=None,bc=[False,[]],rk3=None):
 		 			bc (list): kernel-internal option for boundary treatments.
 		 			rk3 (class '_io.TextIOWrapper'): kernel-internal option to manage produced Fortran source file.		 			
 		 """
-	from genRhs import incPATH
 
-	dim = rhs.dim
+	if rhs==None:
+		exception('rhs is empty. Initialise rhs, through rhs = rhs_info(), before generating LHS.',message='error')
+
+	incPATH = rhs.incPATH
+	dim 	  = rhs.dim
 	
 	if not rk3:
 		rk3 = open(incPATH+'includeRK3.f90','w')
@@ -4069,8 +4080,11 @@ def genrk3update(nvar,rhs=None,bc=[False,[]], updaterk3=None):
 		 			bc (list): kernel-internal option for boundary treatments.
 		 			updaterk3 (class '_io.TextIOWrapper'): kernel-internal option to manage produced Fortran source file.		 			
 		 """
-	from genRhs import incPATH
-	
+
+	if rhs==None:
+		exception('rhs is empty. Initialise rhs, through rhs = rhs_info(), before updating LHS.',message='error')
+
+	incPATH = rhs.incPATH
 	dim     = rhs.dim
 	consvar = rhs.consvar
 
@@ -4196,7 +4210,8 @@ def genbcsrc(nvar,rhs=None):
 	"""
 		 genbcsrc is a kernel-internal function to manage source code generation for boundary conditions.	
 		 """
-	from genRhs import incPATH
+	
+	incPATH = rhs.incPATH
 
 	if rhs == None:
 		exception("BC can't be generated before RHS",message='error')
@@ -4251,12 +4266,13 @@ def genbcsrc(nvar,rhs=None):
 			fh[dir].write(bcexp_m[:-1]+'\n\n')
 			fh[dir].write(bcexp_p[:-1]+'\n\n')
 
-def create_bcsubroutine(fname,fctname,locvname,loopname,indrange,phy=None):
+def create_bcsubroutine(fname,fctname,locvname,loopname,indrange,phy=None,rhs=None):
 	"""
 		 create_bcsubroutine is a kernel-internal function to manage source code generation for boundary conditions.	
 		 """	
-	from genRhs import incPATH
 	
+	incPATH = rhs.incPATH
+
 	if phy:
 
 		bcScheme_template = open(incPATH[:-13]+'template_genbc_'+phy+'.for','r')
@@ -4305,12 +4321,13 @@ def create_bcsubroutine(fname,fctname,locvname,loopname,indrange,phy=None):
 		
 		fname.write("\n\n")		
 
-def create_bccalls(fname,fctname,fctcall):
+def create_bccalls(fname,fctname,fctcall,rhs=None):
 	"""
 		 create_bccalls is a kernel-internal function to manage source code generation for boundary conditions.	
 		 """	
-	from genRhs import incPATH
 	
+	incPATH = rhs.incPATH
+
 	bcScheme_template = open(incPATH[:-13]+'template_bccall.for','r')
 	
 	lines = bcScheme_template.readlines()
@@ -4332,18 +4349,21 @@ def create_bccalls(fname,fctname,fctcall):
 
 def gen_eqns_bc(Eqns,output,localvar,
 	            eqname,Order=2,Stencil=3,
-	            indi    ='i',indj = 'j',indk = 'k',
-	            DirDic  = {'i':{'dir':None,'indbc':None},'j':{'dir':None,'indbc':None},'k':{'dir':None,'indbc':None}},
-	            vname   = 'symb',
-	            update  = False,
-	            updateq = False,
-	            updatest= False,
-	            updateqbc=False):
+	            indi     ='i',indj = 'j',indk = 'k',
+	            DirDic   = {'i':{'dir':None,'indbc':None},'j':{'dir':None,'indbc':None},'k':{'dir':None,'indbc':None}},
+	            vname    = 'symb',
+	            update   = False,
+	            updateq  = False,
+	            updatest = False,
+	            updateqbc= False,
+	            rhs  	   = None):
 					"""
 		 					gen_eqns_bc is a kernel-internal function to manage source code generation for boundary conditions.	
 		 					"""					
-					from genRhs import dim
+				
 					
+					dim 	 = rhs.dim
+
 					indiri = indi
 					indirj = indj
 					indirk = indk
@@ -4375,7 +4395,7 @@ def gen_eqns_bc(Eqns,output,localvar,
 								fcorner = True																	
 
 
-					loop_create('begin',output,bc=bc,edge=edge,corner=corner)
+					loop_create('begin',output,bc=bc,edge=edge,corner=corner,rhs=rhs)
 					
 					history={'x':{'var':[],'symb':[]},'y':{'var':[],'symb':[]},'z':{'var':[],'symb':[]}}
 					history2={'x':[[],[]],'y':[[],[]],'z':[[],[]]}
@@ -4412,26 +4432,26 @@ def gen_eqns_bc(Eqns,output,localvar,
 							# generates BC layers :			
 
 
-							[Out,locvar,history]  = genSymbDer1_bc(DirDic,Eqns[eqn],output,locvar,order=Order,stencil=Stencil,indi=indiri,indj=indirj,indk=indirk,vname=vnametmp,history=history,dhistory=dhistory)			
-							[Out,locvar,history2] = genSymbDer2_bc(DirDic,Out,output,locvar,order=4,stencil=5,indi=indiri,indj=indirj,indk=indirk,vname=vnametmp,history=history2)
+							[Out,locvar,history]  = genSymbDer1_bc(DirDic,Eqns[eqn],output,locvar,order=Order,stencil=Stencil,indi=indiri,indj=indirj,indk=indirk,vname=vnametmp,history=history,dhistory=dhistory,rhs=rhs)			
+							[Out,locvar,history2] = genSymbDer2_bc(DirDic,Out,output,locvar,order=4,stencil=5,indi=indiri,indj=indirj,indk=indirk,vname=vnametmp,history=history2,rhs=rhs)
 							
 							output.write(comment('Update BC terms for layer '+str(DirDic['i']['indbc'])+' '+str(DirDic['j']['indbc'])+' '+str(DirDic['k']['indbc'])+' '+eqname[eqn]))
 	
 							if updateq:
-								exp_rhs =  op_to_dNami(Out,i=indiri,j=indirj,k=indirk) 
-								output.write(updateRHS(eqn,exp_rhs,i=indiri,j=indirj,k=indirk,update=update,updateq=True)+'\n\n')
+								exp_rhs =  op_to_dNami(Out,i=indiri,j=indirj,k=indirk,rhs=rhs) 
+								output.write(updateRHS(eqn,exp_rhs,i=indiri,j=indirj,k=indirk,update=update,updateq=True,rhs=rhs)+'\n\n')
 							elif updatest:
-								exp_stored = op_to_dNami(Out,i=indiri,j=indirj,k=indirk) 
-								output.write(updateStored(eqn,exp_stored,i=indiri,j=indirj,k=indirk,update=update)+'\n\n')	
+								exp_stored = op_to_dNami(Out,i=indiri,j=indirj,k=indirk,rhs=rhs) 
+								output.write(updateStored(eqn,exp_stored,i=indiri,j=indirj,k=indirk,update=update,rhs=rhs)+'\n\n')	
 							elif updateqbc:
-								exp_qbc = op_to_dNami(Out,i=indiri,j=indirj,k=indirk) 
-								output.write(updateVarbc(eqn,exp_qbc,i=indiri,j=indirj,k=indirk,update=update)+'\n\n')									
+								exp_qbc = op_to_dNami(Out,i=indiri,j=indirj,k=indirk,rhs=rhs) 
+								output.write(updateVarbc(eqn,exp_qbc,i=indiri,j=indirj,k=indirk,update=update,rhs=rhs)+'\n\n')									
 							else:
 								exp_rhs = ' - '
-								exp_rhs = exp_rhs + ' ( ' + op_to_dNami(Out,i=indiri,j=indirj,k=indirk) + ' ) '
-								output.write(updateRHS(eqn,exp_rhs,i=indiri,j=indirj,k=indirk,update=update)+'\n\n')
+								exp_rhs = exp_rhs + ' ( ' + op_to_dNami(Out,i=indiri,j=indirj,k=indirk,rhs=rhs) + ' ) '
+								output.write(updateRHS(eqn,exp_rhs,i=indiri,j=indirj,k=indirk,update=update,rhs=rhs)+'\n\n')
 
-					loop_create('end',output,bc=bc,edge=edge,corner=corner)
+					loop_create('end',output,bc=bc,edge=edge,corner=corner,rhs=rhs)
 			
 					tmpvar = ''
 					for var1 in locvar: 
