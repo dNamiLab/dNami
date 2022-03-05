@@ -177,7 +177,7 @@ The points between the edge boundary points and the domain which is more than a 
 
 .. code-block:: python
 
-    genBC(Save_eqns['divF'],3,2,rhsname ,vnamesrc_divF,update=False,rhs=rhs)
+    genBC(divF,3,2,rhsname ,vnamesrc_divF,update=False,rhs=rhs)
 
 The physical boundary conditions at the edge of the domain are enforced with the following line (where derivatives are computed with a 3 point, 2\ :sup:`nd` order, one-sided derivative). The ``setbc`` option specifies the boundary in question (here ``i1``) and whether the physical boundary conditions are enforced on the RHS or directly on the primitive variables (here on the ``rhs``).  
 

@@ -204,20 +204,14 @@ When non-periodic boundary conditions are enforced, the user must do two things:
 
 Both of these cases are dealt with via calls to the ``genBC()`` function.  
 
-.. warning:: 
-
-   Before making a call to the append_Rhs() function, make a copy of the equation dictionnaries to avoid unwanted intermediate modification
-
-The following code block details the two steps: after making a copy of the equations and calling the ``append_Rhs()`` function, a first call to ``genBC()`` is made. This performs an automatic stencil and order reduction of the finite-difference schemes and the filter (based on the set of coefficients currently included in dNami) as the boundary is approached. However this does nothing for the actual boundary point (shown in orange in :numref:`non_core_and_edge`). That point is handled by additional calls to ``genBC()`` for each boundary condition (points in 1D, corner and lines in 2D, corners, lines and faces in 3D). For each, the user can specify whether the boundary condition acts on a primitive variable or on the RHS via the ``setbc`` argument. In the dictionary in the list supplied to this argument, the ``'char'`` is a name variable used for code comments, ``'i1'`` refers to the location of the boundary (here face 'i1' which in 1D is a point) and ``rhs`` which means that the equations supplied in ``src_phybc_wave_i1`` are to act on the RHS.  
+The following code block details the two steps: after calling the ``append_Rhs()`` function, a first call to ``genBC()`` is made. This performs an automatic stencil and order reduction of the finite-difference schemes and the filter (based on the set of coefficients currently included in dNami) as the boundary is approached. However this does nothing for the actual boundary point (shown in orange in :numref:`non_core_and_edge`). That point is handled by additional calls to ``genBC()`` for each boundary condition (points in 1D, corner and lines in 2D, corners, lines and faces in 3D). For each, the user can specify whether the boundary condition acts on a primitive variable or on the RHS via the ``setbc`` argument. In the dictionary in the list supplied to this argument, the ``'char'`` is a name variable used for code comments, ``'i1'`` refers to the location of the boundary (here face 'i1' which in 1D is a point) and ``rhs`` which means that the equations supplied in ``src_phybc_wave_i1`` are to act on the RHS.  
 
 .. code-block:: python
-
-        Save_eqns = {'divF':divF.copy()}
 
         #... <- append_Rhs() calls made here 
 
         # Progressive stencil/order adjustement from domain to boundary 
-        genBC(Save_eqns['divF'],3,2,rhsname,vnamesrc_divF,update=False,rhs=rhs)
+        genBC(divF,3,2,rhsname,vnamesrc_divF,update=False,rhs=rhs)
 
         # Boundary conditions on d(q)/dt
         #i1
