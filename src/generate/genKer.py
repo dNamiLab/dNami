@@ -90,7 +90,7 @@ class rhs_info:
 
 	def export(self):
 		"""
-			 rhsinfo is a user-level function that needs to be called at the end of genRhs.py in order to write necessary rhs information to be used at runtime.
+			 export is a method of the rhs class that needs to be called at the end of genRhs.py in order to write necessary rhs information to be used at runtime.
 			 """
 		genBC_calls(self)
 
