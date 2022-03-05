@@ -1,7 +1,7 @@
 import sys
 import re
 import numpy as np
-from genKer import rhsinfo, genrk3, genrk3update, genFilter, genBC, append_Rhs, genbcsrc
+from genKer import genrk3, genrk3update, genFilter, genBC, append_Rhs
 import os 
 
 wp = 'float64'
@@ -23,14 +23,13 @@ def main():
     genrk3update(len(varsolved),rhs=rhs)
 
 # Generate RHS:
-    Save_eqns = {'divF':divF.copy()}
     append_Rhs(divF, 9,8, rhsname, vnamesrc_divF, update=False,rhs=rhs)                           
 
 # Generate Filters (if required):      
     genFilter(11,10, len(varsolved),rhs=rhs)
 
 # Boundary conditions
-    genBC(Save_eqns['divF']  ,9,8, rhsname , vnamesrc_divF, update=False,rhs=rhs)
+    genBC(divF  ,9,8, rhsname , vnamesrc_divF, update=False,rhs=rhs)
 
     # ------------ I 
     #i1
@@ -55,7 +54,7 @@ def main():
     genBC(src_phybc_wave_imaxjmax,5,4,rhsname , locname_bc, setbc=[True,{'cornerchar':{'imaxjmax':['rhs']}}]  , update=False,rhs=rhs)
 
     # Extract RHS info:
-    rhsinfo(rhs)
+    rhs.export()
 
 if __name__ == '__main__':
     main()

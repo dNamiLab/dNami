@@ -113,7 +113,7 @@ The ``rhs.py`` uses a list to define the variables to be advanced in time and py
 
         varsolved = ['rho','u','et']
 
-To specify that we wish to advance them in conservative form, we refer to the corresponding position in the above list with the ``consvar`` list (the index starts at 1 as this will be used in the Fortran layer).  
+To specify that we wish to advance them in conservative form  we refer to the corresponding position in the above list with the ``consvar`` list (the index starts at 1 as this will be used in the Fortran layer). For more details on this aspect, see the :doc:`/usage/genRhs` section. 
 
 .. code-block:: python
 
@@ -287,7 +287,7 @@ then copy the ``compute.py`` file into the ``wrk`` folder and execute the run:
         cd wrk 
         mpirun -np 2 python3 compute.py
 
-The example should run for 4000 timesteps and then exit. Optionally, the user can choose to visualise the output using the provided python script ``plot.py``. The script gathers the output density fields and construct an x-t diagram showing the entropy perturbation moving from the center to the right of the domain at the flow speed. The result is displayed below: 
+The example should run for 4000 timesteps and then exit. Optionally, the user can choose to visualise the output using the provided python script ``plot_xt.py``. The script gathers the output density fields and construct an x-t diagram showing the entropy perturbation moving from the center to the right of the domain at the flow speed. The result is displayed below: 
 
 .. _xt_quickstart: 
 .. figure:: img/xt_quickstart.png

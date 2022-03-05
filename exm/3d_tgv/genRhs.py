@@ -1,7 +1,7 @@
 import sys
 import re
 import numpy as np
-from genKer import rhsinfo, genrk3, genrk3update, genFilter, genBC, append_Rhs, genbcsrc
+from genKer import genrk3, genrk3update, genFilter, genBC, append_Rhs
 import os 
 
 wp = 'float64'
@@ -25,9 +25,6 @@ def main():
       genrk3update(len(varsolved),rhs=rhs)
 
 # Generate RHS:
-      Save_eqns = {}
-      Save_eqns = {'Src_conv':Src_conv.copy(),'Src_dif': Src_dif.copy()}
-
 # Adding convective and diffusive terms to the RHS with different schemes
       append_Rhs(Src_conv, 13, 4, rhsname,locname_conv,update=False,rhs=rhs)                           
       append_Rhs(Src_dif , 5 , 4 , rhsname,locname_dif ,update=True ,rhs=rhs,stored=True)
@@ -36,7 +33,7 @@ def main():
       genFilter(13,8, len(varsolved),rhs=rhs)
 
 # Extract RHS info:
-      rhsinfo(rhs)
+      rhs.export()
 
 if __name__ == '__main__':
     main()

@@ -154,7 +154,26 @@ This ends the list of compulsory steps when creating a ``genRhs.py``.
 
     When no boundary conditions are specified in a given direction, the default behaviour assumes that the direction is **periodic**. 
         
+*Conservative formulation*
 
+Conservation laws in physic can be written in multiple mathematically equivalent forms, yet numerical methods or implementation considerations may dictate specific choices. A classical formulation in continuum mechanics is the so-called divergence form:
+
+.. math::
+    \dfrac{\partial \textbf{q}}{\partial t} + \textbf{div} \left( \textbf{F} \right) = \textbf{s}, 
+
+where the :math:`\textbf{q}` vector takes the form of :math:`\left[ \rho, \rho \mathrm{var1}, \rho \mathrm{var2},\cdots\right]^{\intercal}` and the flux tensor :math:`\textbf{F}` is made explicit. Conservation of mass may then be ensured exactly with any finite-difference discretisation of the divergence operator, providing that appropriate numerical fluxes are defined based on :math:`\textbf{F}` :cite:`vinokur1989`. The divergence form is therefore often referred as conservative formulation in continuum mechanics. 
+
+dNami offers the user the possibility of advancing the equations in time using a conservative formulation while minimising data transfer. Note, however, that dNami does not automatically enforce conservativity through appropriate numerical fluxes computation yet. It only generates classical finite-differences of :math:`\textbf{F}`. In the Euler equations given above, the 'solved' variables, which are actually stored in memory, are ``rho``, ``u``, ``v`` and ``et`` but the quantities advanced in time by the Runge--Kutta scheme are ``rho``, ``rho*u``, ``rho*v`` and ``rho*et``, referred to as the conserved variables. In practice, having access to the 'solved' variables is useful for setting initial conditions, boundary conditions and outputting information at run time. This requires a transformation between the solved variables and the conserved variables before and after the Runge--Kutta steps. Having access to the solved variables is crucial for efficient computation of the right-hand side of the time-advancement equations as it is more readily expressed as a function of the solved variables rather than the conserved variables. Substitutions of the form ``(rho*vari)/rho`` would be necessary and severely detrimental to efficiency if the switch was not performed. 
+
+Currently, given a list of solved variables and a variable with the protected name ``rho`` e.g.    
+
+``varsolved = [rho, var1, var2, var3, var4, var5, ..., varN]``
+
+the user can choose which variables will be time-advanced in the form ``rho*varN`` using the ``consvar`` list (note that indexing starts at 1 as this information is passed to the Fortran layer) e.g.
+
+``consvar = [3,5,6]``
+
+which corresponds to ``var2``, ``var4`` and ``var5``. Note that a mix of equations formulated in a conservative and non-conservative manner can be advanced simultaneously. 
 
 **Filling out the genRhs.py: Optional steps**
 
