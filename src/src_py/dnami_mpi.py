@@ -33,6 +33,14 @@ class type_mpi:
         if self.iMpi:
             from mpi4py import MPI  # [note] mpi_init is done in 'import mpi'
             self.MPIlib = MPI
+            # check requested number of cores makes sense
+            if nxpr * nypr * nzpr != MPI.COMM_WORLD.Get_size() :
+                if MPI.COMM_WORLD.Get_rank() == 0 :
+                    print(
+                        '[error] nxpr*nypr*nzpr does not match the number of cores requested')
+                    print(' > nxpr = {:5} // nypr = {:5} // nzpr = {:5}'.format(nxpr, nypr, nzpr) )
+                    print(' > Requested number of cores = ', MPI.COMM_WORLD.Get_size())
+                sys.exit()
             # create torus
             self.comm_torus = MPI.COMM_WORLD.Create_cart(
                 [nxpr, nypr, nzpr], periods=True, reorder=True)
@@ -43,12 +51,6 @@ class type_mpi:
             self.ioproc = False
             if self.procid == 0:
                 self.ioproc = True  # do not change ioproc rank value, 0 is assumed elsewhere
-            # check requested number of cores makes sense
-            if nxpr * nypr * nzpr != self.nprocs:
-                if self.ioproc:
-                    print(
-                        '[error] nxpr*nypr*nzpr does not match the number of cores requested')
-                sys.exit()
             # check that nxgb,nygb,nzgb are multiples of nxpr,nypr,nzpr
             if (nxgb % nxpr) == 0:
                 self.nx = int(nxgb / nxpr)
