@@ -7,7 +7,7 @@ import os
 # Set working precision
 wp = 'float64'
   
-from rhs import *
+from equations import *
 
 # Set install path (needed by genKer)
 instpath = os.environ['INSTALLPATH']

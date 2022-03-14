@@ -5,7 +5,7 @@ from genKer import genrk3, genrk3update, genFilter, genBC, append_Rhs
 import os 
 
 wp = 'float64'
-from  rhs import *
+from equations import *
 
 # Set install path (needed by genKer)
 instpath = os.environ['INSTALLPATH']

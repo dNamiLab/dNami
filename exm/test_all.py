@@ -133,14 +133,14 @@ for test in test_list:
 
     # -- Run copy step 
     try:
-        shutil.copyfile( test+'/rhs.py', '../src/generate/rhs.py' )
+        shutil.copyfile( test+'/equations.py', '../src/generate/equations.py' )
         shutil.copyfile( test+'/genRhs.py', '../src/generate/genRhs.py' )
     except Exception as e:
         print('Error at copy: ', e)
         test_stat[test] = f'{bcolors.FAIL}COPY FAIL{bcolors.ENDC}'
         continue
     else:
-        print(' Copied.')
+        print(' Copied equations and genRhs.')
 
     # -- Compile 
     cmd = './install_clean.sh >> ' + test_log
@@ -163,7 +163,7 @@ for test in test_list:
         test_stat[test] = f'{bcolors.FAIL}COPY FAIL{bcolors.ENDC}'
         continue
     else:
-        print(' Copied.')
+        print(' Copied compute.')
 
     # Get mpi proc number:
     lines = open('../'+tmp_dir+'/compute.py').readlines()
