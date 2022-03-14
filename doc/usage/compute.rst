@@ -21,7 +21,7 @@ This creates a dictionary of dictionaries each containing information about diff
         for v in varsolved:
                 dtree['eqns']['qvec']['solved'].append([v,varname[v]])   
 
-where ``varsolved`` was imported from information generated from the ``rhs.py`` file. In the case of the 1D Euler equations solved in the quickstart guide, this list would contain `rho, u, et` which are the density, the velocity and the total energy. After this tree creating step, the information about the computational parameters have to be given to the tree e.g. the grid size, the MPI domain decomposition, etc. For instance, the number of x-direction grid points ``nxgb`` can be set in the relevant section of the tree as:
+where ``varsolved`` was imported from information generated from the ``equations.py`` file. In the case of the 1D Euler equations solved in the quickstart guide, this list would contain `rho, u, et` which are the density, the velocity and the total energy. After this tree creating step, the information about the computational parameters have to be given to the tree e.g. the grid size, the MPI domain decomposition, etc. For instance, the number of x-direction grid points ``nxgb`` can be set in the relevant section of the tree as:
 
 .. code-block:: python
 
@@ -121,7 +121,7 @@ The integer parameters (which are organised in a set pre-defined order) are used
 Computing stored variables
 ##########################
 
-If the user chooses to create stored variables in the ``rhs.py`` then these quantities can be computed by invoking the appropriate function in the ``compute.py``. When specifying the stored variable in the ``rhs.py``, the user can choose whether the variable is 'static' or not. This distinction can be used to differentiate between fields that need to be calculated every time step (e.g. if the pressure is calculated and stored then used to update the RHS) or at regular intervals during the computation (e.g. an output of the vorticity field). To compute the value, the following code block is used:  
+If the user chooses to create stored variables in the ``equations.py`` then these quantities can be computed by invoking the appropriate function in the ``compute.py``. When specifying the stored variable in the ``equations.py``, the user can choose whether the variable is 'static' or not. This distinction can be used to differentiate between fields that need to be calculated every time step (e.g. if the pressure is calculated and stored then used to update the RHS) or at regular intervals during the computation (e.g. an output of the vorticity field). To compute the value, the following code block is used:  
 
 .. code-block:: python
 

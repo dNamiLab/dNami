@@ -67,13 +67,13 @@ In general, the steps to running a case will be:
 
 .. note::
 
-   1. Place a ``rhs.py`` (containing the governing equations) and a ``genRhs.py`` (containing the numerical parameters) in the ``dNami/src/generate/`` folder.  
+   1. Place an ``equations.py`` (containing the governing equations) and a ``genRhs.py`` (containing the numerical parameters) in the ``dNami/src/generate/`` folder.  
    2. Change up to ``dNami/src/`` and run the ``./install_clean.sh`` script to translate the pseudo-code and compile the generated Fortran code.  
    3. Source the environment variables (which add the required locations to the Python path) by running ``source env_dNami.sh`` in ``dNami/src/`` 
    4. Change into a user-created work directory (e.g. ``dNami/wrk/``) where the ``compute.py`` file has been placed. 
    5. Run the computation in parallel e.g. with ``mpirun -np N python3 compute.py`` (where N is the number of processes) or in serial mode ``python3 compute.py`` depending on the decomposition chosen in the ``compute.py``. 
 
-The details of each of the keys files (``rhs.py``, ``genRhs.py`` and ``compute.py``) are specific to the problem to be solved. In the following section, the details of each step are given when solving the 1D Euler equations. 
+The details of each of the keys files (``equations.py``, ``genRhs.py`` and ``compute.py``) are specific to the problem to be solved. In the following section, the details of each step are given when solving the 1D Euler equations. 
 
 Solving the 1D Euler equations
 ------------------------------
@@ -88,7 +88,7 @@ are integrated in time to solve the propagation of an entropy wave out of the co
 
 Setting up a basic case like this is essentially a three-step process:
 
-1. Specify the governing equations and the boundary conditions in symbolic form using the dNami syntax in the ``rhs.py`` file
+1. Specify the governing equations and the boundary conditions in symbolic form using the dNami syntax in the ``equations.py`` file
 2. Specify the desired numerics in the ``genRhs.py`` file then generate and compile the Fortran  code
 3. Specify the problem parameter and integrate the equations in time in the ``compute.py`` file
 
@@ -107,7 +107,7 @@ The user is referred to the API documentation for the settings and function argu
 
 **Specifying the governing equations**
 
-The ``rhs.py`` uses a list to define the variables to be advanced in time and python dictionaries to act as vectors with the keys acting as component identifiers. In the current case, ``rho, rho u and rho e_t`` are the quantities to be advanced in time. The primitive variables are declared using the ``varsolved`` list as follows: 
+The ``equations.py`` uses a list to define the variables to be advanced in time and python dictionaries to act as vectors with the keys acting as component identifiers. In the current case, ``rho, rho u and rho e_t`` are the quantities to be advanced in time. The primitive variables are declared using the ``varsolved`` list as follows: 
 
 .. code-block:: python
 
@@ -139,7 +139,7 @@ Intermediate variables such as the pressure term ``p`` can be either replaced wh
                    'c' : '( ( 1.0_wp + delta ) * p / rho  )**0.5_wp ', #isentropic speed of sound
                  }
 
-The constant coefficients involved in the equations (e.g. ``delta``) are declared at the start of the ``rhs.py`` file in the ``coefficients`` dictionary.
+The constant coefficients involved in the equations (e.g. ``delta``) are declared at the start of the ``equations.py`` file in the ``coefficients`` dictionary.
 
 .. code-block:: python
 
@@ -147,7 +147,7 @@ The constant coefficients involved in the equations (e.g. ``delta``) are declare
                          'delta' : 1, # R/Cv
                        }
 
-Similarly, a separate set of equations for the boundary conditions can be symbolically specified in the ``rhs.py``. For instance, the 1D non-reflecting boundary conditions are implemented in this example using the following expression which gives the time-update of the right-hand side:
+Similarly, a separate set of equations for the boundary conditions can be symbolically specified in the ``equations.py``. For instance, the 1D non-reflecting boundary conditions are implemented in this example using the following expression which gives the time-update of the right-hand side:
 
 .. code-block:: python
 
@@ -186,7 +186,7 @@ The physical boundary conditions at the edge of the domain are enforced with the
     genBC(src_phybc_wave_i1,3,2,rhsname,vnamesrc_divF,setbc=[True,{'char':{'i1':['rhs']}}], update=False,rhs=rhs)
 
 .. warning::
-    The ``rhs.py`` and ``genRhs.py`` files **must be placed** in the ``src/generate/`` folder.
+    The ``equations.py`` and ``genRhs.py`` files **must be placed** in the ``src/generate/`` folder.
     
 Changing up to the ``src/`` folder and running the ``./install_clean.sh`` command will translate the symbolic expressions into Fortran code with the aforementioned numerics and compile the code. Running the command ``source env_dNami.sh`` will add the necessary environment variables to the path.  
 

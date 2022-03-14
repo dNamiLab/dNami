@@ -14,9 +14,9 @@ Assume that ones want to march in time the 2D compressible Euler equations given
 
    \dfrac{\partial }{\partial t} \begin{pmatrix} \rho  \\ \rho u \\ \rho v  \\ \rho e_t \end{pmatrix}  + \dfrac{\partial }{\partial x} \begin{pmatrix} \rho u   \\ \rho u^2 + p \\ \rho u v    \\ u ( \rho e_t + p) \end{pmatrix}  + \dfrac{\partial }{\partial y} \begin{pmatrix} \rho v   \\ \rho u v \\ \rho v^2 + p    \\ v ( \rho e_t + p) \end{pmatrix} = \mathbf{0}
 
-**Setting equations in rhs.py**
+**Setting equations in equations.py**
  
-PDEs and BCs specifications are typically done in a separate file, hereafter named ``rhs.py``. This file should contain the set of PDEs provided through dictionaries (see below) and a series of specific lists needed by dNami. The first parameter to be put in ``rhs.py`` is the number of spatial dimensions:
+PDEs and BCs specifications are typically done in a separate file, hereafter named ``equations.py``. This file should contain the set of PDEs provided through dictionaries (see below) and a series of specific lists needed by dNami. The first parameter to be put in ``equations.py`` is the number of spatial dimensions:
 
 .. code-block:: python
 
@@ -226,7 +226,7 @@ Advanced use: control of the Fortran loop distribution
 
 For optimisation purposes, the user can choose to split the 'do-loops' generated from the pseudo-code in a number of different ways. Here we present a simple way to split the 'do-loops' over the components of the RHS (other alternatives include splitting by derivative direction, splitting by groups of terms, etc) which can lead to more efficient memory access for certain configurations. 
 
-Let us assume that the user has created the following ``rhs.py`` for their one-dimensional case:
+Let us assume that the user has created the following ``equations.py`` for their one-dimensional case:
 
 .. code-block:: python
 
@@ -560,9 +560,9 @@ This will procude the following three 'do-loops' in the Fortran code:
 Advanced use: alias for a quantity vs storing a quantity  
 ########################################################
 
-For performance purposes, when building their ``rhs.py``, the user can choose to either have aliases for intermediate variables in their RHS expression which are replaced when the pseudo-code is turned into Fortran **or** compute intermediate variables which are stored in  memory and later loaded when computing the RHS. Simplistically, the first approach results in a lower memory footprint but higher arithmetic intensity whereas the second approach requires more memory, accessing these additional memory addresses has a lower arithmetic intensity.    
+For performance purposes, when building their ``equations.py``, the user can choose to either have aliases for intermediate variables in their RHS expression which are replaced when the pseudo-code is turned into Fortran **or** compute intermediate variables which are stored in  memory and later loaded when computing the RHS. Simplistically, the first approach results in a lower memory footprint but higher arithmetic intensity whereas the second approach requires more memory, accessing these additional memory addresses has a lower arithmetic intensity.    
 
-Let us assume that the user has created an almost identical ``rhs.py`` to the one in the previous sub-section for their one-dimensional case, but this time ``p`` is a stored variable :
+Let us assume that the user has created an almost identical ``equations.py`` to the one in the previous sub-section for their one-dimensional case, but this time ``p`` is a stored variable :
 
 .. code-block:: python
 
@@ -712,7 +712,7 @@ This results in the following Fortran code, note how ``qst(i-1,indvarsst(1))`` h
 
 	   enddo
 
-This change in ``rhs.py`` would be accompanied by the relevant call in the ``compute.py`` to compute the stored variable before advancing the solution in time shown below:
+This change in ``equations.py`` would be accompanied by the relevant call in the ``compute.py`` to compute the stored variable before advancing the solution in time shown below:
 
 .. code-block:: python
 
