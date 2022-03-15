@@ -1389,7 +1389,7 @@ def genBC(Equations,Stencil,Order,rhsname,vname,setbc=[False,{'bcname':{'i1':['r
 
 								for var in varbc:
 									if 'face' in varbc[var]:
-										if varbc[var]['face'] == bcdir: addvarbc = True
+										if (varbc[var]['face'] == dir1) or (varbc[var]['face'] == dir2): addvarbc = True
 									elif 'edge' in varbc[var]:
 										if varbc[var]['edge'] == bcdir: addvarbc = True
 									else:
