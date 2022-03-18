@@ -1,6 +1,7 @@
 """
-This module contains functions for generating 
-the Fortran code
+This module contains a set of functions and class for generating 
+the Fortran code from symbolic expression provided by the user.
+											 - 2019 Nicolas Alferez
 """
 
 import re
@@ -21,60 +22,51 @@ except:
   print('\033[1;40;94m'+'[build info]'+'\033[0m'+' \'/src_for/includes/gen\' directory already exists') 
  
 class rhs_info:
-	def __init__(self):
-		try: 
-			from genRhs	import dim
-		except:
-			exception('dim not define. Try fixing the number of spatial dimension (dim = 1, dim = 2 or dim = 3)',message='error')
+	"""
+			rhs_info is a user-level class. It needs to be instantiated by the user before initiating the generation process. 
+			
+			Args:
+				dim (in): number of spatial dimensions
+				wp (string): working precision for arithmetic operations (e.g. 'float32' or 'float64')
+				hlo_glob (int): total number of halo cells needed at runtime (including finite-difference and filter constraints).
+				incPATH (string): path to include files (containing automatically generated Fortran source files) 
+				varsolved (list): a list of strings corresponding to symbols (names) of variables marched in time. 
+				varname (dictionary): the symbols of variables stored in the main memory associated with its order in a corresponding contiguous array.
+				consvar (list): this argument is optional. It specifies which variables to be premultiplied by the density before marching in time. A 'rho' symbol is needed in varname. 
+				varstored (dictionary): this argument is optional. It contains names of symbolic expressions used to store additional complex expressions in memory.
+				varloc (dictionary): this argument is optional. It contains names of symbolic expressions used to rename complex algebraic expressions to facilitate equation writing (no intermediate store is performed). 
+				varbc (dictionary): this argument is optional. It contains names of symbolic expressions that are used at domain boundaries. 
+				coefficients (dictionary): this argument is optional. It contains all coefficients needed in the equations.
 
-		try: 
-			from genRhs	import wp
-		except:
-			exception('wp not defined. Try fixing the working precision',message='error')
+			"""
+	def __init__(self,dim         ,wp     ,hlo_glob,incPATH,
+							 varsolved        ,varname, 
+							 consvar     =[]  ,varstored={}   ,varloc  ={}  ,varbc={},
+							 coefficients={}):
 
-
-		try:
-			from genRhs import consvar
-		except:
-			consvar = []
-		try:
-			from genRhs import varbc
-		except:
-			varbc = {}
-		try:
-			from genRhs import varstored
-		except:
-			varstored = {}	
-		try:
-			from genRhs import varloc
-		except:
-			varloc = {}		
-		try:
-			from genRhs import coefficients
-		except:
-			coefficients = {}		
-		try:
-			from genRhs import varsolved
-		except:
-			exception('varsolved not defined',message='error')
+		if type(dim) != int :
+			exception('dim not define properly. Try fixing the number of spatial dimension (dim = 1, dim = 2 or dim = 3), '+str(dim)+' given.',message='error')
 
 		try:
-			from genRhs import varname
-		except:
-			exception('varname not defined',message='error')
+		  np.dtype(wp) 
+		except:  
+			exception('wp not defined properly. Try fixing the working precision as {float32 or float64}, '+str(wp)+' given.',message='error')
+	
+		if type(varsolved) != type([]):
+			exception('varsolved not defined properly (a list of integers is expected), '+str(varsolved)+' given.',message='error')
 
-		try:
-			from genRhs import hlo_glob
-		except:
-			exception('The number of hlo cells, hlo_glob, needs to be defined in genRhs. It is not automatically computed yet.',message='error')								   
-		try:
-			from genRhs import incPATH
-		except:
-			exception('incPATH not defined in genRhs',message='error')	
+		if type(varname) != type({}):
+			exception('varname not defined properly (a dictionary is expected), '+str(varname)+' given.',message='error')
+
+		if type(hlo_glob) != int:
+			exception('The number of hlo cells, hlo_glob, needs to be properly defined in genRhs (an integer is expected), '+str(hlo_glob)+' given. It is not automatically computed yet',message='error')								   
 		
-		self.wp     	  = wp     	 
-		self.dim     	  = dim     	 
-		self.stencil 	  = 1 	 
+		if type(incPATH) != str:
+			exception('incPATH not properly defined in genRhs (a string is expected), '+str(incPATH)+' given.',message='error')	
+		
+		self.wp     	    = wp     	 
+		self.dim     	    = dim     	 
+		self.stencil 	    = 1 	 
 		self.order        = 1      
 		self.consvar      = consvar 
 		self.coefficients = coefficients
@@ -90,7 +82,7 @@ class rhs_info:
 
 	def export(self):
 		"""
-			 export is a method of the rhs class that needs to be called at the end of genRhs.py in order to write necessary rhs information to be used at runtime.
+			 export is a method of the rhs_info class that needs to be called at the end of genRhs.py to write necessary rhs information on disk to be used at runtime.
 			 """
 		genBC_calls(self)
 
