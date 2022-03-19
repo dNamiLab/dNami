@@ -71,7 +71,7 @@ Build the documentation by changing into the doc directory and executing the fol
 ```bash
 make html
 ```
-After building the documentation the *_build/html* directory should contain the index.html startpage.
+After building the documentation the ``_build/html`` directory should contain the ``index.html`` startpage.
 
 
 ## Community guidelines 
