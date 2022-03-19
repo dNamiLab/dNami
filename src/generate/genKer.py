@@ -1,8 +1,8 @@
 """
 This module contains a set of functions and class for generating 
 the Fortran code from symbolic expression provided by the user.
-											 - 2019 Nicolas Alferez
 """
+#											 - 2019 Nicolas Alferez
 
 import re
 import os
@@ -26,7 +26,7 @@ class rhs_info:
 			rhs_info is a user-level class. It needs to be instantiated by the user before initiating the generation process. 
 			
 			Args:
-				dim (in): number of spatial dimensions
+				dim (int): number of spatial dimensions
 				wp (string): working precision for arithmetic operations (e.g. 'float32' or 'float64')
 				hlo_glob (int): total number of halo cells needed at runtime (including finite-difference and filter constraints).
 				incPATH (string): path to include files (containing automatically generated Fortran source files) 
