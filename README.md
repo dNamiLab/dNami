@@ -83,8 +83,8 @@ We look forward to seeing dNami used to solve problems from many different field
 
 ### Extending the documentation
 
-If you want to add additional content to the documentation, add/edit *.rst* files in the *doc/usage*
-directory and also update *doc/index.rst* (if necessary). 
+If you want to add additional content to the documentation, add/edit ``.rst`` files in the ``doc/usage``
+directory and also update ``doc/index.rst`` (if necessary). 
 
 ### Issues and support  
 
