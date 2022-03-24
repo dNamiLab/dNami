@@ -24,9 +24,7 @@ The time evolution of a variety of physical and biological processes may be desc
 
 .. math::
 
-   \begin{equation} \label{eq:gov_eq}
    \frac{\partial\textbf{q}}{\partial t} = f(\textbf{q}) \,\, + \,\, \mbox{initial/boundary conditions},
-   \end{equation}
 
 in a flexible and efficient manner, where :math:`\textbf{q} \in \mathbb{R}^n` is a vector of :math:`n` real-valued unknowns, :math:`t` is time, and :math:`f(\textbf{q})` is a generic function of :math:`\textbf{q}` which may include differential and algebraic operators.
 

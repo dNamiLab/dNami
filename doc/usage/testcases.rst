@@ -30,9 +30,7 @@ The files for this case are located in the ``exm/1d_entropywave`` folder. The in
 To illustrate  higher-than-second-order derivatives, the one-dimensional Korteweg-De Vries equation is implemented in dNami and integrated in time. The general form of the equation is:
 
 .. math::
-	\begin{equation}
 	    \dfrac{\partial u}{\partial t } + \epsilon u \dfrac{\partial u}{\partial x } + \mu  \dfrac{\partial ^3 u}{\partial x^3 } = 0
-	\end{equation}
  
 For this test case, the scaling coefficients are set to :math:`\epsilon=6` and :math:`\mu=1`. To compute the third derivative of :math:`u` in dNami, first the second derivative is computed and stored and then a first derivative of this intermediate variable is taken when specifying the right-hand side as illustrated in the following code block:
 
@@ -46,31 +44,23 @@ The case of two colliding solitons is simulated here for which there is an analy
 
 .. _1d_kdv_sol:
 .. math::
-	\begin{equation}
 	    u(x,t) = 2 \dfrac{\partial ^2 f  }{\partial x^2 }, \forall x \in \mathbb{R}, \forall t \in \mathbb{R},
-	\end{equation}
 
 where the function :math:`f` is defined by:
 
 .. math::
-	\begin{equation}
 	    f = 1 + e^{\eta_1} + e^{\eta_2} + \left( \dfrac{k_1 - k_2}{k_1 + k_2} \right)^2  e^{\eta_1  + \eta_2},
-	\end{equation}
 
 with: 
 
 .. math::
-	\begin{align}
 	    \eta_1 = k_1 x - k_1^3 t + \eta_1^{(0)}, \\
 	    \eta_2 = k_2 x - k_2^3 t + \eta_2^{(0)}. \\
-	\end{align}
 
 Following :cite:`taha1984analytical`, the coefficients in the previous equations are taken to be:
 
 .. math::
-	\begin{equation}
 	    k_1 = 1, \quad  k_2= \sqrt{2}, \quad \eta_1^{(0)} = 0 , \quad \eta_2^{(0)} = 2 \sqrt{2}
-	\end{equation}
 
 The domain is restricted to the segment :math:`x \in [-20,20]`, taken to be periodic and discretised with :math:`n_x=500` points. At the start of the simulation, the :math:`u` field is initialised using the analytical solution for :math:`t=0`. :numref:`1d_kdv` shows the solution after 6 time units. 
 
@@ -90,7 +80,6 @@ This case solves the two-dimensional gasdynamics equations in curvilinear coordi
 
 .. math::
 
-        \begin{equation}
        \dfrac{\partial }{\partial t} 
        \begin{pmatrix}
         \rho \\
@@ -116,7 +105,6 @@ This case solves the two-dimensional gasdynamics equations in curvilinear coordi
         \rho v J V - \dfrac{\partial \xi}{\partial x} p \\
         (\rho e_t +p ) J V \\
        \end{pmatrix}  = \textbf{0}    
-       \end{equation}
 
 .. math::
 
@@ -129,7 +117,6 @@ where :math:`U` and :math:`V` are the contra-variant velocities (i.e. the projec
 
 .. math::
 
-	\begin{equation}
 	    \begin{pmatrix}
 	    U \\
 	    V 
@@ -140,7 +127,6 @@ where :math:`U` and :math:`V` are the contra-variant velocities (i.e. the projec
 	    -\dfrac{\partial \eta}{\partial x} u + \dfrac{\partial \xi}{\partial x} v \\
 	    \end{pmatrix}    
 	    \label{eq:dNami_contravel}
-	\end{equation}
 
 The computational space :math:`(x,y)` is related to physical space :math:`(\xi, \eta)` with the mapping: 
 

@@ -22,7 +22,8 @@ project = 'dNami'
 copyright = '2019, Conservatoire National des Arts et Métiers and Okinawa Institute of Science and Technology School Corporation'
 author = 'Nicolas Alferez, S2T Unit'
 
-
+latex_engine = 'xelatex'
+latex_use_xindy = False
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
