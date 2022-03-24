@@ -33,23 +33,46 @@ First order derivative syntax
 
 The tables below show how to express derivatives in the dNami syntax in each of the three spatial directions. 
 
-.. table:: First derivative notation expressed in the dNami syntax
+.. only:: html
 
-   +--------------------------------------+------------------+--------------------------------+
-   |        Mathematical notation         |  dNami notation  |          Description           |
-   +======================================+==================+================================+
-   | .. math::                            |                  |                                |
-   |                                      |                  |                                |
-   |    \dfrac{\partial f}{\partial x}    |     [ f ]_1x     | First derivative in x direction|
-   +--------------------------------------+------------------+--------------------------------+
-   | .. math::                            |                  |                                |
-   |                                      |                  |                                |
-   |    \dfrac{\partial f}{\partial y}    |     [ f ]_1y     | First derivative in y direction|
-   +--------------------------------------+------------------+--------------------------------+
-   | .. math::                            |                  |                                |
-   |                                      |                  |                                |
-   |    \dfrac{\partial f}{\partial z}    |     [ f ]_1z     | First derivative in z direction|
-   +--------------------------------------+------------------+--------------------------------+
+   .. table:: First derivative notation expressed in the dNami syntax
+   
+      +--------------------------------------+------------------+--------------------------------+
+      |        Mathematical notation         |  dNami notation  |          Description           |
+      +======================================+==================+================================+
+      | .. math::                            |                  |                                |
+      |                                      |                  |                                |
+      |    \dfrac{\partial f}{\partial x}    |     [ f ]_1x     | First derivative in x direction|
+      +--------------------------------------+------------------+--------------------------------+
+      | .. math::                            |                  |                                |
+      |                                      |                  |                                |
+      |    \dfrac{\partial f}{\partial y}    |     [ f ]_1y     | First derivative in y direction|
+      +--------------------------------------+------------------+--------------------------------+
+      | .. math::                            |                  |                                |
+      |                                      |                  |                                |
+      |    \dfrac{\partial f}{\partial z}    |     [ f ]_1z     | First derivative in z direction|
+      +--------------------------------------+------------------+--------------------------------+
+
+.. only:: latex
+
+   .. tabularcolumns:: |C|C|C|
+   .. table:: First derivative notation expressed in the dNami syntax
+   
+      +--------------------------------------+------------------+--------------------------------+
+      |        Mathematical notation         |  dNami notation  |          Description           |
+      +======================================+==================+================================+
+      |                                      |                  |                                |
+      |:math:`\dfrac{\partial f}{\partial x}`|     [ f ]_1x     | First derivative in x direction|
+      |                                      |                  |                                |
+      +--------------------------------------+------------------+--------------------------------+
+      |                                      |                  |                                |
+      |:math:`\dfrac{\partial f}{\partial y}`|     [ f ]_1y     | First derivative in y direction|
+      |                                      |                  |                                |
+      +--------------------------------------+------------------+--------------------------------+
+      |                                      |                  |                                |
+      |:math:`\dfrac{\partial f}{\partial z}`|     [ f ]_1z     | First derivative in z direction|
+      |                                      |                  |                                |
+      +--------------------------------------+------------------+--------------------------------+
 
 Second order derivative syntax
 ==============================
@@ -57,29 +80,56 @@ Second order derivative syntax
 
 To specify second order derivatives, two ways are currently possible. The user can directly specify a second derivative (discretised as a second derivative) or by taking the first derivative twice as detailed below. The two approaches are mathematically equivalent but will yields different results when discretised. The curly-bracket '}' symbol is used when taking a derivative inside another derivative. This approach can also be applied to cross-derivatives.   
 
-.. table:: Second derivative notation expressed in dNami syntax
+.. only:: html
 
-   +---------------------------------------------------------------+------------------+----------------------------------------+
-   |        Mathematical notation                                  |  dNami notation  |          Description                   |
-   +===============================================================+==================+========================================+
-   | .. math::                                                     |                  |                                        |
-   |                                                               |                  |                                        |
-   |    \dfrac{\partial^2 f}{\partial x^2}                         |     [ f ]_2xx    | Second derivative in x direction       |
-   +---------------------------------------------------------------+------------------+----------------------------------------+
-   | .. math::                                                     |                  |                                        |
-   |                                                               |                  |                                        |
-   |    \dfrac{\partial}{\partial x}\dfrac{\partial f}{\partial x} |                  | Double first derivative in x direction |
-   |                                                               |    [ {f}_1x ]_1x |                                        |
-   +---------------------------------------------------------------+------------------+----------------------------------------+
-   | .. math::                                                     |                  |                                        |
-   |                                                               |                  |                                        |
-   |    \dfrac{\partial}{\partial y}\dfrac{\partial f}{\partial x} |     [ f ]_2xy    | Cross-derivative in x  and y directions|
-   +---------------------------------------------------------------+------------------+----------------------------------------+
-   | .. math::                                                     |                  |                                        |
-   |                                                               |                  |                                        |
-   |    \dfrac{\partial}{\partial y}\dfrac{\partial f}{\partial x} |                  | First derivative in x and y direction  |
-   |                                                               |    [ {f}_1x ]_1y |                                        |
-   +---------------------------------------------------------------+------------------+----------------------------------------+
+   .. table:: Second derivative notation expressed in dNami syntax
+   
+      +---------------------------------------------------------------+------------------+----------------------------------------+
+      |        Mathematical notation                                  |  dNami notation  |          Description                   |
+      +===============================================================+==================+========================================+
+      | .. math::                                                     |                  |                                        |
+      |                                                               |                  |                                        |
+      |    \dfrac{\partial^2 f}{\partial x^2}                         |     [ f ]_2xx    | Second derivative in x direction       |
+      +---------------------------------------------------------------+------------------+----------------------------------------+
+      | .. math::                                                     |                  |                                        |
+      |                                                               |                  |                                        |
+      |    \dfrac{\partial}{\partial x}\dfrac{\partial f}{\partial x} |                  | Double first derivative in x direction |
+      |                                                               |    [ {f}_1x ]_1x |                                        |
+      +---------------------------------------------------------------+------------------+----------------------------------------+
+      | .. math::                                                     |                  |                                        |
+      |                                                               |                  |                                        |
+      |    \dfrac{\partial}{\partial y}\dfrac{\partial f}{\partial x} |     [ f ]_2xy    | Cross-derivative in x  and y directions|
+      +---------------------------------------------------------------+------------------+----------------------------------------+
+      | .. math::                                                     |                  |                                        |
+      |                                                               |                  |                                        |
+      |    \dfrac{\partial}{\partial y}\dfrac{\partial f}{\partial x} |                  | First derivative in x and y direction  |
+      |                                                               |    [ {f}_1x ]_1y |                                        |
+      +---------------------------------------------------------------+------------------+----------------------------------------+
+
+.. only:: latex
+
+   .. tabularcolumns:: |C|C|C|
+   .. table:: Second derivative notation expressed in dNami syntax
+   
+      +------------------------------------------------------------------+------------------+----------------------------------------+
+      |        Mathematical notation                                     |  dNami notation  |          Description                   |
+      +==================================================================+==================+========================================+
+      |                                                                  |                  |                                        |
+      |:math:`\dfrac{\partial^2 f}{\partial x^2}`                        |     [ f ]_2xx    | Second derivative in x direction       |
+      |                                                                  |                  |                                        |
+      +------------------------------------------------------------------+------------------+----------------------------------------+
+      |                                                                  |                  |                                        |
+      |:math:`\dfrac{\partial}{\partial x}\dfrac{\partial f}{\partial x}`|  [ {f}_1x ]_1x   | Double first derivative in x direction |
+      |                                                                  |                  |                                        |
+      +------------------------------------------------------------------+------------------+----------------------------------------+
+      |                                                                  |                  |                                        |
+      |:math:`\dfrac{\partial}{\partial y}\dfrac{\partial f}{\partial x}`|     [ f ]_2xy    | Cross-derivative in x  and y directions|
+      |                                                                  |                  |                                        |
+      +------------------------------------------------------------------+------------------+----------------------------------------+
+      |                                                                  |                  |                                        |
+      |:math:`\dfrac{\partial}{\partial y}\dfrac{\partial f}{\partial x}`|  [ {f}_1x ]_1y   | First derivative in x and y direction  |
+      |                                                                  |                  |                                        |
+      +------------------------------------------------------------------+------------------+----------------------------------------+
 
 Higher order derivative syntax
 ===============================
