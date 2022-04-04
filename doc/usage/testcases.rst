@@ -25,7 +25,18 @@ The files for this case are located in the ``exm/1d_entropywave`` folder. The in
 
    x-t diagram of the density perturbation for the one-dimensional Euler equations on a periodic domain. The blue lines indicate the flow speed. 
 
-**2) Korteweg-De Vries example** 
+**2) Standing shock perturbation**  
+
+The 1D Euler equations on a non-periodic domain detailed in the quickstart guide is revisited here. In this case, a standing shock is initialised in the center of the domain and an entropy perturbation is sent at it using characteristic-based boundary conditions. To tackle the added numerical issue presented by the discontinuity, a uniform bulk viscosity and thermal conductivity approach is used. This involves supplementing the inviscid Euler equations with a diffusive terms of the form:
+
+
+.. math::
+
+    \mathbf{C} = \begin{pmatrix} 0 \\ - \mu_b \frac{\partial^2 u}{\partial x^2} \\  - \mu_b \frac{\partial}{\partial x} \left( u \frac{\partial}{\partial x}\right) - \kappa \frac{\partial^2 T}{\partial x^2}  \end{pmatrix}
+
+The amplitude of :math:`\mu_b` and :math:`\kappa` are adjusted to capture and resolve the discontinuity without adding excessive numerical noise.  
+
+**3) Korteweg-De Vries example** 
 
 To illustrate  higher-than-second-order derivatives, the one-dimensional Korteweg-De Vries equation is implemented in dNami and integrated in time. The general form of the equation is:
 
