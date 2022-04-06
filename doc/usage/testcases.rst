@@ -32,9 +32,18 @@ The 1D Euler equations on a non-periodic domain detailed in the quickstart guide
 
 .. math::
 
-    \mathbf{C} = \begin{pmatrix} 0 \\ - \mu_b \frac{\partial^2 u}{\partial x^2} \\  - \mu_b \frac{\partial}{\partial x} \left( u \frac{\partial}{\partial x}\right) - \kappa \frac{\partial^2 T}{\partial x^2}  \end{pmatrix}
+    \mathbf{C} = \begin{pmatrix} 0 \\ - \mu_b \frac{\partial^2 u}{\partial x^2} \\  - \mu_b \frac{\partial}{\partial x} \left( u \frac{\partial u }{\partial x}\right) - \kappa \frac{\partial^2 T}{\partial x^2}  \end{pmatrix}
 
-The amplitude of :math:`\mu_b` and :math:`\kappa` are adjusted to capture and resolve the discontinuity without adding excessive numerical noise.  
+The amplitude of :math:`\mu_b` and :math:`\kappa` are adjusted to capture and resolve the discontinuity without adding excessive numerical noise. A standing sock is initialised in the center of the domain using the Rankine-Hugoniot shock jump conditions for an ideal gas for an upstream Mach number :math:`M_0 = 1.5`. Using the characteristic boundary condition formulation, a harmonic density perturbation is forced on the left boundary. This perturbation is advected at the supersonic flow speed into the shock. At the shock, both an amplified density perturbation and an acoustic perturbation are transmitted to the downstream region.  
+
+.. only:: html
+
+   .. _2d_stand_shock
+   .. figure:: img/shock_pert.gif
+      :width: 80%
+      :align: center
+
+      Animation of the density profile over time 
 
 **3) Korteweg-De Vries example** 
 
