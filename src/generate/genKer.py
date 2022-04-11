@@ -79,6 +79,7 @@ class rhs_info:
 		self.hlo_glob     = hlo_glob
 		self.bc_info      = [{},{}]
 		self.incPATH      = incPATH
+		self.fltstencil   = 1 	 
 
 	def export(self):
 		"""
@@ -97,6 +98,14 @@ class rhs_info:
 		hlo_rhs      = self.hlo_rhs  
 		bc_info      = self.bc_info     
 		varbc        = self.varbc
+
+
+		if (max( int( (self.stencil-1)/2), int( (self.fltstencil-1)/2) )  != self.hlo_glob) :
+			exception('Are you sure hlo_glob is correct?' ,message='error')
+		exception('hlo_glob  = {}'.format(self.hlo_glob),message='com')
+		exception('D Stencil = {}'.format(int((self.stencil-1)/2   )),message='com')
+		exception('F Stencil = {}'.format(int((self.fltstencil-1)/2)),message='com')
+
 
 
 		instpath = os.environ['INSTALLPATH']
@@ -3800,6 +3809,7 @@ def genFilter(stencil,order,nvar,dirBC='',indbc='',fltbeg=2,rhs=None):
 
 	dim     = rhs.dim
 	incPATH = rhs.incPATH
+	rhs.fltstencil = stencil
 
 	if indbc == '':
 
