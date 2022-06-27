@@ -1,4 +1,3 @@
-pip install setuptools==58
 sphinx<4
 sphinx-panels
 sphinx_copybutton
