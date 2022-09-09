@@ -25,7 +25,7 @@ The ability of dNami to clearly separate the problem statement from its numerica
 
 ## Citing the code
 
-If you use **dNami** for a scientific publication, please cite it using the following Zenodo reference:
+If you use **dNami** for a scientific publication, please cite it using the [Zenodo reference](https://zenodo.org/record/6720082):
 
 Bibtex:
 
