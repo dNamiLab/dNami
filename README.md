@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6720593.svg)](https://doi.org/10.5281/zenodo.6720593)
 
 # dNami
 **dNami** [di:nɑ:mi:] is an open-source multi-language (Python, Fortran, C) framework for solving systems of balance laws using explicit numerical schemes on structured meshes. 
@@ -25,27 +26,22 @@ The ability of dNami to clearly separate the problem statement from its numerica
 
 ## Citing the code
 
-If you use **dNami** for a scientific publication, please cite it using the [Zenodo reference](https://zenodo.org/record/6720082):
+If you use **dNami** for a scientific publication, please cite it using the [Zenodo reference](https://zenodo.org/record/6720593):
 
 Bibtex:
 
-.. code-block:: text
-
-	@software{alferez_nicolas_2022_6720593,
-	  author       = {Alferez, Nicolas and
-					  Touber, Emile and
-					  Winn, Stephen and
-					  Ali, Yussuf},
-	  title        = {{dNami: a framework for solving systems of balance 
-					   laws using explicit numerical schemes on
-					   structured meshes}},
-	  month        = jun,
-	  year         = 2022,
-	  publisher    = {Zenodo},
-	  version      = 2,
-	  doi          = {10.5281/zenodo.6720593},
-	  url          = {https://doi.org/10.5281/zenodo.6720593}
-	} 
+```
+@software{alferez_nicolas_2022_6720593,
+	author       = {Alferez, Nicolas and Touber, Emile and Winn, Stephen and Ali, Yussuf},
+	title        = {{dNami: a framework for solving systems of balance laws using explicit numerical schemes on structured meshes}},
+	month        = jun,
+	year         = 2022,
+	publisher    = {Zenodo},
+	version      = 2,
+	doi          = {10.5281/zenodo.6720593},
+	url          = {https://doi.org/10.5281/zenodo.6720593}
+} 
+```
 
 ## Dependencies
 
