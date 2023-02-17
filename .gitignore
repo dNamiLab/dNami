@@ -6,4 +6,5 @@ src/pymod
 src/src_for/rhs.for
 */*/__pycache__
 src/src_for/includes/gen
+*.swp
 

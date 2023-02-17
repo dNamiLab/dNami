@@ -39,6 +39,7 @@ To get started with dNami, please check out the :doc:`Quickstart guide </usage/q
 
    usage/quickstart
    usage/testcases
+   usage/gallery
    usage/genRhs
    usage/syntax   
    usage/compute
