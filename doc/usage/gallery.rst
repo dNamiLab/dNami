@@ -4,12 +4,12 @@ Detailed examples
 Hunga-Tonga Hunga Ha'apai volcano explosion
 -------------------------------------------
 
-On January 15th 2022, the explosion of the Hunga-Tonga Hunga Ha'apai caused unexpectedly large wave amplitudes around the world. Following the confusion surrounding warnings issued by the Japanese Meteorological Agency (JMA) witnessed by some of the authors on Okinawa, Japan, we decided to investigate the physics involved in the tsunami generation mechanisms. Rapid first attempts were made using a one-way coupled system (Euler equations for the atmosphere, shallow water equations for the water layer; the results were used to generate the animation on the index page of this website) which led us to a more thorough analysis of the theory and the simulations of the newly developed two-way coupled model illustrated hereafter. This page details the elements that go into simulating the January 15 :math:`^{th}` explosion using dNami, from setting up the symbolic equations to post-processing the output. A grid convergence study and a comparison to available measurements are also provided. All the scripts necessary to run the case are located in the ``exm/2d_tonga_TWC`` directory. 
+On January 15th 2022, the explosion of the Hunga-Tonga Hunga Ha'apai caused unexpectedly large wave amplitudes around the world. Following the confusion surrounding warnings issued by the Japanese Meteorological Agency (JMA) witnessed by some of the authors on Okinawa, Japan, we decided to investigate the physics involved in the tsunami generation mechanisms. Rapid first attempts were made using a one-way coupled system (Euler equations for the atmosphere, shallow water equations for the water layer; the results were used to generate the animation on the index page of this website) which led us to a more thorough analysis of the theory and the simulations of the newly developed two-way coupled model illustrated hereafter. This page details the elements that go into simulating the January 15 :math:`^{th}` explosion using dNami, from setting up the symbolic equations to post-processing the output. A grid convergence study and a comparison to available measurements are also provided. All the scripts necessary to run the case are located in the ``exm/2d_tonga_TWC`` directory on the ``tonga`` branch (please checkout this branch to obtain the source files). This case was developed for and included as part of a published paper titled 'Two-way coupled long-wave isentropic ocean-atmosphere dynamics' (doi:10.1017/jfm.2023.131).
 
 Equations
 ~~~~~~~~~~~~
 
-Resulting from the derivation in [JFM], the governing equations to be integrated using **dNami** are : 
+Resulting from the derivation in JFM paper, the governing equations to be integrated using **dNami** are : 
 
 .. math::
 

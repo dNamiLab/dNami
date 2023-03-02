@@ -8,7 +8,7 @@ from dnami import np, sys
 # MESH
 # =============================================================================
 
-def write_grid(tree):
+def write_grid(tree,fpath='./out/'):
         """
         This functions writes the axes to file in './out'
         
@@ -27,7 +27,7 @@ def write_grid(tree):
         if tree['mpi']['dMpi'].ioproc:
                 head = np.empty(6,dtype=wp)
                 head[:] = [nxgb,nygb,nzgb,Lx,Ly,Lz]
-                with open('./out/axes.bin',"wb") as fh:
+                with open(fpath+'axes.bin',"wb") as fh:
                         np.concatenate((head,x,y,z)).tofile(fh)
                         fh.closed
 
@@ -324,7 +324,7 @@ def read_restart(tree,fname='restart.bin'):
         # run some checks & print some info to terminal:
         if ioproc:
                 print('\033[1;32m'+'================================'+'\033[0m')
-                print('\033[1;32m'+'RESTARTING FROM RESTART.BIN FILE'+'\033[0m')
+                print('\033[1;32m'+f'RESTARTING FROM {fname}'+'\033[0m')
                 print('\033[1;32m'+'================================'+'\033[0m')
                 print('\033[1m'+'From header:'+'\033[0m')
                 print('n,time:',int(head[1]),',',head[2])
@@ -458,6 +458,101 @@ def read_restart(tree,fname='restart.bin'):
                                          ,index['j'][0]:index['j'][1],0:nvar] = dat.reshape((sizeloc['i'],sizeloc['j'],nvar)).copy()
                                 else:
                                         q[index['i'][0]:index['i'][1],0:nvar] = dat.reshape((sizeloc['i'],nvar)).copy()
+
+        return tree
+
+def read_data(tree,fields,fname='data.bin'):
+        """
+        Reads the data file in order to read back in a custom data field. By default, it looks for the file 'data.bin' where the compute.py is located but a custom path can be used.  
+
+        Args:
+          tree: The dnami tree data structure 
+          fields: List of fields to fill using the 'data.bin' file
+          fname: The filename of the restart file
+        Returns: 
+          This function returns the updated dNami tree
+        """
+
+        # unpack useful tree data
+        wp   = tree['misc']['working precision']
+        dmpi = tree['mpi']['dMpi']
+        grid = tree['grid']
+        # nvar = tree['eqns']['qvec']['nvars']
+        hlo  = tree['num']['hlo']
+        ndim = tree['eqns']['ndim']
+        views = []
+        for nv,f in enumerate(fields):
+            views.append ( tree['eqns']['qvec']['views'][f] )
+        nvar = len(fields)
+        bcs  = tree['bc']
+
+        ioproc = dmpi.ioproc
+        iMpi   = dmpi.iMpi
+        if iMpi : 
+                nprocs = dmpi.nprocs
+                MPIWP  = dmpi.MPIWP
+                MPI    = dmpi.MPIlib
+
+        nxgb, nygb, nzgb = grid['size']['nxgb'], grid['size']['nygb'], grid['size']['nzgb']
+        nx  , ny  , nz   = dmpi.nx             , dmpi.ny             , dmpi.nz
+
+        # read in restart
+        headsize = 7
+        if iMpi:
+                head = np.empty(headsize,dtype=wp)
+                dat  = np.empty((nx,ny,nz,nvar),dtype=wp)
+                header = MPIWP.Create_contiguous(headsize)
+                header.Commit() 
+                fh = MPI.File.Open(dmpi.comm_torus,fname,MPI.MODE_RDONLY)
+                fh.Set_view(0,MPIWP,header)
+                fh.Read_at(0,head)
+                header.Free()   
+                subarray = MPIWP.Create_subarray((nxgb,nygb,nzgb,nvar),(nx,ny,nz,nvar),(dmpi.ibeg-1,dmpi.jbeg-1,dmpi.kbeg-1,0))
+                subarray.Commit()
+                disp = MPIWP.Get_size()*headsize
+                fh.Set_view(disp,MPIWP,subarray)
+                fh.Read_all(dat)
+                subarray.Free()
+                fh.Close()
+        else:
+                with open(fname,"rb") as fh:
+                        head = np.fromfile(fh,dtype=wp,count=headsize)
+                        dat  = np.fromfile(fh,dtype=wp,count=nx*ny*nz*nvar)
+                        dat  = np.reshape(dat,(nx,ny,nz,nvar))
+                fh.closed
+        
+        # run some checks & print some info to terminal:
+        if ioproc:
+                print('\033[1;32m'+'========================================================='+'\033[0m')
+                print('\033[1;32m'+'READING DATA FROM FILE {}....'.format(fname)+'\033[0m')
+                print('\033[1;32m'+'========================================================='+'\033[0m')
+                print('\033[1m'+'From header:'+'\033[0m')
+                print('n,time:',int(head[1]),',',head[2])
+                print('nxgb,nygb,nzgb,nvar:',int(head[3]),',',int(head[4]),',',int(head[5]),',',int(head[6]))
+                if nxgb != head[3]: print('\033[1;40;31m'+'[error]'+'\033[0m'+' nxgb does not match that of restart.bin'); sys.exit()
+                if nygb != head[4]: print('\033[1;40;31m'+'[error]'+'\033[0m'+' nygb does not match that of restart.bin'); sys.exit()
+                if nzgb != head[5]: print('\033[1;40;31m'+'[error]'+'\033[0m'+' nzgb does not match that of restart.bin'); sys.exit()
+                print('We are good to go!')
+        
+        # set iteration number and time:
+        tree['num']['tint']['itn'] = int(head[1])
+        tree['eqns']['time']       = head[2]
+        
+        # set fields:
+        if ndim == 3:
+            for nv, f in enumerate(fields):
+                views[nv][hlo:hlo+nx,hlo:hlo+ny,hlo:hlo+nz] = dat.copy()[:,:,:,nv]
+        elif ndim == 2:
+            for nv, f in enumerate(fields):
+                views[nv][hlo:hlo+nx,hlo:hlo+ny]            = dat.reshape(nx,ny,nvar).copy()[:,:,nv]
+        elif ndim == 1:
+            for nv, f in enumerate(fields):
+                views[nv][hlo:hlo+nx]                       = dat.reshape(nx,nvar).copy()[:,nv]
+        else:
+            if ioproc: print('[error] (read_restart) ndim (',ndim,') should be 1, 2 or 3')
+            sys.exit()
+
+        # -- NON PERIODIC NRY
 
         return tree
 

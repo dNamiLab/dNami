@@ -16,8 +16,14 @@ hlo_glob = 5
 
 def main():
       
-    from genKer import rhs_info    
-    rhs = rhs_info()
+    from genKer import rhs_info   
+    # rhs = rhs_info(dim,wp,hlo_glob,incPATH,varsolved,varname, 
+    #                consvar=consvar,varstored=varstored,varloc=varloc,varbc=varbc,
+    #                coefficients=coefficients) 
+    
+    rhs = rhs_info(dim,wp,hlo_glob,incPATH,varsolved,varname, 
+                   consvar=consvar,varstored=varstored,varloc=varloc,varbc=varbc,
+                   coefficients=coefficients)
 
 # Generate LHS:
     genrk3(len(varsolved)      ,rhs=rhs) 

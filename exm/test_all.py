@@ -24,6 +24,7 @@ import glob
 import os 
 import subprocess
 import shutil
+import sys
 
 # -- Color class 
 class bcolors:
@@ -61,7 +62,7 @@ if shutil.which('mpirun') or shutil.which('mpiexec'):
 else:
     deps['mpi'] = f'{bcolors.FAIL}MISSING{bcolors.ENDC}'
 
-# -- mpirun or mpiexec 
+# -- gfortran or ifort 
 if shutil.which('gfortran') or shutil.which('ifort'):
     deps['fcompiler'] = f'{bcolors.OKGREEN}OK{bcolors.ENDC}'
 else:
@@ -86,26 +87,32 @@ print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 print('')
 # ---------------------------------------------------
 
-# -- Get list of tests
 test_dir  = os.getcwd()
 test_log  = test_dir + '/test.log'
-test_list = sorted(glob.glob('./*'))
-test_list.remove('./test_all.py')
-try:
-    test_list.remove('./test.log')
-except:
-    pass
 test_stat = {} 
 
-# -- Check if all tests have a reference.dat file:
-for test in test_list:
+# -- Get list of tests
+if len(sys.argv) == 1:
 
-    # Get folder contents:
-    files = glob.glob(test + '/*')
-    ref = [i for i in files if 'reference.dat' in i]
-    if len(ref) == 0:
-        test_list.remove(test)
+    test_list = sorted(glob.glob('./*'))
+    test_list.remove('./test_all.py')
+    try:
+        test_list.remove('./test.log')
+    except:
+        pass
 
+    # -- Check if all tests have a reference.dat file:
+    for test in test_list:
+
+        # Get folder contents and check:
+        files = glob.glob(test + '/*')
+        ref = [i for i in files if 'reference.dat' in i]
+        if len(ref) == 0:
+            test_list.remove(test)
+
+# -- Or only run the input test 
+else:
+    test_list = [str(sys.argv[1])]
 
 
 # -- Print the list
@@ -117,6 +124,7 @@ print(' ============================================' )
 print(' ')
 print(' ')
 print(' ')
+
 
 # -- Before first test, create temporary work directory and remove files from previous test
 tmp_dir = 'wrk_tmp'

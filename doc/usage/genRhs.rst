@@ -131,9 +131,11 @@ Next, the user must initialise the ``rhs`` class which is used to store and tran
 .. code-block:: python
 
     from genKer import rhs_info    
-    rhs = rhs_info()
+    rhs = rhs_info(dim,wp,hlo_glob,incPATH,varsolved,varname,  
+                   consvar=consvar,varstored=varstored,varloc=varloc,
+                   coefficients=coefficients)
 
-Then, the Runge--Kutta time-marching steps are generated with calls to the following functions:
+The equations declared in the ``equations.py`` are thus stored by the ``rhs`` class as well as the number of dimensions, the maximum halo size, etc. This information is used in the following pseudo-code translation steps. Then, the Runge--Kutta time-marching steps are generated with calls to the following functions:
 
 .. code-block:: python
 

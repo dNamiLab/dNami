@@ -185,7 +185,7 @@
                                         3.0_wp/20.0_wp, &
                                         3.0_wp/ 5.0_wp /)
 
-  real(wp) :: one_over_rho
+  real(wp) :: one_over_premult
   
 #include "includeF_globVarStored.f90"
 
@@ -326,7 +326,7 @@ enddo ! END cache blocking k
                                         3.0_wp/20.0_wp, &
                                         3.0_wp/ 5.0_wp /)
 
-  real(wp) :: one_over_rho
+  real(wp) :: one_over_premult
   
 #include "includeRHS_globVar_rk3.f90"
 

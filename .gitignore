@@ -6,5 +6,12 @@ src/pymod
 src/src_for/rhs.for
 */*/__pycache__
 src/src_for/includes/gen
+doc/_build
+*.DS_store
 *.swp
+exm/test.log
+wrk*/
+src/generate/equations.py
+src/generate/functions.py
+src/generate/genRhs.py
 
