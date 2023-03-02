@@ -1,4 +1,4 @@
-sphinx>2,<4
+sphinx>2
 sphinx-panels
 sphinx_copybutton
 git+https://github.com/pandas-dev/pydata-sphinx-theme
