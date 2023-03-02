@@ -1,8 +1,7 @@
-sphinx<4
+sphinx>2,<4
 sphinx-panels
 sphinx_copybutton
 git+https://github.com/pandas-dev/pydata-sphinx-theme
 sphinxext-rediraffe
 sphinx-autobuild
 sphinxcontrib-bibtex
-setuptools<58.0.0
