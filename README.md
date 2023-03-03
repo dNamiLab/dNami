@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6720593.svg)](https://doi.org/10.5281/zenodo.6720593)
+[![Documentation Status](https://readthedocs.org/projects/dnami/badge/?version=latest)](https://dnami.readthedocs.io/en/latest/?badge=latest)
 # dNami
 **dNami** [di:nɑ:mi:] is an open-source multi-language (Python, Fortran, C) framework for solving systems of balance laws using explicit numerical schemes on structured meshes. 
 dNami uses MPI, loop-unrolling and cache blocking techniques to speed up stencil-based operations. Spatial derivatives are constructed using a customisable finite-difference formulation. 
