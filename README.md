@@ -45,6 +45,25 @@ dNami solves Equation (1) on structured grids. Parallelisation is then ensured v
 
 Python is used at runtime to set up the run parameters and initial conditions. More importantly the time loop is exposed to Python, giving the user the freedom to interact with the computation inside the RK steps at run-time and to plug-in external libraries and/or output custom values with in-place data read and write between Python and Fortran. dNami's Python interface thus allows easy integration of pre-processing, co-processing and post-processing tools. 
 
+## Citing the code
+
+If you use **dNami** for a scientific publication, please cite it using the [Zenodo reference](https://zenodo.org/record/6720593):
+
+Bibtex:
+
+```
+@software{dNami,
+	author       = {Alferez, Nicolas and Touber, Emile and Winn, Stephen and Ali, Yussuf},
+	title        = {{dNami: a framework for solving systems of balance laws using explicit numerical schemes on structured meshes}},
+	month        = jun,
+	year         = 2022,
+	publisher    = {Zenodo},
+	version      = 2,
+	doi          = {10.5281/zenodo.6720593},
+	url          = {https://doi.org/10.5281/zenodo.6720593}
+} 
+```
+
 
 ## Dependencies
 
