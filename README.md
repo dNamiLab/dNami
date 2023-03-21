@@ -1,8 +1,8 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6720593.svg)](https://doi.org/10.5281/zenodo.6720593)
-
+[![Documentation Status](https://readthedocs.org/projects/dnami/badge/?version=latest)](https://dnami.readthedocs.io/en/latest/?badge=latest)
 # dNami
 **dNami** [di:nɑ:mi:] is an open-source multi-language (Python, Fortran, C) framework for solving systems of balance laws using explicit numerical schemes on structured meshes. 
-dNami uses MPI, loop-unrolling and cache blocking techniques to speed up stencil-based operations.
+dNami uses MPI, loop-unrolling and cache blocking techniques to speed up stencil-based operations. Spatial derivatives are constructed using a customisable finite-difference formulation. 
 
 <p align="center">
   <img src="./doc/usage/img/earth.gif" alt="earth.gif" />
@@ -24,24 +24,7 @@ in a flexible and efficient manner, where **``q``** ``in R^n`` is a vector of ``
 
 The ability of dNami to clearly separate the problem statement from its numerical implementation (often a major time sink in research laboratories) is rooted in the flexibility of the Python language so as to let the user define her/his own system of balance laws in the most natural way (i.e. using a human-readable syntax), which is then interpreted in Fortran to build a computationally-efficient library of the equation above which is callable from Python. Users can then easily interact with their own system of balance laws, including at runtime, thereby making it possible to integrate solutions to the equation above with other tools and libraries (e.g. optimisation and stability tools) to fully explore the properties of the system, seamlessly from small to large-scale calculations.
 
-## Citing the code
 
-If you use **dNami** for a scientific publication, please cite it using the [Zenodo reference](https://zenodo.org/record/6720593):
-
-Bibtex:
-
-```
-@software{alferez_nicolas_2022_6720593,
-	author       = {Alferez, Nicolas and Touber, Emile and Winn, Stephen and Ali, Yussuf},
-	title        = {{dNami: a framework for solving systems of balance laws using explicit numerical schemes on structured meshes}},
-	month        = jun,
-	year         = 2022,
-	publisher    = {Zenodo},
-	version      = 2,
-	doi          = {10.5281/zenodo.6720593},
-	url          = {https://doi.org/10.5281/zenodo.6720593}
-} 
-```
 
 ## Dependencies
 
@@ -88,7 +71,7 @@ Build the documentation by changing into the doc directory and executing the fol
 ```bash
 make html
 ```
-After building the documentation the *_build/html* directory should contain the index.html startpage.
+After building the documentation the ``_build/html`` directory should contain the ``index.html`` startpage.
 
 
 ## Community guidelines 
@@ -100,8 +83,8 @@ We look forward to seeing dNami used to solve problems from many different field
 
 ### Extending the documentation
 
-If you want to add additional content to the documentation, add/edit *.rst* files in the *doc/usage*
-directory and also update *doc/index.rst* (if necessary). 
+If you want to add additional content to the documentation, add/edit ``.rst`` files in the ``doc/usage``
+directory and also update ``doc/index.rst`` (if necessary). 
 
 ### Issues and support  
 
