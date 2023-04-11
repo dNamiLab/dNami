@@ -12,10 +12,10 @@ Welcome to dNami's documentation!
 
    .. _earth:
    .. figure:: usage/img/earth.gif 
-      :width: 70%
+      :width: 100%
       :align: center
 
-      Animation of the atmospheric and water-height disturbance due to the Tonga volcano explosion in January 2022 computed with dNami. Check out a higher resolution version on YouTube: https://www.youtube.com/watch?v=sIivtcx1Al0
+      Animation of the atmospheric and water-height disturbance due to the Tonga volcano explosion in January 2022 computed with dNami (right) and comparison to global infra-red satellite data (left). Check out a higher resolution version on `YouTube <https://www.youtube.com/watch?v=PaGtq5KBqJg>`_.  
 
 Motivation and scope
 ====================
