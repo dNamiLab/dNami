@@ -1,5 +1,6 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6720593.svg)](https://doi.org/10.5281/zenodo.6720593)
 [![Documentation Status](https://readthedocs.org/projects/dnami/badge/?version=latest)](https://dnami.readthedocs.io/en/latest/?badge=latest)
+[![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 # dNami
 **dNami** [di:nɑ:mi:] is an open-source multi-language (Python, Fortran, C) framework for solving systems of balance laws using explicit numerical schemes on structured meshes. 
 dNami uses MPI, loop-unrolling and cache blocking techniques to speed up stencil-based operations. Spatial derivatives are constructed using a customisable finite-difference formulation. 
@@ -9,7 +10,8 @@ dNami uses MPI, loop-unrolling and cache blocking techniques to speed up stencil
 </p>
 
 <p align="center">
-	<i> Animation of the atmospheric and water-height disturbance due to the Tonga volcano explosion in January 2022 computed with dNami. Check out a higher resolution version on YouTube: https://www.youtube.com/watch?v=sIivtcx1Al0</i>
+	<i> Animation of the atmospheric and water-height disturbance due to the Tonga volcano explosion in January 2022 computed with dNami. Check out a higher resolution version on 
+<a href="https://www.youtube.com/watch?v=PaGtq5KBqJg">YouTube.</a> </i>
 </p>
 
 ## Motivation and scope
