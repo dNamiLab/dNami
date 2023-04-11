@@ -10,7 +10,7 @@ dNami uses MPI, loop-unrolling and cache blocking techniques to speed up stencil
 </p>
 
 <p align="center">
-	<i> Animation of the atmospheric and water-height disturbance due to the Tonga volcano explosion in January 2022 computed with dNami. Check out a higher resolution version on 
+	<i> Animation of the atmospheric and water-height disturbance due to the Tonga volcano explosion in January 2022 computed with dNami (right) and comparison to global infra-red satellite data (left). Check out a higher resolution version on 
 <a href="https://www.youtube.com/watch?v=PaGtq5KBqJg">YouTube.</a> </i>
 </p>
 
