@@ -15,7 +15,7 @@ GNU **gfortran** compiler).
 
    .. code-block:: bash
 
-    git clone git@github.com:dNamiLab/dNami.git
+    git clone https://github.com/dNamiLab/dNami.git
     
    By default, this will create a ``dNami`` folder containing the source code. 
 
